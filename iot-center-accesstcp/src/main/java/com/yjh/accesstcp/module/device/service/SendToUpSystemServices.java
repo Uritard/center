@@ -176,7 +176,7 @@ public class SendToUpSystemServices {
                 case "9":
                     String mapRealPath = sendToUpSystemDao.selectMapPath();
                     String fileFtpPathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute").get("content"));
-                    String filePathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative").get("content"));
+                    String filePathMap = Constant.FTP_IMAGE_RELATIVE;
                     String mapAbsPath = mapRealPath.replace(filePathMap, fileFtpPathMap);
                     String mapModelTargetPath = stationCode + mapRealPath.replace(filePathMap, "");
                     uploadFileToUpFtps(mapAbsPath, mapModelTargetPath);
@@ -292,7 +292,7 @@ public class SendToUpSystemServices {
                         for (String mapRealPath : mapRealPathList) {
                             Map<String,Object> mapInfo = new HashMap<>();
                             String fileFtpPathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute").get("content"));
-                            String filePathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative").get("content"));
+                            String filePathMap = Constant.FTP_IMAGE_RELATIVE;
                             String mapAbsPath = mapRealPath.replace(filePathMap, fileFtpPathMap);
                             String mapModelTargetPath = stationCode + mapRealPath.replace(filePathMap, "");
                             uploadFileToUpFtps(mapAbsPath, mapModelTargetPath);
@@ -437,7 +437,7 @@ public class SendToUpSystemServices {
                     List<String> mapRealPaths = sendToUpSystemDao.selectMapPathAll();
                     for (String mapRealPath:mapRealPaths) {
                         String fileFtpPathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute").get("content"));
-                        String filePathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative").get("content"));
+                        String filePathMap = Constant.FTP_IMAGE_RELATIVE;
                         String mapAbsPath = mapRealPath.replace(filePathMap, fileFtpPathMap);
                         String mapModelTargetPath = stationCode + mapRealPath.replace(filePathMap, "");
                         uploadFileToUpFtps(mapAbsPath, mapModelTargetPath);
@@ -680,9 +680,8 @@ public class SendToUpSystemServices {
 //        if ("1".equals(edgeLevel)){
 //            selectEdge = null;
 //        }
-        String presetRealImgPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content"));
         String presetImgPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content"));
-        List<Map<String, Object>> list = sendToUpSystemDao.selectDeviceModel(Constant.standardPoints(),Constant.middlegroundIds(), null, presetRealImgPath, presetImgPath);
+        List<Map<String, Object>> list = sendToUpSystemDao.selectDeviceModel(Constant.standardPoints(),Constant.middlegroundIds(), null, Constant.PRESET_REAL_IMG_PATH, presetImgPath);
         String stationName = getStationName();
         list.forEach(item->{
             item.put("station_code",stationCode);
@@ -735,7 +734,7 @@ public class SendToUpSystemServices {
             item.put("video_pos",jsonArray.toJSONString());
             if ("1".equals(edgeLevel) && Objects.nonNull(item.get("preset_img")) && Objects.nonNull(item.get("local_path"))){
                 item.put("preset_img", "/" + stationCode + item.get("preset_img"));
-                String localPath = String.valueOf(item.get("local_path")).replace(presetRealImgPath,presetImgPath);
+                String localPath = String.valueOf(item.get("local_path")).replace(Constant.PRESET_REAL_IMG_PATH,presetImgPath);
                 String targetPath = String.valueOf(item.get("preset_img"));
                 uploadFileToUpFtps(localPath, targetPath);
             }
@@ -755,7 +754,7 @@ public class SendToUpSystemServices {
         String stationCode = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "edgeId", "content");
         String stationName = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "stationName", "content");
 
-        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
         SerializeConfig serializeConfig = new SerializeConfig();
         serializeConfig.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;
@@ -764,7 +763,7 @@ public class SendToUpSystemServices {
             robotModel.setStationName(stationName);
             robotModel.setMountPatroldeviceCode("");
             if (robotModel.getPhotePath() != null){
-                robotModel.setPhotePath(robotModel.getPhotePath().replace(relativeImgMap.get("content"),absoluteImgMap.get("content")));
+                robotModel.setPhotePath(robotModel.getPhotePath().replace(Constant.FTP_IMAGE_RELATIVE,absoluteImgMap.get("content")));
             }
         }).map((Function<RobotModel, Map<String, Object>>) robotModel -> {
             JSONObject jsonObject = (JSONObject) JSON.toJSON(robotModel, serializeConfig);
@@ -988,7 +987,7 @@ public class SendToUpSystemServices {
     public String createMapModel() {
         String mapRealPath = sendToUpSystemDao.selectMapPath();
         String fileFtpPathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath").get("content"));
-        String filePathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative").get("content"));
+        String filePathMap = Constant.FTP_IMAGE_RELATIVE;
         String mapAbsPath = mapRealPath.replace(filePathMap, fileFtpPathMap);
         return mapAbsPath;
     }
@@ -1377,7 +1376,7 @@ public class SendToUpSystemServices {
                         throw new BusinessException("不存在地图文件");
                     }
                     String fileFtpPathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute").get("content"));
-                    String filePathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative").get("content"));
+                    String filePathMap = Constant.FTP_IMAGE_RELATIVE;
                     List<String> ftpFilePathList = new ArrayList<>(mapFileList.size());
                     for (String mapFilePath : mapFileList) {
                         ftpFilePathList.add(mapFilePath.replace(filePathMap, fileFtpPathMap));

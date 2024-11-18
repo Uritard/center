@@ -261,8 +261,10 @@ public class TSysParamService{
         result.put("pcmEncode", Boolean.valueOf(SysParamConfig.getSysContent("isPcmEncode")));
 
         result.put("systemName", SysParamConfig.getSysContent("stationName"));
-        result.put("logoImage", SysParamConfig.getSysContent("logoImage"));
-        result.put("loginLogoImage", SysParamConfig.getSysContent("loginLogoImage"));
+
+        result.put("logoImage", redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "logoImage"));
+        result.put("loginLogoImage", redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "loginLogoImage"));
+        result.put("iconLogoImage", redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "iconLogoImage"));
 
         result.put("serviceAddress", SysParamConfig.getSysContent("serviceAddress"));
         result.put("vocalPrintSrc", SysParamConfig.getSysContent("vocalPrintSrc"));
@@ -276,12 +278,10 @@ public class TSysParamService{
     }
     public Map<String,String > homePageInfo(){
         Map<String,String> result = Maps.newHashMap();
-        Map<String,String> systemNameMap = redisTemplate.opsForHash().entries("t_sys_param:stationName");
-        Map<String,String> logoImageMap = redisTemplate.opsForHash().entries("t_sys_param:logoImage");
-        Map<String,String> loginLogoImageMap = redisTemplate.opsForHash().entries("t_sys_param:loginLogoImage");
-        result.put("systemName",systemNameMap.get("content"));
-        result.put("logoImage",logoImageMap.get("content"));
-        result.put("loginLogoImage",loginLogoImageMap.get("content"));
+        result.put("systemName", SysParamConfig.getSysContent("stationName"));
+        result.put("logoImage", String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "logoImage")));
+        result.put("loginLogoImage", String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "loginLogoImage")));
+        result.put("iconLogoImage", String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "iconLogoImage")));
         return result;
     }
 

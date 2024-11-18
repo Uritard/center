@@ -1846,7 +1846,7 @@ public class CameraConService {
             log.info("生成文件名" + fileName);
             //保存文件地址
             String videoPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoPath", "content"));
-            String videoRealPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoRealPath", "content"));
+            String videoRealPath = Constant.VIDEO_REAL_PATH;
             createDirectory(videoPath);
             String path = videoPath + fileName;
             log.info("保存文件地址：" + path);
@@ -1888,7 +1888,7 @@ public class CameraConService {
             int lRealPlayHandle = Constant.recordLongMap.get(fileName);
             hCNetSDK.NET_DVR_StopRealPlay(lRealPlayHandle);
             String videoPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoPath", "content"));
-            String videoRealPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoRealPath", "content"));
+            String videoRealPath = Constant.VIDEO_REAL_PATH;
             String url = "chmod 777 " + videoPath + fileName;
             Runtime.getRuntime().exec(url);
             TranscodeThread transcodeThread = new TranscodeThread(videoPath, videoRealPath, fileName, Constant.WEBSOCKET_URL,
@@ -1929,7 +1929,7 @@ public class CameraConService {
             log.info("生成文件名" + fileName);
             //保存文件地址
             String videoPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoPath", "content"));
-            String videoRealPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoRealPath", "content"));
+            String videoRealPath = Constant.VIDEO_REAL_PATH;
             String path = videoPath + fileNameTemp;
             log.info("保存文件地址：" + path);
             int lUserIDLong = Constant.maps.get(String.valueOf(cameraConInfo.getRecordId()));
@@ -2257,7 +2257,7 @@ public class CameraConService {
                 //测温图片
                 if (m_strJpegWithAppenData.dwJpegPicLen > 0) {
                     String hotPic = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
-                    String hotPicshow = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
+                    String hotPicshow = Constant.RESULT_IMG_REAL_PATH;
                     String path = hotPic + newName + ".jpg";
                     log.info("hotPic地址：" + path);
                     fout = new FileOutputStream(path);
@@ -2288,7 +2288,7 @@ public class CameraConService {
                     log.info("图片获取失败错误码" + iErr);
                 }
                 String hotFir = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content"));
-                String hotFirShow = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath", "content"));
+                String hotFirShow = Constant.INFRARED_REAL_PATH;
                 //测温数据data
                 if (m_strJpegWithAppenData.dwP2PDataLen > 0) {
                     String path = hotFir + newName + ".data";
@@ -2439,9 +2439,9 @@ public class CameraConService {
             try {
 
                 String hotPic = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
-                String hotPicshow = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
+                String hotPicshow = Constant.RESULT_IMG_REAL_PATH;
                 String hotFir = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content"));
-                String hotFirShow = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath", "content"));
+                String hotFirShow = Constant.INFRARED_REAL_PATH;
                 //测温图片
                 String picPath = hotPic + newName + ".jpg";
                 log.info("hotPic地址：" + picPath);
@@ -2922,7 +2922,7 @@ public class CameraConService {
         File file = new File(path);
         String fileName = file.getName();
         fileName = fileName.substring(0, fileName.lastIndexOf("."));
-        String hotFirShow = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath", "content"));
+        String hotFirShow = Constant.INFRARED_REAL_PATH;
         path = hotFirShow + fileName + ".csv";
         log.info("cvs path:" + path);
         String temperature = "0.00";
@@ -3450,7 +3450,7 @@ public class CameraConService {
     }
 
     public String getPresetUrlPath() {
-        return (String) redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
+        return Constant.PRESET_REAL_IMG_PATH;
     }
 
     public Map<String, Object> playBackByTime(Long cameraId, String startTime, String endTime) {

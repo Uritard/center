@@ -79,14 +79,14 @@ public class OperationResultHandler implements MessageHandlerStrategy, Initializ
     }
 
     private void operationResultFileHandler(XMLBaseModel xmlBaseModel, String ftpFilePath, String confirmFilePath, Map<String, String> operationResultMap) {
-        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
 
         String todayTime = DateTimeUtil.format(new Date(), "yyyy/MM/dd");
 
         String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/" + xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
-        String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/" + xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
+        String developRelativeUrl = Constant.FTP_IMAGE_RELATIVE + "/" + todayTime + "/" + xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
         // 操作结果图片  可见光结果、红外fir、音频wav
         String[] sArray = ftpFilePath.split("/");
         String ftpFileName = sArray[sArray.length - 1];

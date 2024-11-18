@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.module.command.service;
 
+import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.commons.utils.JSONUtil;
 import com.yjh.accessrobot.module.command.dao.SysUserDao;
 import com.yjh.accessrobot.module.command.dao.TCameraRecorderDao;
@@ -82,7 +83,7 @@ public class TRobotInfoService {
     @Transactional(rollbackFor = Exception.class)
     public void saveReportData(List<RobotModel> robotModelList, String edgeNode, String type) {
 
-        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
 
         if(CollectionUtils.isEmpty(robotModelList)){
@@ -112,7 +113,7 @@ public class TRobotInfoService {
             tRobotInfo.setInferadUsername(robotModel.getInferadUsername());
             tRobotInfo.setInferadPassword(robotModel.getInferadPassword());
             tRobotInfo.setPhotePath(StringUtils.isBlank(robotModel.getPhotePath()) ? robotModel.getPhotePath() :
-                robotModel.getPhotePath().replace(absoluteImgMap.get("content"), relativeImgMap.get("content")));
+                robotModel.getPhotePath().replace(absoluteImgMap.get("content"), Constant.FTP_IMAGE_RELATIVE));
             tRobotInfo.setCreateBy(robotModel.getCreateBy());
             tRobotInfo.setCreateDate(robotModel.getCreateDate());
             tRobotInfo.setUpdateBy(robotModel.getUpdateBy());

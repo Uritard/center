@@ -976,13 +976,12 @@ public class NonhomologousWarnThread implements Runnable{
             HashOperations<String, String, String> operations = redisTemplate.opsForHash();
             Map<String,String> map = operations.entries("t_sys_param:prefixAbsolutePath");
             String absPath = map.get("content");
-            Map<String,String> entries = operations.entries("t_sys_param:prefixRelativePath");
-            String relPath = entries.get("content");
+            String relPath = Constant.PREFIX_RELATIVE_PATH;
             if (StringUtils.startsWithAny(analyseResultImg, absPath, relPath)) {
                 resultImage = flag ? analyseResultImg.replace(absPath, relPath) : analyseResultImg.replace(relPath, absPath);
             } else {
                 String filePath = operations.get("t_sys_param:fileAbsPath", "content");
-                String fileUrl = operations.get("t_sys_param:fileRealPath", "content");
+                String fileUrl = Constant.FILE_REAL_PATH;
                 assert fileUrl != null; assert filePath != null;
                 resultImage = flag ? analyseResultImg.replace(filePath, fileUrl) : analyseResultImg.replace(fileUrl, filePath);
             }

@@ -784,9 +784,9 @@ public class UPatrolResultService {
     }
 
     public List dataTxtFileToList(String filePath) {
-        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
-        String fileAbsolutePath = filePath.replace(String.valueOf(relativeImgMap.get("content")), String.valueOf(absoluteImgMap.get("content")));
+        String fileAbsolutePath = filePath.replace(String.valueOf(Constant.FTP_IMAGE_RELATIVE), String.valueOf(absoluteImgMap.get("content")));
         File file = new File(fileAbsolutePath);
         List resList = new ArrayList<>();
         if (file.exists()) {

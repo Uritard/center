@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.service;
 
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.module.device.entity.TDeviceTypeImg;
 import com.yjh.platform.module.device.dao.TDeviceTypeImgDao;
 
@@ -93,7 +94,7 @@ public class TDeviceTypeImgService{
         List<TDeviceTypeImg> inList = new ArrayList<>();
         colName.add("device_type");
         List<TDictBusiness> list = tDictBusinessDao.selectQuery(colName);
-        String realPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:deviceTypeImgReaPath", "content"));
+        String realPath = Constant.DEVICE_TYPE_IMG_REA_PATH;
         String absPath  =  String.valueOf(redisTemplate.opsForHash().get("t_sys_param:deviceTypeImgAbsPath", "content"));
 
         for(TDictBusiness tDictBusiness : list){

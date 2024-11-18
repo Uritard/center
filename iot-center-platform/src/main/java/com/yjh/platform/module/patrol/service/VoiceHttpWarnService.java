@@ -61,7 +61,7 @@ public class VoiceHttpWarnService {
             log.error("声纹文件下载失败", e);
         }
         String resultRealImg = filePath.replaceAll(SysParamConfig.getSysContent("resultImgPath"),
-                SysParamConfig.getSysContent("resultImgRealPath"));
+                Constant.RESULT_IMG_REAL_PATH);
         voiceInstance.setImagePath(resultRealImg);
         voiceInstance.setFilePath(filePath);
         return voiceWarnHandler(voiceInstance, voiceAlarm);

@@ -942,7 +942,7 @@ public class CameraConService {
             String parent = StringUtils.isEmpty(parentPath) ? "" : parentPath + "/";
             String filePathTem = parent + cameraId + "_" + DateUtil.format(new Date(), DatePattern.PURE_DATETIME_MS_FORMAT) + ran + ".jpg";
             String captureResultPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
-            String capturePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
+            String capturePath = Constant.RESULT_IMG_REAL_PATH;
             filePathTem = StringUtils.stripStart(filePathTem, "/\\");
             filePath = CommonUtils.concatPath(captureResultPath, filePathTem);
             urlPath = CommonUtils.concatPath(capturePath, filePathTem);
@@ -950,7 +950,7 @@ public class CameraConService {
             // 图片物理路径前缀
             String absPrePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content"));
             // 图片网络路径前缀
-            String urlPrePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:prefixRelativePath", "content"));
+            String urlPrePath = Constant.PREFIX_RELATIVE_PATH;
             urlPath = StringUtils.replace(absolutePath, absPrePath, urlPrePath);
         }
         log.info("filePath: {}, urlPath: {}", filePath, urlPath);
@@ -1072,10 +1072,6 @@ public class CameraConService {
 
     public String getPresetBasePath() {
         return (String)redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content");
-    }
-
-    public String getPresetUrlPath() {
-        return (String)redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
     }
 
     @Scheduled(cron = "0 0 */6 * * ?")
@@ -1465,9 +1461,9 @@ public class CameraConService {
             String parentPath = StringUtils.defaultString(parentDir);
             IInfraredService iInfraredService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IInfraredService.class);
             String hotPic = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
-            String hotPicShow = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
+            String hotPicShow = Constant.RESULT_IMG_REAL_PATH;
             String hotFir = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content"));
-            String hotFirShow = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath", "content"));
+            String hotFirShow = Constant.INFRARED_REAL_PATH;
             Boolean flag = Boolean.valueOf(redisTemplate.opsForHash().get("t_sys_param:isWatermarkToInfrared", "content").toString());
             Boolean infraredAnalysis = Boolean.valueOf(redisTemplate.opsForHash().get("t_sys_param:isInfraredAnalysis", "content").toString());
             PicPlayEntity build = PicPlayEntity.builder()
@@ -1974,7 +1970,7 @@ public class CameraConService {
          */
 
         String csvRedisPath  = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content"));
-        String picRedisPath  = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
+        String picRedisPath  = Constant.RESULT_IMG_REAL_PATH;
 
         String csvPath = picPath.replace(picRedisPath,csvRedisPath).replace("jpg","csv");
 
@@ -2077,7 +2073,6 @@ public class CameraConService {
             return null;
         }
         String videoPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoPath", "content"));
-        String videoRealPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoRealPath", "content"));
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
         RecordCtrlEntity entity = RecordCtrlEntity.builder()
                 .deviceId(cameraConInfo.getDeviceChannel())
@@ -2106,7 +2101,7 @@ public class CameraConService {
         }
         Map<String, String> jasonMap = new HashMap<>(3);
         jasonMap.put("type", "recordFilePath");
-        jasonMap.put("filePath", videoRealPath + result.getData().getRecordUrl());
+        jasonMap.put("filePath", Constant.VIDEO_REAL_PATH + result.getData().getRecordUrl());
         jasonMap.put("absPath", videoPath + result.getData().getRecordUrl());
         Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
         return jasonMap;

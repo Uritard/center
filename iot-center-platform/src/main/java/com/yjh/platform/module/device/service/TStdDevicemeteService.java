@@ -609,10 +609,7 @@ public class TStdDevicemeteService{
 
     @Transactional(rollbackFor = Exception.class)
     public String createModel(){
-        Map<String,Object> mapForCreatePath  = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
-        String path = (String) mapForCreatePath.get("content");
-        Map<String,Object> mapForReturnPath  = redisTemplate.opsForHash().entries("t_sys_param:zipRealPath");
-        String returnPath = StringUtils.substringAfter((String) mapForReturnPath.get("content"), "/imgs");
+        String returnPath = StringUtils.substringAfter(Constant.ZIP_REAL_PATH, "/imgs");
 
         //        String path = "D:/code/voice";
         //        String returnPath = "D:/code/voice";

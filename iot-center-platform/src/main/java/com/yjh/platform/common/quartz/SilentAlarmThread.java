@@ -408,7 +408,7 @@ public class SilentAlarmThread implements Runnable {
 //
             if (!alarmShieldService.isShield(MapUtils.getLong(map, "device_mete_id"))) {
                 String defectResultRealImg = imageUrl.replaceAll(SysParamConfig.getSysContent("resultImgPath"),
-                        SysParamConfig.getSysContent("resultImgRealPath"));
+                        Constant.RESULT_IMG_REAL_PATH);
                 String alarmLevel = tCameraPresetService.selectAlarmLevel("defect_model", desc);
                 if (alarmLevel == null) {
                     alarmLevel = "132";
@@ -491,7 +491,7 @@ public class SilentAlarmThread implements Runnable {
                 // 目前都是识别图片 所以是5
                 xmlItem.put("file_type", "5");
                 String imgPath = tWarnInfo.getImagePath().replaceAll(
-                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content")),
+                        Constant.RESULT_IMG_REAL_PATH,
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content")));
                 String targetNamePath = imgPath.replace(
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content")), "").substring(1);

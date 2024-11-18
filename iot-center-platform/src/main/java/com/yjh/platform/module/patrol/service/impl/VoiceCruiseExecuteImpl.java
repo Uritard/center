@@ -115,9 +115,7 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
                 isok = true;
                 //文件替换
                 String absVoicePath = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:absVoicePath").get("content"));
-                String relativeVoicePath =
-                    String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:relativeVoicePath").get("content"));
-                voiceFileUrl = voiceFilePath.replace(absVoicePath, relativeVoicePath);
+                voiceFileUrl = voiceFilePath.replace(absVoicePath, Constant.RELATIVE_VOICE_PATH);
             } catch (Exception e) {
                 log.warn("声纹设备录音出错", e);
             }
