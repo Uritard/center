@@ -802,7 +802,7 @@ public class HelloController {
      */
     public String replaceResultImgPath(String analyseResultImg, boolean flag) {
         String resultImage = analyseResultImg;
-        try {3
+        try {
             HashOperations<String, String, String> operations = redisTemplate.opsForHash();
             Map<String,String> map = operations.entries("t_sys_param:prefixAbsolutePath");
             String absPath = map.get("content");
