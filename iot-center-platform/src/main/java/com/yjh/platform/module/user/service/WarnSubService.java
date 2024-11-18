@@ -38,16 +38,16 @@ public class WarnSubService {
         }
         if (StringUtils.isNotBlank(alarmLevelString)) {
             List<String> l = Arrays.asList(alarmLevelString.split(","));
-            if (l.contains(level) && SubWarnTypeEnum.DEVICE.getTypeCode().equals(type)) {
+            if (l.contains(level) && SubWarnTypeEnum.INSPECTION.getTypeCode().equals(type)) {
                 return true;
             }
         }
         WarnSub warnSub = warnSubDao.selectByUserId(userId);
         if (Objects.nonNull(warnSub) && StringUtils.isNotBlank(warnSub.getSubWarnType())) {
             List<String> subWarnTypeList = Arrays.asList(warnSub.getSubWarnType().split(","));
-            if (SubWarnTypeEnum.SYSTEM.getTypeCode().equals(type) && subWarnTypeList.contains(type)) {
+            if (SubWarnTypeEnum.DEVICE.getTypeCode().equals(type) && subWarnTypeList.contains(type)) {
                 return true;
-            } else if (SubWarnTypeEnum.DEVICE.getTypeCode().equals(type) && subWarnTypeList.contains(type) && StringUtils.isNotBlank(warnSub.getSubWarnLevel())) {
+            } else if (SubWarnTypeEnum.INSPECTION.getTypeCode().equals(type) && subWarnTypeList.contains(type) && StringUtils.isNotBlank(warnSub.getSubWarnLevel())) {
                 List<String> subWarnLevelList = Arrays.asList(warnSub.getSubWarnLevel().split(","));
                 return subWarnLevelList.contains(level);
             }
