@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.thread;
 
 import com.yjh.platform.common.utils.FileUtil;
+import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -42,15 +43,14 @@ public class SequenceThread implements Runnable {
     public void run() {
         try {
             Map<String, Object> map = uPatrolTaskService.selectForSequenceInfoByMeteId(meteId).get(0);
-            String imgPath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content")+"/"+filePath;
 
             String[] str = filePath.split("/");
             String ftpFileName = str[str.length-1];
-            String resultImagePath = redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content") + ftpFileName;
+            String resultImagePath = redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content") + "sequence/" + ftpFileName;
             log.info("算法指定的路径为：{}", resultImagePath);
 
-            log.info("imgPath:{} resultImagePath:{}",imgPath,resultImagePath);
-            FileUtil.copyFileUsingStream(imgPath, resultImagePath);
+            log.info("imgPath:{} resultImagePath:{}",filePath,resultImagePath);
+            uPatrolTaskService.downloadPicture(resultImagePath, filePath);
             Analysis analysis = new Analysis();
             analysis.setAnalyseType("6");
             analysis.setInstanceId(Long.valueOf(map.get("cfgDeviceId").toString()));

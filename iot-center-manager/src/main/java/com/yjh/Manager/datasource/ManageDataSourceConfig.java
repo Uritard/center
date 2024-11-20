@@ -1,4 +1,4 @@
-package com.yjh.Manager.datasource;
+package com.yjh.manager.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.support.http.StatViewServlet;
@@ -32,7 +32,7 @@ import java.util.*;
  * @date 2020/6/29
  */
 @Configuration
-@MapperScan(basePackages = {"com.yjh.Manager.module.dao"}, sqlSessionTemplateRef = "baseSqlSessionTemplate")
+@MapperScan(basePackages = {"com.yjh.manager.module.*.dao"}, sqlSessionTemplateRef = "baseSqlSessionTemplate")
 public class ManageDataSourceConfig {
 
     private Logger log = LoggerFactory.getLogger(ManageDataSourceConfig.class);
@@ -50,8 +50,9 @@ public class ManageDataSourceConfig {
         List filterList=new ArrayList<>();
         filterList.add(wallFilter());
         druidDataSource.setProxyFilters(filterList);
-        log.info("druidDataSource003: "+druidDataSource);
+//        log.info("password: "+ConfigTools.decrypt(publicKey, password));
 //        druidDataSource.setPassword(ConfigTools.decrypt(publicKey, password));
+//        log.info("druidDataSource002: "+druidDataSource);
         return druidDataSource;
     }
 

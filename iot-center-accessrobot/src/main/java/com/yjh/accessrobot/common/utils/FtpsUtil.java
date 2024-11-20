@@ -1,6 +1,10 @@
 package com.yjh.accessrobot.common.utils;
 
+import com.yjh.accessrobot.commons.utils.file.FileUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
@@ -8,6 +12,7 @@ import org.apache.commons.net.ftp.FTPSClient;
 
 import javax.net.ssl.*;
 import java.io.*;
+import java.nio.file.Files;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -154,7 +159,6 @@ public class FtpsUtil {
             log.error("FTPS上传文件参数有误"+e);
         }
     }
-
     public static boolean isFTPFileExist(String filePath,String host,int port,String key_pw,String username,String password) {
         try {
             FTPSClient ftpClient = null;
@@ -200,13 +204,9 @@ public class FtpsUtil {
                     ftpClient.setFileTransferMode(FTP.STREAM_TRANSFER_MODE);
 
                     // 提取绝对地址的目录以及文件名
-                    filePath = filePath.replace("ftp://"+host+":"+port+"/", "");
-                    String file = filePath.substring(filePath.lastIndexOf("/")+1);
-                    FTPFile[] list = ftpClient.listFiles(filePath);
-                    for (FTPFile ftpFile : list) {
-                        if (ftpFile.getName().equals(file)) {
-                            return true;
-                        }
+                    String[] list = ftpClient.listNames(filePath);
+                    if (ArrayUtils.isNotEmpty(list)) {
+                        return true;
                     }
 
                     // Logout
@@ -226,11 +226,83 @@ public class FtpsUtil {
         return false;
     }
 
-    public static void main(String[] args) throws NoSuchAlgorithmException {
-        String path = "D://1.jpg";
-        String fileName = "/3/1.jpg";
+    public static void downloadFile(String filepath, String remoteFilename,String host,int port,String username,String password) {
         try {
-            putFile(path, fileName, "172.24.39.150", 10012, "Yzzx220", "Yzzx@220901");
+            log.info("-------------------------------文件下载开始");
+            log.info("filepath：{}，remoteFilename：{}，host：{}，port:{},key_pw:{},username：{}，password：{}",
+                filepath,remoteFilename,host,port,key_pw,username,password);
+            try {
+                FTPSClient ftpClient = new FTPSClient("TLS",true);
+                ftpClient.setAuthValue("TLS");
+                ftpClient.connect(host, port);
+                // Connect to host
+                int reply = ftpClient.getReplyCode();
+
+                if (FTPReply.isPositiveCompletion(reply)) {
+
+                    // Login
+                    if (ftpClient.login(username, password)) {
+                        if (FTPReply.isPositiveCompletion(ftpClient.sendCommand(
+                            "OPTS UTF8", "ON"))) {
+                            // 开启服务器对UTF-8的支持，
+                            LOCAL_CHARSET = "UTF-8";
+                        }
+
+                        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+                        ftpClient.setControlEncoding(LOCAL_CHARSET);
+                        if(key_pw.equals("1")){
+                            // Set protection buffer size
+                            ftpClient.execPBSZ(0);
+                            // Set data channel protection to private
+                            ftpClient.execPROT("P");
+                            // Enter local passive mode
+                            ftpClient.enterLocalPassiveMode();
+                        }else if(key_pw.equals("2")){
+                            // Set protection buffer size
+                            ftpClient.execPBSZ(0);
+                            // Set data channel protection to private
+                            ftpClient.execPROT("P");
+                            ftpClient.enterLocalActiveMode();
+                        }
+                        ftpClient.setFileTransferMode(FTP.STREAM_TRANSFER_MODE);
+                        // Store file on host
+                        File localFile = new File(filepath);
+                        // create parent dir
+                        FileUtils.forceMkdir(localFile.getParentFile());
+                        OutputStream os = Files.newOutputStream(localFile.toPath());
+                        ftpClient.retrieveFile(remoteFilename, os);
+
+                        os.close();
+
+                        // Logout
+                        ftpClient.logout();
+                        log.info("FTPS下载文件成功");
+                    } else {
+                        log.info("FTP login failed---登录失败");
+                    }
+
+                    // Disconnect
+                    ftpClient.disconnect();
+                } else {
+                    log.info("FTP connect to host failed---连接失败");
+                }
+            } catch (IOException ioe) {
+                log.error("FTPS下载文件失败", ioe);
+            } catch (Exception e) {
+                log.error("FTPS下载文件错误", e);
+            }
+        } catch (Exception e) {
+            log.error("FTPS上传文件参数有误", e);
+        }
+    }
+
+    public static void main(String[] args) {
+        String path = "D://1.jpg";
+        String fileName = "/alarm/2000/2024/11/06/8672615a07bc432187e0cfe8d05b9be3/CCD/80233_Region2000_20241106180047.jpg";
+        try {
+            boolean flag = isFTPFileExist(fileName, "172.24.39.10", 10012, key_pw,"Yzzx220", "Yzzx@220901");
+            System.out.println("isFTPFileExist:" + flag);
         } catch (Exception e) {
             e.printStackTrace();
         }

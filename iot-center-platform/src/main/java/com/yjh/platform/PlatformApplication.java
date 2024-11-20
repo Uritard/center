@@ -31,7 +31,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.session.data.redis.config.ConfigureRedisAction;
 
 import javax.annotation.Resource;
 
@@ -109,11 +108,6 @@ public class PlatformApplication  implements CommandLineRunner {
         /*InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
         InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
         nettyClient.start(remoteAddress1, remoteAddress2, redisTemplate, analyseDataOperateService, url);*/
-    }
-
-    @Bean
-    public static ConfigureRedisAction configureRedisAction() {
-        return ConfigureRedisAction.NO_OP;
     }
 
     @Bean

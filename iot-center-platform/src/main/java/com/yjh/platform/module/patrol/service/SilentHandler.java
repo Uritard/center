@@ -1,5 +1,6 @@
 package com.yjh.platform.module.patrol.service;
 
+import com.yjh.platform.algorithm.FtpsService;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
@@ -32,6 +33,8 @@ public class SilentHandler {
     @Autowired
     private IntelAnalysisService intelAnalysisService;
     @Autowired
+    private FtpsService ftpsService;
+    @Autowired
     private TCameraPresetDao tCameraPresetDao;
 
     /**
@@ -46,15 +49,13 @@ public class SilentHandler {
         String edgeCode = silentInfo.getEdgeCode();
 
         //将图片copy到resultImg下面
-        String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
         String resultImg = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
 
         // 文件路径
-        String temporaryFilePath = ftpsFilePath + "/" + imgPath;
-        log.info("temporaryFilePath==={}", temporaryFilePath);
-        String tarPath = resultImg + "jm/" + instanceId + "_" + deviceCode + "_" + DateTimeUtil.format3(new Date()) + ".jpg";
+        log.info("temporaryFilePath==={}", imgPath);
+        String tarPath = resultImg + "jm/" + instanceId + "_" + deviceCode + "_" + DateTimeUtil.formatFilename(new Date()) + ".jpg";
 
-        FileUtil.copyFileUsingStream(temporaryFilePath,tarPath);
+        ftpsService.downloadAnalysisFile(imgPath, tarPath);
         // 调用算法接口分析结果
         List<Analysis> analysisList = new ArrayList<>();
         TCameraPreset tCameraPreset = tCameraPresetDao.selectIsDownSystemPreset(instanceId, edgeCode, Constant.standardPoints());

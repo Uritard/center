@@ -1,17 +1,14 @@
 package com.yjh.platform.module.patrol.thread;
 
 import com.alibaba.fastjson.JSON;
-import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.*;
-import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail;
-import com.yjh.platform.module.patrol.event.InspectionResultEvent;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
@@ -20,20 +17,18 @@ import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.MAP_LOCK;
@@ -356,22 +351,6 @@ public class InspectionResultThread implements Runnable{
      */
     private void simulationToolTaskHandler(String originPath, String taskId, String instanceId, String value, String filePath) {
         try {
-            // 复制图片到算法分析指定的路径
-            String ftpFileName = originPath.trim().substring(originPath.trim().lastIndexOf("/") + 1);
-            String resultImagePath = SysParamConfig.getSysContent("resultImgPath") + "/" + taskId + "/" +instanceId+"_"+ ftpFileName;
-            FileUtil.copyFileUsingStream(originPath, resultImagePath);
-
-            // 复制原图到算法分析指定的路径
-            if (StringUtils.isNotEmpty(ftpFileName) && StringUtils.isNotEmpty(value) && !ftpsTurbo()){
-                log.info("ftpFileName and value is not empty...");
-                log.info("resultImagePath=={}", resultImagePath);
-                try {
-                    uPatrolTaskService.downloadPicture(resultImagePath,filePath);
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-
             TCruisePointInstanceDetail details = uPatrolTaskService.selectForTask(Long.valueOf(instanceId));
 
             Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
@@ -380,14 +359,9 @@ public class InspectionResultThread implements Runnable{
 
             tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
             tCruiseTaskResultMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
-            if (TypeEnum.VOICE.getCode() != cruiseType) {
-                tCruiseTaskResultMap.put("origpic", resultImagePath);
-                String picPath =
-                    resultImagePath.replace(SysParamConfig.getSysContent("resultImgPath"), Constant.RESULT_IMG_REAL_PATH);
-                tCruiseTaskResultMap.put("picpath", picPath);
-            }
+
             AbstractVideoCruise abstractVideoCruise = AbstractVideoCruise.Factory.getVideoCruise(cruiseType);
-            File file = new File(resultImagePath);
+            File file = new File(originPath);
             boolean fileFound = !file.isDirectory() && file.exists();
 
             // 判断是否有配置算法
@@ -397,9 +371,9 @@ public class InspectionResultThread implements Runnable{
             log.info("algorithm:【{}】,cruiseType:【{}】,fileFound:【{}】,sysLevel:【{}】,isInterrupt:【{}】",
                     algorithm, cruiseType, fileFound, sysLevel, isInterrupt);
             // 调用算法的条件:配置了算法 + 非声纹的点 + resultImg能找到文件 + 巡视主机 + 正常的点
-            if (algorithm != null && TypeEnum.VOICE.getCode() != cruiseType && fileFound && "2".equals(sysLevel) && !isInterrupt) {
-                Map<String, String> jsonForRe = new HashMap<>();
-                jsonForRe.put("absPath", resultImagePath);
+            if (algorithm != null && TypeEnum.VOICE.getCode() != cruiseType && fileFound && Constant.isHost() && !isInterrupt) {
+                Map<String, String> jsonForRe = new HashMap<>(4);
+                jsonForRe.put("absPath", originPath);
                 String preset = analyseDataOperateDao.selectPresetIdByInstanceId(instanceId);
                 if (preset == null){
                     preset = details.getDevicePointId();
@@ -455,15 +429,6 @@ public class InspectionResultThread implements Runnable{
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-    }
-
-    /**
-     * 如果 ftpsTurbo 为 true，则表示设置了文件盘共享，不使用 ftps 对文件进行传输拷贝
-     */
-    public boolean ftpsTurbo() {
-        boolean ftpsTurbo = Boolean.parseBoolean(SysParamConfig.getSysContent("ftpsTurbo"));
-        log.warn("ftpsTurbo is {}", ftpsTurbo);
-        return ftpsTurbo;
     }
 
     public void computeEmpty(Map<String, String> map, String key, String value) {

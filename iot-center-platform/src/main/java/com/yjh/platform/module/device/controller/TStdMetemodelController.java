@@ -50,7 +50,7 @@ public class TStdMetemodelController {
     private SysUserDao sysUserDao;
     @Autowired
     private LogsRecord logsRecord;
-    private static final String LOG_URL = "http://iot-center-share/sysLog/v1/add";
+    private static final String LOG_URL = "http://iot-center-manager/sysLog/v1/add";
 
     private Logger log = LoggerFactory.getLogger(TStdMetemodelController.class);
 
