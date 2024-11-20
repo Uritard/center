@@ -1263,7 +1263,7 @@
             a.device_id = b.device_id
         where 1 = 1
           and (a.warn_type != '507' or a.warn_type is null)
-          and a.alarm_source in (279,280,281,689)
+          and a.alarm_source in (279,280,281,689,998)
           and conf_mode = 276
         group by b.up_region_id
         UNION ALL
@@ -1275,7 +1275,7 @@
             left join t_std_device b on
             a.device_id = b.device_id
         where 1 = 1
-          and a.alarm_source in (279,280,281,689)
+          and a.alarm_source in (279,280,281,689,998)
           and conf_mode = 276
         group by b.up_region_id
         UNION ALL
@@ -1339,5 +1339,23 @@
         <foreach collection="instanceIds" item="instanceId" open="(" separator="," close=")">
             #{instanceId, jdbcType=VARCHAR}
         </foreach>
+    </select>
+    <select id="selectInstanceByVoiceCode" resultType="com.yjh.platform.module.task.entity.VoiceInstance">
+        SELECT
+            b.device_id,
+            b.device_mete_id,
+            b.instance_id,
+            b.custom_id,
+            c.device_name,
+            d.mete_name,
+            a.voice_code,
+            a.voice_device_name
+        FROM
+            t_voice_device a
+                INNER JOIN t_cruise_point_instance b ON a.voice_device_id = b.cruise_id
+                LEFT JOIN t_std_device c ON c.device_id = b.device_id
+                LEFT JOIN t_std_devicemete d ON d.device_mete_id = b.device_mete_id
+        WHERE a.voice_code = #{voiceCode, jdbcType=VARCHAR}
+            LIMIT 1
     </select>
 </mapper>

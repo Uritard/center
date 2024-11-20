@@ -70,7 +70,7 @@ public class ReportManageService {
         // 明细
         List<TCruiseDataResultDetail> tCruiseDataResultDetailList =  uPatrolResultDao.selectDetail(list,startTime,endTime);
         String absPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content");
-        String relPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixRelativePath", "content");
+        String relPath = Constant.PREFIX_RELATIVE_PATH;
         // 相对路径替换绝对路径
         tCruiseDataResultDetailList.forEach(detail->{
             String resultPath = detail.getPicPath().replace(relPath, absPath);
@@ -473,7 +473,7 @@ public class ReportManageService {
         Map<KeyValue<Long, String>, List<TCruiseDataResultDetail>> listMap = new TreeMap<>(Comparator.comparing(KeyValue::getKey));
 
         String absPath = (String)redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content");
-        String relPath = (String)redisTemplate.opsForHash().get("t_sys_param:prefixRelativePath", "content");
+        String relPath = Constant.PREFIX_RELATIVE_PATH;
 
         Boolean reportGroupByStation = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:reportGroupByStation", "content"));
         // 相对路径替换绝对路径

@@ -134,4 +134,27 @@
         left join t_iot_device_point b on b.iot_device_id = a.id
         where ip = #{ip} and protocol_model = 9
     </select>
+
+    <insert id="banchInsertLinkageConfig" useGeneratedKeys="true" keyProperty="id" parameterType="com.yjh.accessmeter.module.device.entity.LinkageConfig">
+        insert into linkage_config(
+            type,
+            ip,
+            remark,
+            edge_code,
+            data
+        )values
+        <foreach collection="list" separator="," item="item">
+                (
+            #{item.type, jdbcType=INTEGER},
+            #{item.ip, jdbcType=VARCHAR},
+            #{item.remark, jdbcType=VARCHAR},
+            #{item.edgeCode, jdbcType=VARCHAR},
+            #{item.data, jdbcType=VARCHAR}
+               )
+        </foreach>
+    </insert>
+
+    <delete id="deleteLinkageConfigByIp" >
+        delete from linkage_config where ip = #{ip}
+    </delete>
 </mapper>

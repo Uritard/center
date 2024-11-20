@@ -311,10 +311,8 @@ public class TCameraPresetService {
         String picPath = mapForPreset.get("content");///home/yjh_iot_center/iot-picture/presets
         Map<String, String> mapForZip = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
         String zipPath = mapForZip.get("content");///home/yjh_iot_center/iot-picture/zip
-        Map<String, String> mapForZipReal = redisTemplate.opsForHash().entries("t_sys_param:zipRealPath");
-        String zipPathReal = mapForZipReal.get("content");//http://192.168.9.40:10086/imgs/zip
 
-        String picUrl = (String) redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
+        String picUrl = Constant.PRESET_REAL_IMG_PATH;
 
         FileUtil.mkdir(zipPath);
         //判断文件大小
@@ -402,7 +400,7 @@ public class TCameraPresetService {
         } catch (Exception e) {
             log.error("复制文件错误：" + e);
         }
-        result.setData(zipPathReal + "/picture.zip");
+        result.setData(Constant.ZIP_REAL_PATH + "/picture.zip");
         return result;
     }
 
@@ -520,10 +518,6 @@ public class TCameraPresetService {
 
     public String getPresetBasePath(){
         return (String)redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content");
-    }
-
-    public String getPresetUrlPath(){
-        return (String)redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
     }
 
     public Map<String, Object> selectInstanceInfo(Long presetId) {
@@ -973,9 +967,9 @@ public class TCameraPresetService {
     public String saveImgToFtpsToCoverOriImg(String urlPath, String presetImgHttpUrl) {
         log.info("将相机采集到的图片覆盖到原预置位图片, urlPath: {}, presetImg: {}", urlPath, presetImgHttpUrl);
         try {
-            String localPath = presetImgHttpUrl.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content").toString());
-            String ftpsLocalPath = urlPath.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content").toString());
-            String romotePath = presetImgHttpUrl.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content").toString(), "");
+            String localPath = presetImgHttpUrl.replaceAll(Constant.PRESET_REAL_IMG_PATH, redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content").toString());
+            String ftpsLocalPath = urlPath.replaceAll(Constant.PRESET_REAL_IMG_PATH, redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content").toString());
+            String romotePath = presetImgHttpUrl.replaceAll(Constant.PRESET_REAL_IMG_PATH, "");
 
             FtpsUtil.putFile(ftpsLocalPath, romotePath, applicationProperties.getIntelAnalysisFtps().getIp(), applicationProperties.getIntelAnalysisFtps().getPort(),
                 applicationProperties.getIntelAnalysisFtps().getUserName(), applicationProperties.getIntelAnalysisFtps().getPassword());
@@ -1064,7 +1058,7 @@ public class TCameraPresetService {
         // /home/yjh_iot_center/iot-picture/specimens
         String presetRealImgPath = getPresetBasePath();
         // https://172.24.39.9/imgs/specimens
-        String presetImgPath = getPresetUrlPath();
+        String presetImgPath = Constant.PRESET_REAL_IMG_PATH;
 
         return toLocal ? presetImg.replaceAll(presetImgPath, presetRealImgPath) : presetImg.replaceAll(presetRealImgPath, presetImgPath);
     }

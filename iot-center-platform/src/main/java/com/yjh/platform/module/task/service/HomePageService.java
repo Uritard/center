@@ -201,6 +201,10 @@ public class HomePageService {
                     source.add(689);
                     alarmList = tWarnInfoDao.countPollOrInvadeWarnByStationOnMonth(source);
                     break;
+                case "声纹":
+                    source.add(998);
+                    alarmList = tWarnInfoDao.countPollOrInvadeWarnByStationOnMonth(source);
+                    break;
                 case "物联设备":
                     alarmList = tWarnInfoDao.countIotByStationOnMonth();
                     break;

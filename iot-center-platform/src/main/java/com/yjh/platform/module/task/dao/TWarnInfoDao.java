@@ -1,10 +1,7 @@
 package com.yjh.platform.module.task.dao;
 
 import com.yjh.platform.module.device.entity.TaskInfoBean;
-import com.yjh.platform.module.task.entity.TJContentInfoDetail;
-import com.yjh.platform.module.task.entity.TWarnInfo;
-import com.yjh.platform.module.task.entity.TWarnInfoDetail;
-import com.yjh.platform.module.task.entity.WarnStatistical;
+import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -126,4 +123,7 @@ public interface TWarnInfoDao {
     int batchUpDate(@Param(value = "list") List<Long> warnIdList, @Param("userId") String userId);
 
     List<TWarnInfo> selectCruiseInfoByTaskAndInstanceIds(@Param("taskId")String taskId, @Param("instanceIds") List<String> instanceIds);
+
+    VoiceInstance selectInstanceByVoiceCode(@Param("voiceCode") String voiceCode);
+
 }

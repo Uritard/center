@@ -410,4 +410,18 @@ public class Constant {
         }
         return "1".equals(upSystemFlag);
     }
+
+    /**
+     * 机器人巡检结果图片相对路径
+     */
+    public static final String FTP_IMAGE_RELATIVE = "/imgs/ftpImg";
+    /**
+     * 缺陷算法图片存储相对路径
+     */
+    public static final String DEFECT_RESULT_REAL_IMG = "/imgs/analyseResultImg/defect";
+    /**
+     * 预置位图片存储绝对路径
+     */
+    public static final String PRESET_REAL_IMG_PATH = "/imgs/specimens";
+
 }

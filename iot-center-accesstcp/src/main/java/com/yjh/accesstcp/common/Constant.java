@@ -432,4 +432,23 @@ public class Constant {
     public static final String T_SYS_PARAM = "t_sys_param:";
     //主站任务下发到机器人
     public static final String ROBOT_TASK_ISSUE_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
+
+    /**
+     * 机器人巡检结果图片相对路径
+     */
+    public static final String FTP_IMAGE_RELATIVE = "/imgs/ftpImg";
+
+    /**
+     * 模型文件的相对路径
+     */
+    public static final String MODEL_RELATIVE_PATH = "/files/tcpFiles";
+    /**
+     * 预置位图片存储绝对路径
+     */
+    public static final String PRESET_REAL_IMG_PATH = "/imgs/specimens";
+    /**
+     * 文件映射相对路径
+     */
+    public static final String FILE_REAL_PATH = "/files/";
+
 }

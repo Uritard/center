@@ -29,6 +29,7 @@ import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.service.TAlgorithmInfoService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -1088,7 +1089,7 @@ public class ProcessResultToUpSystem {
 
         String taskPatrolledId = getTaskPatrolledId(taskId);
         Map<String, Object> xmlItem = new HashMap<>(16);
-        xmlItem.put("task_patrolled_id", alarmSource == 689 ? "jm_" + DateTimeUtil.format3(warnTime) : taskPatrolledId);
+        xmlItem.put("task_patrolled_id", ArrayUtils.contains(new Integer[]{689, 998}, alarmSource) ? "jm_" + DateTimeUtil.format3(warnTime) : taskPatrolledId);
         xmlItem.put("device_id", deviceId);
         xmlItem.put("is_alarm", isWarn);
         xmlItem.put("confirm_people", dealPersonId);
@@ -1142,12 +1143,12 @@ public class ProcessResultToUpSystem {
         String resultImage = analyseResultImg;
         try {
             String absPath = SysParamConfig.getSysContent("prefixAbsolutePath");
-            String relPath = SysParamConfig.getSysContent("prefixRelativePath");
+            String relPath = Constant.PREFIX_RELATIVE_PATH;
             if (StringUtils.startsWithAny(analyseResultImg, absPath, relPath)) {
                 resultImage = flag ? analyseResultImg.replace(absPath, relPath) : analyseResultImg.replace(relPath, absPath);
             } else {
                 String filePath = SysParamConfig.getSysContent("fileAbsPath");
-                String fileUrl = SysParamConfig.getSysContent("fileRealPath");
+                String fileUrl = Constant.FILE_REAL_PATH;
                 assert fileUrl != null; assert filePath != null;
                 resultImage = flag ? analyseResultImg.replace(filePath, fileUrl) : analyseResultImg.replace(fileUrl, filePath);
             }

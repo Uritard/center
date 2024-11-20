@@ -62,7 +62,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
 
         // 处理数据
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
-        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
 
         String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
@@ -90,7 +90,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
 
                 String todayTime = DateTimeUtil.format(new Date(), "yyyy/MM/dd");
                 // 开发环境图片相对路径文件目录
-                String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/" + taskId + "/Road";
+                String developRelativeUrl = Constant.FTP_IMAGE_RELATIVE + "/" + todayTime + "/" + taskId + "/Road";
                 // 开发环境图片绝对路径文件目录
                 String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/" + taskId + "/Road";
                 // 将ftp服务器上的文件复制到开发环境

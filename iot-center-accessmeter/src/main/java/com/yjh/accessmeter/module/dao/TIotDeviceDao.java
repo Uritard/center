@@ -4,10 +4,7 @@
 
 package com.yjh.accessmeter.module.dao;
 
-import com.yjh.accessmeter.module.device.entity.IotDevice;
-import com.yjh.accessmeter.module.device.entity.IotDeviceData;
-import com.yjh.accessmeter.module.device.entity.IotDeviceDataEx;
-import com.yjh.accessmeter.module.device.entity.IotDevicePoint;
+import com.yjh.accessmeter.module.device.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -38,4 +35,6 @@ public interface TIotDeviceDao {
     List<IotDevice> selectAllMeter();
 
     List<IotDeviceDataEx> selectByIp(@Param("ip") String ip);
+    int banchInsertLinkageConfig(@Param("list") List<LinkageConfig> list);
+    int deleteLinkageConfigByIp(@Param("ip") String ip);
 }

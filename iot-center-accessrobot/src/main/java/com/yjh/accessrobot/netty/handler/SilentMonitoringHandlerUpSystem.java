@@ -81,11 +81,14 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
         robotService.downloadFile(targetPath, filePath);
 
         String defectResultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")),
-                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")));
+                Constant.DEFECT_RESULT_REAL_IMG);
+        //689->静默  998->声纹
+        int alarmSource = Integer.parseInt(String.valueOf(map.getOrDefault("source", "689")));
         TWarnInfo tWarnInfo = new TWarnInfo()
                 .setWarnLevel(Integer.valueOf(AlarmLevelEnum.getAlarmLevelByProtocolCode(alarmLevel).getCode()))
+                .setWarnType(alarmSource == 998 ? 501 : null)
                 .setWarnTime(DateTimeUtil.parse(time))
-                .setWarnName("静默监视告警数据")
+                .setWarnName(alarmSource == 689 ? "静默监视" : "声纹" + "告警数据")
                 .setWarnContent(content)
                 .setDeviceId(Long.valueOf(String.valueOf(map.get("device_id"))))
                 .setDeviceName(String.valueOf(map.get("device_name")))
@@ -95,7 +98,7 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
                 .setDeviceMeteName(String.valueOf(map.get("mete_name")))
                 .setConfMode(276)
                 .setDefectModel(450)
-                .setAlarmSource(689)
+                .setAlarmSource(alarmSource)
                 .setOriginId(originId)
                 .setEdgeCode(sendCode)
                 .setImagePath(defectResultRealImg);

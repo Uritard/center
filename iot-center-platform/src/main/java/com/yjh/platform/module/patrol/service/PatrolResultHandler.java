@@ -389,7 +389,6 @@ public class PatrolResultHandler {
         Map<String, String> isAlarmMap = new HashMap<>(16);
         String taskId = infoMap.get("taskId");
 
-        String ftpImageRelative = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content"));
         String ftpImageAbsolute = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content"));
         String filePathTemp = new SimpleDateFormat("yyyy/MM/dd").format(new Date()) + "/" + taskId;
         boolean isAlarm = false;
@@ -399,7 +398,7 @@ public class PatrolResultHandler {
         String descConfirmRelativeUrl = "";
 
         String developAbsoluteUrl = ftpImageAbsolute + "/" + filePathTemp;
-        String developRelativeUrl = ftpImageRelative + "/" + filePathTemp;
+        String developRelativeUrl = Constant.FTP_IMAGE_RELATIVE + "/" + filePathTemp;
 
         String[] filePathList = robotPatrolTaskResult.getFilePath().split(",");
         String[] fileTypeList = robotPatrolTaskResult.getFileType().split(",");
@@ -453,7 +452,7 @@ public class PatrolResultHandler {
                         case "3":
                             if (instance != null && instance.getCruiseType() == TypeEnum.VOICE.getCode()) {
                                 String voicePath = (String) redisTemplate.opsForHash().get("t_sys_param:absVoicePath", "content");
-                                String voiceUrl = (String) redisTemplate.opsForHash().get("t_sys_param:relativeVoicePath", "content");
+                                String voiceUrl = Constant.RELATIVE_VOICE_PATH;
                                 String timeAfterTem = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
                                 String voiceAbsPath = "/" + instance.getCruiseId() + "/1/" + timeAfterTem + "/" + fileName;
                                 descFilePath = voicePath + voiceAbsPath;
@@ -698,7 +697,7 @@ public class PatrolResultHandler {
                 if (StringUtils.isNotEmpty(firDocPath)) {
                     firDocPath = firDocPath.replaceAll(
                             String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content")),
-                            String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath", "content")));
+                            Constant.INFRARED_REAL_PATH);
                     cruiseResultMap.put("firDocPath", firDocPath);
                     File file = new File(firDocPath);
                     // 放入文件名

@@ -228,6 +228,19 @@ public class Constant {
 
     private static String ftpsFilePath;
 
+    private static String ffmpegCmd;
+
+    public static String ffmpegCmd() {
+        if (StringUtils.isEmpty(ffmpegCmd)) {
+            try {
+                ffmpegCmd = (String) redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "ffmpegCmd");
+            } catch (Exception e) {
+                ffmpegCmd = "ffmpeg.cmd";
+            }
+        }
+        return ffmpegCmd;
+    }
+
 
     public static String websocketSendMsg(String url, Map<String, String> map) {
         String result = null;
@@ -702,6 +715,59 @@ public class Constant {
     public final static Map<String,Integer> threePhaseCountMap = new ConcurrentHashMap();
 
     public final static String envKey="EnvDevice:";
+
+    /**
+     * 机器人巡检结果图片相对路径
+     */
+    public static final String FTP_IMAGE_RELATIVE = "/imgs/ftpImg";
+    /**
+     * 压缩包相对路径
+     */
+    public static final String ZIP_REAL_PATH = "/imgs/zip";
+    /**
+     * 音频文件绝对路径
+     */
+    public static final String RELATIVE_VOICE_PATH = "/files/voiceFile";
+    /**
+     * 缺陷算法图片存储相对路径
+     */
+    public static final String DEFECT_RESULT_REAL_IMG = "/imgs/analyseResultImg/defect";
+    /**
+     * 表计识别算法结果图片存储相对路径
+     */
+    public static final String METER_RESULT_REAL_IMG = "/imgs/analyseResultImg/meter";
+    /**
+     * 设备类型图片存储相对路径
+     */
+    public static final String DEVICE_TYPE_IMG_REA_PATH = "/files/deviceTypeImage";
+    /**
+     * 判别算法图片存储相对路径
+     */
+    public static final String JUDGE_RESULT_REAL_IMG = "/imgs/analyseResultImg/panbie";
+    /**
+     * 红外文件存储相对路径
+     */
+    public static final String INFRARED_REAL_PATH = "/imgs/infrared/";
+    /**
+     * 相机抓图存储相对路径
+     */
+    public static final String RESULT_IMG_REAL_PATH = "/imgs/resultImg/";
+    /**
+     * 预置位图片存储绝对路径
+     */
+    public static final String PRESET_REAL_IMG_PATH = "/imgs/specimens";
+    /**
+     * 存储相对路径前缀
+     */
+    public static final String PREFIX_RELATIVE_PATH = "/imgs/";
+    /**
+     * 文件映射相对路径
+     */
+    public static final String FILE_REAL_PATH = "/files/";
+    /**
+     * 视频录制相对路径
+     */
+    public static final String VIDEO_REAL_PATH = "/imgs/video/";
 
 }
 

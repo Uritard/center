@@ -1,17 +1,14 @@
 package com.yjh.platform.module.patrol.thread;
 
 import com.alibaba.fastjson.JSON;
-import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.*;
-import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail;
-import com.yjh.platform.module.patrol.event.InspectionResultEvent;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
@@ -20,20 +17,18 @@ import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.MAP_LOCK;

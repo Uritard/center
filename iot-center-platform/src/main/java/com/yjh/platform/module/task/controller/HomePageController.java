@@ -124,7 +124,7 @@ public class HomePageController {
         return result;
     }
 
-    @ApiOperation(value = "根据机器人(机器人巡检),监控(视频巡检),入侵(静默监视),物联设备分类查询告警")
+    @ApiOperation(value = "根据机器人(机器人巡检),监控(视频巡检),入侵(静默监视),声纹,物联设备分类查询告警")
     @RequestMapping(value = "/countAllByAlarmType", method = RequestMethod.GET)
     public Result countAllByAlarmType() {
         Result result = new Result();

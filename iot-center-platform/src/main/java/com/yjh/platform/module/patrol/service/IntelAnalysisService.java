@@ -796,7 +796,7 @@ public class IntelAnalysisService {
 
                     //基准图
                     String imageNormalUrlPath = analyseDataOperateDao.selectPresetImgByCruise(instanceId);
-                    String basePath = imageNormalUrlPath.replaceAll(SysParamConfig.getSysContent("presetRealImgPath"),
+                    String basePath = imageNormalUrlPath.replaceAll(Constant.PRESET_REAL_IMG_PATH,
                         SysParamConfig.getSysContent("presetImgPath")).replace("//", "/");
                     log.info("判别基准：{}", basePath);
 
@@ -806,7 +806,7 @@ public class IntelAnalysisService {
 
                     try {
                         String defectResultRealImg = resImageUrl.replaceAll(SysParamConfig.getSysContent("judgeResultImg"),
-                            SysParamConfig.getSysContent("judgeResultRealImg") + "/");
+                            Constant.JUDGE_RESULT_REAL_IMG + "/");
                         Map<String, Object> jasonMaps = new HashMap<>(16);
                         jasonMaps.put("type", "algorithmTest");
                         jasonMaps.put("path", defectResultRealImg);
@@ -850,7 +850,7 @@ public class IntelAnalysisService {
 
                     try {
                         String defectResultRealImg = resImageUrl.replaceAll(SysParamConfig.getSysContent("defectResultImg") + "/",
-                            SysParamConfig.getSysContent("defectResultRealImg"));
+                                Constant.DEFECT_RESULT_REAL_IMG);
                         Map<String, Object> jasonMaps = new HashMap<>(16);
                         jasonMaps.put("type", "algorithmTest");
                         jasonMaps.put("path", defectResultRealImg);
@@ -983,7 +983,7 @@ public class IntelAnalysisService {
 
                 String targetPath = copyFileFromFtps(type, resImageUrl);
                 String defectResultRealImg = targetPath.replaceAll(SysParamConfig.getSysContent("defectResultImg"),
-                    SysParamConfig.getSysContent("defectResultRealImg"));
+                        Constant.DEFECT_RESULT_REAL_IMG);
                 resultImg.add(defectResultRealImg);
             }
 
@@ -1306,7 +1306,7 @@ public class IntelAnalysisService {
                 }
                 // 目前都是识别图片 所以是5
                 xmlItem.put("file_type", "5");
-                String imgPath = tWarnInfo.getImagePath().replaceAll(SysParamConfig.getSysContent("defectResultRealImg"),
+                String imgPath = tWarnInfo.getImagePath().replaceAll(Constant.DEFECT_RESULT_REAL_IMG,
                     SysParamConfig.getSysContent("defectResultImg"));
                 String targetNamePath = imgPath.replace(SysParamConfig.getSysContent("defectResultImg"), "").substring(1);
                 String edgeId = SysParamConfig.getSysContent("edgeId");
