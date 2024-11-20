@@ -33,7 +33,7 @@ public class RedisConn {
 
     private Duration timeout = Duration.ofMillis(6000);
 
-    @Value("${spring.datasource.gateway.publicKey}")
+    @Value("${spring.datasource.accesstcp.publicKey}")
     private String publicKey;
 
     @Value("${spring.redis.password}")

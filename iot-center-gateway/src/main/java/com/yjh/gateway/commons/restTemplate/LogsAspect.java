@@ -27,7 +27,7 @@ public class LogsAspect {
 
     private static final String LOG_URL = "http://iot-center-platform/sysUser/v1/logoutGateway";
 
-    private static final String ADD_LOG = "http://iot-center-share/sysLog/v1/add";
+    private static final String ADD_LOG = "http://iot-center-manager/sysLog/v1/add";
 
 
     @LoadBalanced

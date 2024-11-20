@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.manager.module.log.dao.SysLogDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.manager.module.log.entity.SysLog">
+        <id column="log_id" jdbcType="BIGINT" property="logId" />
+        <result column="log_type" jdbcType="VARCHAR" property="logType" />
+        <result column="ip" jdbcType="VARCHAR" property="ip" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="content" jdbcType="VARCHAR" property="content" />
+        <result column="user_id" jdbcType="BIGINT" property="userId" />
+        <result column="user_name" jdbcType="VARCHAR" property="userName" />
+        <result column="request_origin" jdbcType="VARCHAR" property="requestOrigin" />
+        <result column="request_path" jdbcType="VARCHAR" property="requestPath" />
+        <result column="request_method" jdbcType="VARCHAR" property="requestMethod" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        log_id, log_type, ip, title, state, content, user_id, user_name, request_origin, request_path, request_method, create_time
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="logId" parameterType="com.yjh.manager.module.log.entity.SysLog">
+        insert into sys_logs(
+            log_id,
+            log_type,
+            ip,
+            title,
+            state,
+            content,
+            user_id,
+            user_name,
+            request_origin,
+            request_path,
+            request_method,
+            create_time
+        )values(
+                #{logId, jdbcType=BIGINT},
+                #{logType, jdbcType=VARCHAR},
+                #{ip, jdbcType=VARCHAR},
+                #{title, jdbcType=VARCHAR},
+                #{state, jdbcType=INTEGER},
+                #{content, jdbcType=VARCHAR},
+                #{userId, jdbcType=BIGINT},
+                #{userName, jdbcType=VARCHAR},
+                #{requestOrigin, jdbcType=VARCHAR},
+                #{requestPath, jdbcType=VARCHAR},
+                #{requestMethod, jdbcType=VARCHAR},
+                #{createTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from sys_logs
+                where log_id = #{logId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.manager.module.log.entity.SysLog">
+        update sys_logs a <set>
+        <if test="logId != null ">a.log_id = #{logId},</if>
+        <if test="logType != null ">a.log_type = #{logType},</if>
+        <if test="ip != null and ">a.ip = #{ip},</if>
+        <if test="title != null ">a.title = #{title},</if>
+        <if test="state != null ">a.state = #{state},</if>
+        <if test="content != null ">a.content = #{content},</if>
+        <if test="userId != null ">a.user_id = #{userId},</if>
+        <if test="userName != null">a.user_name = #{userName},</if>
+        <if test="requestOrigin != null ">a.request_origin = #{requestOrigin},</if>
+        <if test="requestPath != null ">a.request_path = #{requestPath},</if>
+        <if test="requestMethod != null ">a.request_method = #{requestMethod},</if>
+        <if test="createTime != null ">a.create_time = #{createTime},</if>
+    </set>
+            where a.log_id = #{logId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.manager.module.log.entity.SysLog">
+        select
+        a.log_id,
+        a.log_type,
+        a.ip,
+        a.title,
+        a.state,
+        a.content,
+        a.user_id,
+        a.user_name,
+        a.request_origin,
+        a.request_path,
+        a.request_method,
+        a.create_time
+        from sys_logs a
+        where 1 = 1
+            and a.log_id = #{logId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.manager.module.log.entity.SysLog" resultType="com.yjh.manager.module.log.entity.SysLog">
+        select
+        a.log_id,
+        a.log_type,
+        a.ip,
+        a.title,
+        a.state,
+        a.content,
+        a.user_id,
+        a.user_name,
+        a.request_origin,
+        a.request_path,
+        a.request_method,
+        a.create_time
+        from sys_logs a
+        where 1 = 1
+        <if test="logId != null and logId != ''"> and a.log_id = #{logId, jdbcType=BIGINT}</if>
+        <if test="logType != null and logType != ''"> and a.log_type = #{logType, jdbcType=VARCHAR}</if>
+        <if test="ip != null and ip != ''"> and a.ip = #{ip, jdbcType=VARCHAR}</if>
+        <if test="title != null and title != ''"> and a.title = #{title, jdbcType=VARCHAR}</if>
+        <if test="state != null and state != ''"> and a.state = #{state, jdbcType=INTEGER}</if>
+        <if test="content != null and content != ''"> and a.content = #{content, jdbcType=VARCHAR}</if>
+        <if test="userId != null and userId != ''"> and a.user_id = #{userId, jdbcType=BIGINT}</if>
+        <if test="userName != null and userName != ''"> and a.user_name = #{userName, jdbcType=VARCHAR}</if>
+        <if test="requestOrigin != null and requestOrigin != ''"> and a.request_origin = #{requestOrigin, jdbcType=VARCHAR}</if>
+        <if test="requestPath != null and requestPath != ''"> and a.request_path = #{requestPath, jdbcType=VARCHAR}</if>
+        <if test="requestMethod != null and requestMethod != ''"> and a.request_method = #{requestMethod, jdbcType=VARCHAR}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectByPage"  resultType="com.yjh.manager.module.log.entity.SysLogDetail">
+        select
+        a.log_id as logId,
+        a.user_name as userName,
+        a.title,
+        a.ip,
+        a.state,
+        a.log_type as logType,
+        a.content,
+        a.user_id,
+        a.create_time as createTime
+        from sys_logs a
+        where 1 = 1
+        <if test="state != null and state != ''"> and a.state = #{state, jdbcType=VARCHAR}</if>
+        <if test="title != null and title != ''"> and a.title like concat('%',#{title, jdbcType=VARCHAR},'%') </if>
+        <if test="userName != null and userName != ''"> and a.user_name like CONCAT('%',#{userName, jdbcType=VARCHAR},'%')</if>
+        <if test="logType != null and logType != ''"> and a.log_type = #{logType, jdbcType=VARCHAR}</if>
+        <if test="startTime != null and endTime != null"> and  a.create_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+         order by a.create_time desc
+    </select>
+
+    <select id="selectByPageSort"  resultType="com.yjh.manager.module.log.entity.SysLogDetail">
+        select
+        a.log_id as logId,
+        a.user_name as userName,
+        a.title,
+        a.ip,
+        a.state,
+        a.log_type as logType,
+        a.content,
+        a.user_id,
+        a.create_time as createTime
+        from sys_logs a
+        where 1 = 1
+        <if test="state != null and state != ''"> and a.state = #{state, jdbcType=VARCHAR}</if>
+        <if test="title != null and title != ''"> and a.title like concat('%',#{title, jdbcType=VARCHAR},'%') </if>
+        <if test="userName != null and userName != ''"> and a.user_name like CONCAT('%',#{userName, jdbcType=VARCHAR},'%')</if>
+        <if test="logType != null and logType != ''"> and a.log_type = #{logType, jdbcType=VARCHAR}</if>
+        <if test="startTime != null and endTime != null"> and  a.create_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="sortField == 'create_time'"> order by a.create_time ${sortOrder}</if>
+        <if test="sortField != null and sortField != 'create_time'"> order by a.${sortField} ${sortOrder},a.create_time desc</if>
+    </select>
+
+
+    <select id="selectByPageAsc"  resultType="com.yjh.manager.module.log.entity.SysLogDetail">
+        select
+        a.log_id as logId,
+        a.user_name as userName,
+        a.title,
+        a.ip,
+        a.state,
+        a.log_type as logType,
+        a.content,
+        a.user_id,
+        a.create_time as createTime
+        from sys_logs a
+        where 1 = 1
+        <if test="state != null and state != ''"> and a.state = #{state, jdbcType=VARCHAR}</if>
+        <if test="title != null and title != ''"> and a.title like concat('%',#{title, jdbcType=VARCHAR},'%') </if>
+        <if test="userName != null and userName != ''"> and a.user_name like CONCAT('%',#{userName, jdbcType=VARCHAR},'%')</if>
+        <if test="logType != null and logType != ''"> and a.log_type = #{logType, jdbcType=VARCHAR}</if>
+        <if test="startTime != null and endTime != null"> and  a.create_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        order by a.create_time Asc
+    </select>
+
+    <insert id="batchInsert">
+        insert into sys_logs(
+            log_id,
+            log_type,
+            ip,
+            title,
+            state,
+            content,
+            user_id,
+            user_name,
+            request_origin,
+            request_path,
+            request_method,
+            create_time
+        )values
+        <foreach collection="list" item="SysLog" separator=",">
+            (
+                #{SysOperateLog.logId, jdbcType=BIGINT},
+                #{SysOperateLog.logType, jdbcType=VARCHAR},
+                #{SysOperateLog.ip, jdbcType=VARCHAR},
+                #{SysOperateLog.title, jdbcType=VARCHAR},
+                #{SysOperateLog.state, jdbcType=INTEGER},
+                #{SysOperateLog.content, jdbcType=VARCHAR},
+                #{SysOperateLog.userId, jdbcType=BIGINT},
+                #{SysOperateLog.userName, jdbcType=VARCHAR},
+                #{SysOperateLog.requestOrigin, jdbcType=VARCHAR},
+                #{SysOperateLog.requestPath, jdbcType=VARCHAR},
+                #{SysOperateLog.requestMethod, jdbcType=VARCHAR},
+                #{SysOperateLog.createTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <select id="logAnalyze" resultType="com.yjh.manager.module.log.entity.LongAnalyseDetail">
+        SELECT
+        count(*) as count,
+                log_type
+        FROM
+            sys_logs
+            GROUP BY log_type
+    </select>
+
+
+</mapper>

@@ -1,4 +1,4 @@
-package com.yjh.Manager.common.utils;
+package com.yjh.manager.common.utils;
 
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.Enumeration;
 
 /**
- * @author tt
+ * @author
  * @ClassName:
  * @Description: 封装公共方法
  * @date 2018/5/17 14:43

@@ -14,9 +14,9 @@
         <module>iot-center-accessudp</module>
         <module>iot-center-accesstcp</module>
         <module>iot-center-platform</module>
-        <module>iot-center-share</module>
+        <!--<module>iot-center-share</module>-->
         <module>iot-center-manager</module>
-        <module>iot-center-gateway</module>
+        <!--<module>iot-center-gateway</module>-->
         <module>iot-center-accessmeter</module>
         <!-- <module>iot-center-accessvqd</module> -->
     </modules>
