@@ -120,7 +120,7 @@
             limit 1
     </select>
 
-    <select id="selectByIp" resultType="com.yjh.accessmeter.module.device.entity.IotDeviceDataEx">
+    <select id="selectByIpAndAddress" resultType="com.yjh.accessmeter.module.device.entity.IotDeviceDataEx">
         select
         a.*,
         b.id as point_id,
@@ -132,6 +132,12 @@
         b.extend
         from t_iot_device a
         left join t_iot_device_point b on b.iot_device_id = a.id
+        where ip = #{ip} and address = #{address} and protocol_model = 9
+    </select>
+    <select id="selectGatewayIdByIp" resultType="java.lang.String">
+        select distinct
+        a.address
+        from t_iot_device a
         where ip = #{ip} and protocol_model = 9
     </select>
 

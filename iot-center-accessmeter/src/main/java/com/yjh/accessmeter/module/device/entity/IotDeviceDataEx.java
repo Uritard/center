@@ -28,4 +28,6 @@ public class IotDeviceDataEx extends IotDeviceData{
     private String state;
 
     private String type;
+
+    private String extend;
 }

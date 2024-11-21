@@ -9,10 +9,9 @@ import lombok.Data;
 @Data
 public class LoginReqMsg {
 
-    private String gatewayId;
-    private String status;
-    private String name;
-    private String type;
-    private String timestamp;
-    private String version;
+    private String sn;
+    private String module;
+    private String manufacture;
+    private String algId;
+    private String checkID;
 }

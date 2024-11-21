@@ -5,12 +5,12 @@
 package com.yjh.accessmeter.module.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessmeter.common.Constant;
 import com.yjh.accessmeter.common.result.BusinessException;
 import com.yjh.accessmeter.common.result.Result;
 import com.yjh.accessmeter.common.result.ResultCodeEnum;
 import com.yjh.accessmeter.common.utils.ByteUtil;
-import com.yjh.accessmeter.common.utils.XmlUtil;
 import com.yjh.accessmeter.module.dao.TIotDeviceDao;
 import com.yjh.accessmeter.module.device.entity.IotDevice;
 import com.yjh.accessmeter.module.device.entity.IotDeviceDataEx;
@@ -21,10 +21,8 @@ import com.yjh.accessmeter.protocol.ISensorProtocol;
 import com.yjh.accessmeter.protocol.ProtocolEnum;
 import com.yjh.accessmeter.protocol.SensorProtocolFactory;
 import com.yjh.accessmeter.protocol.aigateway.info.ConfigResp;
-import com.yjh.accessmeter.protocol.aigateway.info.Data;
-import com.yjh.accessmeter.protocol.entity.EnvAction;
-import com.yjh.accessmeter.protocol.impl.EnvTerminalProtocolImpl;
-import com.yjh.accessmeter.protocol.impl.transport.TcpShortManager;
+import com.yjh.accessmeter.protocol.aigateway.info.DataInfo;
+import com.yjh.accessmeter.protocol.aigateway.info.DeviceExtend;
 import io.netty.buffer.ByteBufUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
@@ -41,6 +39,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -290,13 +289,6 @@ public class SensorCollectService {
         return hex;
     }
 
-    public void asyncResultHandler(Map<String,Object> re){
-        if (ProtocolEnum.AI_GATEWAY.getCode().equals(re.get("type"))){
-            //智能网关结果处理
-            AIGatewayResultHandler(re);
-        }
-    }
-
     public void linkageConfigSync(ConfigResp configResp,String ip){
         List<ConfigResp.LinkageListData> list = configResp.getLinkageList();
         List<LinkageConfig> linkageConfigList = new ArrayList<>();
@@ -314,27 +306,43 @@ public class SensorCollectService {
         }
     }
 
-    private void AIGatewayResultHandler(Map<String,Object> re){
-        String ip = re.get("ip").toString();
-        //根据ip查询设备
-        List<IotDeviceDataEx> list = iotDeviceDao.selectByIp(ip);
-        List<IotDeviceDataEx> resultList = new ArrayList<>();
-        list.forEach(device -> {
-            if (re.containsKey(device.getChannelNum())){
-                device.setId(null);
-                //建设备的时候 一对一 例如;灯=一个device+一个devicePoint
-                device.setValue(re.get(device.getChannelNum()).toString());
-                resultList.add(device);
-            }
-        });
-        if (!resultList.isEmpty()) {
-            try {
-                iotDeviceDao.batchInsertData(resultList);
-                platformProxy.uploadToRedis(resultList);
-            } catch (Exception e) {
-                log.error("设备采集数据入库失败: {}", JSON.toJSONString(resultList), e);
-            }
+    public void aIGatewayResultHandler(DataInfo dataInfo,String ip,String gatewayId){
+        if (dataInfo != null && dataInfo.getDevices() != null && !dataInfo.getDevices().isEmpty()){
+            //数据处理 deviceid - data
+            Map<String,List<Map<String,String>>> deviceIdDataMap = dataInfo.getDevices().stream()
+                    .collect(Collectors.toMap(
+                            DataInfo.Devices::getDeviceId,
+                            DataInfo.Devices::getData
+                    ));
+            //根据ip查询设备
+            List<IotDeviceDataEx> list = iotDeviceDao.selectByIpAndAddress(ip,gatewayId);
+            List<IotDeviceDataEx> resultList = new ArrayList<>();
+            list.forEach(device -> {
+                if (deviceIdDataMap.containsKey(device.getChannelNum())){
+                    device.setId(null);
+                    DeviceExtend deviceExtend = JSONObject.parseObject(device.getExtend(), DeviceExtend.class);
+                    AtomicReference<String> value = new AtomicReference<>("");
+                    deviceIdDataMap.get(device.getChannelNum()).forEach(map ->{
+                        if (map.containsKey(deviceExtend.getValue())){
+                            value.set(map.get(device.getExtend()));
+                        }
+                    });
+                    if (!value.get().isEmpty()){
+                        device.setValue(value.get());
+                        resultList.add(device);
+                    }
+                }
+            });
+            if (!resultList.isEmpty()) {
+                try {
+                    iotDeviceDao.batchInsertData(resultList);
+                    platformProxy.uploadToRedis(resultList);
+                } catch (Exception e) {
+                    log.error("设备采集数据入库失败: {}", JSON.toJSONString(resultList), e);
+                }
 
+            }
         }
+
     }
 }
