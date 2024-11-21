@@ -12,8 +12,9 @@ public interface Topic {
     /**
      * 网关注册
      */
-    public final static String GATEWAY_ATTACH = "/gateway/gatewayAttach";
-    public final static String GATEWAY_ATTACH_ACK = "/gateway/${gatewayId}/gatewayAttachAck";
+    public final static String GATEWAY_ATTACH = "/v1/edge/access";
+    //  /v1/edge/{manufacture}/{module}/{sn}
+    public final static String GATEWAY_ATTACH_ACK = "/v1/edge/%d/%d/%d";
 
     /**
      * 心跳
@@ -28,14 +29,17 @@ public interface Topic {
 
     /**
      * 实时数据
+     * /v1/devices/{gatewayId}/datas
      */
-    public final static String DATA = "/gateway/%s/data";
+
+    public final static String DATA = "/v1/devices/%s/datas";
 
     /**
      * 遥控
+     *  /v1/devices/{gatewayId}/command
      */
-    public final static String COMMAND = "/gateway/%s/command";
-    public final static String COMMAND_ACk = "/gateway/${gatewayId}/commandAck";
+    public final static String COMMAND = "/v1/devices/%s/command";
+    public final static String COMMAND_ACk = "/v1/devices/%s/commandResponse";
 
 
     /**

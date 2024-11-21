@@ -13,8 +13,8 @@ import com.yjh.accessmeter.protocol.ProtocolListener;
 import com.yjh.accessmeter.protocol.ProtocolType;
 import com.yjh.accessmeter.protocol.aigateway.info.ConfigResp;
 import com.yjh.accessmeter.protocol.aigateway.info.ControlReq;
-import com.yjh.accessmeter.protocol.aigateway.info.Data;
-import com.yjh.accessmeter.protocol.aigateway.info.LoginReqMsg;
+import com.yjh.accessmeter.protocol.aigateway.info.DataInfo;
+import com.yjh.accessmeter.protocol.aigateway.info.DeviceExtend;
 import com.yjh.accessmeter.protocol.aigateway.topic.Topic;
 import com.yjh.accessmeter.protocol.entity.ResultMete;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +38,7 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
     private static Map<String, MqttClient> mqttClientMap = new HashMap<>();
     private static Map<String, String> gatewayIdMap = new HashMap<>();
     private volatile boolean inited = false;
+    private static Integer midNumber = 1;
 
 
     @Override
@@ -45,7 +46,7 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
         for (IotDevice device : devices) {
             if (!mqttClientMap.containsKey(device.getIp())) {
                 try {
-                    log.info("{}开始注册mqtt",device.getDeviceName());
+                    log.info("{}开始注册mqtt",device);
                     //注册
                     String url = "tcp://" + device.getIp() + ":" + device.getPort();
                     MqttClient client = new MqttClient(url, Topic.serverClientId, new MemoryPersistence());
@@ -70,9 +71,19 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
                         }
                     });
                     client.connect(options);
-
-                    client.subscribe(Topic.GATEWAY_ATTACH);
-                    mqttClientMap.put(device.getIp(), client);
+                    //查询注册到这个ip的网关
+                    List<String> gatewayIds = SpringBeanUtils.getBean(TIotDeviceDao.class).selectGatewayIdByIp(device.getIp());
+                    if (!gatewayIds.isEmpty()){
+                        for (String gatewayId:gatewayIds){
+                            String dataTopic = String.format(Topic.DATA,gatewayId);
+                            String unionTopic = String.format(Topic.DATA,gatewayId);
+                            client.subscribe(dataTopic);
+                            client.subscribe(unionTopic);
+                            gatewayIdMap.put(dataTopic,gatewayId);
+                            gatewayIdMap.put(unionTopic,gatewayId);
+                        }
+                    }
+                    mqttClientMap.put(device.getIp(),client);
                 } catch (Exception e) {
                     log.error("设备：{} 建立mqtt链接出错！=》{}", device, e);
                 }
@@ -84,30 +95,32 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
 
     private void msgHandler(String ip, MqttClient client, String topic, MqttMessage message) {
         try {
-            if (topic.equals(Topic.GATEWAY_ATTACH)) {
-                //注册消息
-                LoginReqMsg loginReqMsg = JSONObject.parseObject(String.valueOf(message), LoginReqMsg.class);
-                String gatewayId = loginReqMsg.getGatewayId();
-                gatewayIdMap.put(ip, gatewayId);
-                client.subscribe(String.format(Topic.DATA, gatewayId));
-                client.subscribe(String.format(Topic.CONFIG_ACK, gatewayId));
+            if (gatewayIdMap.containsKey(topic)) {
+
+                String gatewayId = gatewayIdMap.get(topic);
+                if (topic.equals(String.format(Topic.DATA,gatewayId))){
+                    //数据上报消息
+                    DataInfo dataInfo = JSONObject.parseObject(String.valueOf(message), DataInfo.class);
+                    SpringBeanUtils.getBean(SensorCollectService.class).aIGatewayResultHandler(dataInfo,ip,gatewayId);
+                }
+
             } else {
                 String gatewayId = gatewayIdMap.get(ip);
                 if (topic.equals(String.format(Topic.DATA, gatewayId))) {
                     //实时数据
-                    Data data = JSONObject.parseObject(String.valueOf(message), Data.class);
-                    log.info("实时数据：{}", data);
-                    //结果数据处理
-                    List<Data.DataInfo> list = data.getDataList().getSignal().getData();
-                    list.addAll(data.getDataList().getPulse().getData());
-                    list.addAll(data.getDataList().getPulse().getData());
+//                    Data data = JSONObject.parseObject(String.valueOf(message), Data.class);
+//                    log.info("实时数据：{}", data);
+//                    //结果数据处理
+//                    List<Data.DataInfo> list = data.getDataList().getSignal().getData();
+//                    list.addAll(data.getDataList().getPulse().getData());
+//                    list.addAll(data.getDataList().getPulse().getData());
                     Map<String, Object> re = new HashMap<>();
-                    list.forEach(dataInfo -> {
-                        re.put(dataInfo.getNodeId(), dataInfo.getValue());
-                    });
+//                    list.forEach(dataInfo -> {
+//                        re.put(dataInfo.getNodeId(), dataInfo.getValue());
+//                    });
                     re.put("type", ProtocolEnum.AI_GATEWAY.getCode());
                     re.put("ip", ip);
-                    SpringBeanUtils.getBean(SensorCollectService.class).asyncResultHandler(re);
+//                    SpringBeanUtils.getBean(SensorCollectService.class).asyncResultHandler(re);
                 } else if (topic.equals(String.format(Topic.CONFIG_ACK, gatewayId))) {
                     //联动配置列表请求
                     ConfigResp configResp = JSONObject.parseObject(String.valueOf(message), ConfigResp.class);
@@ -147,88 +160,24 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
             IotDevicePoint point = list.get(0);
             String ip = device.getIp();
             MqttClient client = mqttClientMap.get(ip);
-            String gatewayId = gatewayIdMap.get(ip);
+            String gatewayId = device.getAddress();
             String topic = String.format(Topic.COMMAND, gatewayId);
             ControlReq message = new ControlReq();
-            message.setGatewayId(gatewayId);
-            message.setType(CONTROL_TYPE);
-            ControlReq.Detail detail = new ControlReq.Detail();
-            detail.setDotName(point.getPointName());
-            detail.setNodeId(point.getChannelNum());
-            message.setDetail(detail);
-            String deviceState = String.valueOf(params.get("deviceStatus"));
-            if ("1".equals(deviceState)) {
-                deviceState = "open";
-            } else if ("2".equals(deviceState)) {
-                deviceState = "close";
-            } else {
-                result.setCode(SYSTEMERROR.getCode(), "暂不支持！");
-                return result;
-            }
-            message.setValue(deviceState);
-            message.setTimestamp(System.currentTimeMillis());
+            message.setMsgType("cloudReq");
+            message.setMid(String.valueOf(midNumber));
+            midNumber++;
+            message.setCmd("remoteControlCommand");
+            message.setDeviceId(point.getChannelNum());
+            DeviceExtend deviceExtend = JSONObject.parseObject(point.getExtend(), DeviceExtend.class);
+            Map<String,String> paras = new HashMap<>();
+            String state = params.get("deviceState").toString();//前段传来 1-开 2-关 网关要求 1-开 0-关
+            paras.put(deviceExtend.getCtrl(),"1".equals(state)?"1":"0");
+            message.setParas(paras);
             client.publish(topic, message);
         } catch (Exception e) {
             result.setCode(SYSTEMERROR.getCode(), SYSTEMERROR.getName());
             log.error("控制：{} ,参数：{} 出错", device, params, e);
         }
         return result;
-    }
-
-    public static void main(String[] args) {
-        String message = "{\n" +
-                "\t\"dataList\": {\n" +
-                "\t\t\"signal\": {\n" +
-                "\t\t\t\"data\": [\n" +
-                "\t\t\t\t{\n" +
-                "\t\t\t\t\t\"dotName\": \"comstate\",\n" +
-                "\t\t\t\t\t\"nodeId\": \"20FD29C8E4635196\",\n" +
-                "\t\t\t\t\t\"value\": 1\n" +
-                "\t\t\t\t},\n" +
-                "\t\t\t\t{\n" +
-                "\t\t\t\t\t\"dotName\": \"空调状态\",\n" +
-                "\t\t\t\t\t\"nodeId\": \"20FD29C8E4635196\",\n" +
-                "\t\t\t\t\t\"value\": 0\n" +
-                "\t\t\t\t}\n" +
-                "\t\t\t]\n" +
-                "\t\t},\n" +
-                "\t\t\"measure\": {\n" +
-                "\t\t\t\"data\": [\n" +
-                "\t\t\t\t{\n" +
-                "\t\t\t\t\t\"dotName\": \"温度\",\n" +
-                "\t\t\t\t\t\"nodeId\": \"20FD29C8E4635196\",\n" +
-                "\t\t\t\t\t\"value\": 25\n" +
-                "\t\t\t\t},\n" +
-                "\t\t\t\t{\n" +
-                "\t\t\t\t\t\"dotName\": \"湿度\",\n" +
-                "\t\t\t\t\t\"nodeId\": \"20FD29C8E4635196\",\n" +
-                "\t\t\t\t\t\"value\": 85\n" +
-                "\t\t\t\t}\n" +
-                "\t\t\t]\n" +
-                "\t\t},\n" +
-                "\t\t\"pulse\": {\n" +
-                "\t\t\t\"data\": [\n" +
-                "\t\t\t\t{\n" +
-                "\t\t\t\t\t\"dotName\": \"电能量\",\n" +
-                "\t\t\t\t\t\"nodeId\": \"20FD29C8E4635196\",\n" +
-                "\t\t\t\t\t\"value\": 10000\n" +
-                "\t\t\t\t},\n" +
-                "\t\t\t\t{\n" +
-                "\t\t\t\t\t\"dotName\": \"总功率\",\n" +
-                "\t\t\t\t\t\"nodeId\": \"20FD29C8E4635196\",\n" +
-                "\t\t\t\t\t\"value\": 10000\n" +
-                "\t\t\t\t}\n" +
-                "\t\t\t]\n" +
-                "\t\t}\n" +
-                "\t},\n" +
-                "\t\"gatewayId\": \"fd29c8e4-6351-964e-965b-e15997c8d5c95fd8\",\n" +
-                "\t\"type\": \"CMD_ REPORTDATA\",\n" +
-                "\t\"timestamp\": 1634351050367\n" +
-                "}";
-
-        Data data = JSONObject.parseObject(message, Data.class);
-        Data data1 = JSONObject.parseObject(message).toJavaObject(Data.class);
-
-        log.info("ddd=={}", data);
     }
 }

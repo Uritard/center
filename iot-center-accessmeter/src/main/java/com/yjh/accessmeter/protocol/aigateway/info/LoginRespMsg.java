@@ -9,11 +9,11 @@ import lombok.Data;
 @Data
 public class LoginRespMsg {
 
-    private String timestamp;
+//    private String timestamp;
     private String gatewayId;
-    private String type;
-    private String name;
-    private String status;
-    private String code;
-    private String msg;
+//    private String type;
+//    private String name;
+//    private String status;
+//    private String code;
+//    private String msg;
 }
