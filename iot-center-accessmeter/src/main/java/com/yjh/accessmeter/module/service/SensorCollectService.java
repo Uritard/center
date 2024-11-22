@@ -309,26 +309,42 @@ public class SensorCollectService {
     public void aIGatewayResultHandler(DataInfo dataInfo,String ip,String gatewayId){
         if (dataInfo != null && dataInfo.getDevices() != null && !dataInfo.getDevices().isEmpty()){
             //数据处理 deviceid - data
-            Map<String,List<Map<String,String>>> deviceIdDataMap = dataInfo.getDevices().stream()
-                    .collect(Collectors.toMap(
-                            DataInfo.Devices::getDeviceId,
-                            DataInfo.Devices::getData
-                    ));
+
+            Map<String, List<Map<String, String>>> deviceIdDataMap = new HashMap<>();
+            dataInfo.getDevices().forEach(data ->{
+                if (deviceIdDataMap.containsKey(data.getDeviceId())){
+                    deviceIdDataMap.get(data.getDeviceId()).addAll(data.getData());
+                } else {
+                    deviceIdDataMap.put(data.getDeviceId(),data.getData());
+                }
+            });
+
             //根据ip查询设备
             List<IotDeviceDataEx> list = iotDeviceDao.selectByIpAndAddress(ip,gatewayId);
             List<IotDeviceDataEx> resultList = new ArrayList<>();
             list.forEach(device -> {
-                if (deviceIdDataMap.containsKey(device.getChannelNum())){
+                String channel = device.getChannelNum();
+                if (channel.contains("_")){
+                    channel = channel.split("_")[0];
+                }
+                if (deviceIdDataMap.containsKey(channel)){
                     device.setId(null);
                     DeviceExtend deviceExtend = JSONObject.parseObject(device.getExtend(), DeviceExtend.class);
                     AtomicReference<String> value = new AtomicReference<>("");
-                    deviceIdDataMap.get(device.getChannelNum()).forEach(map ->{
-                        if (map.containsKey(deviceExtend.getValue())){
-                            value.set(map.get(device.getExtend()));
+                    String finalExtendValue = deviceExtend.getValue();
+                    deviceIdDataMap.get(channel).forEach(map ->{
+                        if (map.containsKey(finalExtendValue)){
+                            value.set(map.get(finalExtendValue));
                         }
                     });
                     if (!value.get().isEmpty()){
-                        device.setValue(value.get());
+                        String valueTemp = value.get();
+                        if (device.getControllable() == 1){
+                            //控制的 开关转换  前段 1-关 2-开 网关要求 1-开 0-关
+                            valueTemp = "1".equals(valueTemp) ? "2" : "1";
+                            device.setState(valueTemp);
+                        }
+                        device.setValue(valueTemp);
                         resultList.add(device);
                     }
                 }

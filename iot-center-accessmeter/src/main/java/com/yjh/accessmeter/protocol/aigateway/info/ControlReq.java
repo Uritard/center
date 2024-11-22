@@ -10,7 +10,7 @@ import java.util.Map;
  * @Date: 2024/10/22
  */
 @Data
-public class ControlReq extends MqttMessage {
+public class ControlReq {
     private String msgType;
     private String mid;
     private String serviceId;

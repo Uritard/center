@@ -21,9 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static com.yjh.accessmeter.common.result.ResultCodeEnum.SYSTEMERROR;
 import static com.yjh.accessmeter.protocol.aigateway.topic.Topic.CONTROL_TYPE;
@@ -49,7 +51,7 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
                     log.info("{}开始注册mqtt",device);
                     //注册
                     String url = "tcp://" + device.getIp() + ":" + device.getPort();
-                    MqttClient client = new MqttClient(url, Topic.serverClientId, new MemoryPersistence());
+                    MqttClient client = new MqttClient(url, Topic.serverClientId+System.currentTimeMillis(), new MemoryPersistence());
                     MqttConnectOptions options = new MqttConnectOptions();
                     options.setCleanSession(true);
                     client.setCallback(new MqttCallback() {
@@ -62,7 +64,12 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
                         @Override
                         public void messageArrived(String topic, MqttMessage mqttMessage) {
                             log.info("收到消息，topic：{}，msg:{}", topic, mqttMessage);
-                            msgHandler(device.getIp(), client, topic, mqttMessage);
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    msgHandler(device.getIp(), client, topic, mqttMessage);
+                                }
+                            }).start();
                         }
 
                         @Override
@@ -103,7 +110,6 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
                     DataInfo dataInfo = JSONObject.parseObject(String.valueOf(message), DataInfo.class);
                     SpringBeanUtils.getBean(SensorCollectService.class).aIGatewayResultHandler(dataInfo,ip,gatewayId);
                 }
-
             } else {
                 String gatewayId = gatewayIdMap.get(ip);
                 if (topic.equals(String.format(Topic.DATA, gatewayId))) {
@@ -162,18 +168,42 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
             MqttClient client = mqttClientMap.get(ip);
             String gatewayId = device.getAddress();
             String topic = String.format(Topic.COMMAND, gatewayId);
-            ControlReq message = new ControlReq();
-            message.setMsgType("cloudReq");
-            message.setMid(String.valueOf(midNumber));
+            ControlReq controlReq = new ControlReq();
+            controlReq.setMsgType("cloudReq");
+            controlReq.setMid(String.valueOf(midNumber));
             midNumber++;
-            message.setCmd("remoteControlCommand");
-            message.setDeviceId(point.getChannelNum());
+            controlReq.setCmd("remoteControlCommand");
+            controlReq.setDeviceId(point.getChannelNum());
             DeviceExtend deviceExtend = JSONObject.parseObject(point.getExtend(), DeviceExtend.class);
+            String ctrlCmd = deviceExtend.getCtrl();
+            String state = params.get("deviceStatus").toString();
+            if (device.getIotDeviceType() == 856){
+                String attr = params.get("deviceAttr").toString();
+                String[] cmd = ctrlCmd.split(",");
+                //空调的话要区分控制开关 还是制冷制热
+                if ("1".equals(state) && "12".contains(attr)){
+                    ctrlCmd = cmd[1];
+                    state = "1".equals(attr)?"2":"1";
+                } else {
+                    ctrlCmd = cmd[0];
+                    state = "1".equals(state)?"1":"0";
+                }
+            } else {
+                state = "1".equals(state)?"1":"0";
+            }
             Map<String,String> paras = new HashMap<>();
-            String state = params.get("deviceState").toString();//前段传来 1-开 2-关 网关要求 1-开 0-关
-            paras.put(deviceExtend.getCtrl(),"1".equals(state)?"1":"0");
-            message.setParas(paras);
-            client.publish(topic, message);
+            //前段传来 1-开 2-关 网关要求 1-开 0-关
+            paras.put(ctrlCmd,state);
+            controlReq.setParas(paras);
+
+            MqttMessage mqttMessage = new MqttMessage();
+            //保证消息能到达一次
+            mqttMessage.setQos(1);
+            mqttMessage.setRetained(true);
+            String jsonStr = JSONObject.toJSONString(controlReq);
+            byte[] msgBytes = jsonStr.getBytes(StandardCharsets.UTF_8);
+            mqttMessage.setPayload(msgBytes);
+            client.publish(topic, mqttMessage);
         } catch (Exception e) {
             result.setCode(SYSTEMERROR.getCode(), SYSTEMERROR.getName());
             log.error("控制：{} ,参数：{} 出错", device, params, e);
