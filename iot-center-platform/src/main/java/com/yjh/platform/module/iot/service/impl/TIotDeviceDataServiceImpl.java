@@ -349,7 +349,7 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                 public Object execute(RedisOperations operations) throws DataAccessException {
                     groupData.forEach((k, v) -> {
                         Map<String, String> valMap =
-                            v.stream().collect(Collectors.toMap(IotDeviceDataEx::getChannelNum, TIotDeviceData::getValue));
+                            v.stream().collect(Collectors.toMap(IotDeviceDataEx::getChannelNum, TIotDeviceData::getValue, (e1, e2)->e1));
                         IotDeviceDataEx ex = v.get(0);
                         valMap.put("time", DateTimeUtil.format(ex.getCreateTime()));
                         if (!CommonUtils.isEmptyOrNullstr(ex.getState())) {
