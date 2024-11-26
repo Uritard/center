@@ -40,7 +40,7 @@
             device.ip,
             device.port,
             device.address,
-            device.device_id,
+            device.meter_type,
             device.up_region_name
         FROM
             t_iot_device device
