@@ -2389,7 +2389,7 @@ CREATE TABLE `u_patrol_plan_attr` (
   `instance_id` bigint(48) NOT NULL DEFAULT '0' COMMENT '巡检点实例ID',
   `instance_name` varchar(255) DEFAULT '' COMMENT '巡检点实例名称',
   `position_id` bigint(48) DEFAULT '0' COMMENT '巡检点ID(机器人上报的点位id)',
-  `position_name` varchar(50) DEFAULT '' COMMENT '巡检点名称',
+  `position_name` varchar(255) DEFAULT '' COMMENT '巡检点名称',
   `robot_id` bigint(20) DEFAULT '1' COMMENT '机器人id',
   `area_id` varchar(32) DEFAULT '' COMMENT '区域ID',
   `point_type` int(11) DEFAULT '1' COMMENT '巡检方式 1视频 2机器人 3红外 4在线监测 5SCADA 6声纹',
@@ -2684,7 +2684,7 @@ CREATE TABLE `a_interface_task_info` (
 `invalid_start_time` varchar(32) DEFAULT NULL COMMENT '不可用开始时间',
 `invalid_end_time` varchar(32) DEFAULT NULL COMMENT '不可用结束时间',
 `isenable` varchar(5) DEFAULT NULL COMMENT '是否可用 <0>: = 可用<1>: = 不可用 2 删除',
-`creator` varchar(32) DEFAULT NULL COMMENT '编制人',
+`creator` varchar(128) DEFAULT NULL COMMENT '编制人',
 `create_time` varchar(32) DEFAULT NULL COMMENT '编制时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='A接口任务信息';
 
@@ -2800,7 +2800,7 @@ CREATE TABLE `t_iot_device` (
 `address` varchar(30) DEFAULT '' COMMENT '设备地址',
 `iot_device_type` int DEFAULT '1' COMMENT '物联设备类型',
 `protocol_model` varchar(128) DEFAULT '' COMMENT '协议类型，MODBUS, RS485, DLT645',
-`device_id` bigint DEFAULT NULL COMMENT '关联设备Id',
+`meter_type` int DEFAULT NULL COMMENT '子表-0，总表-1',
 `up_region_id` bigint DEFAULT '1' COMMENT '上级区域id',
 `up_region_name` varchar(128) DEFAULT '' COMMENT '上级区域名称',
 `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
