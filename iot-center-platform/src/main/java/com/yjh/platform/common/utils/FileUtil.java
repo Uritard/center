@@ -6,7 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.name.Rename;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -15,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -271,4 +273,40 @@ public class FileUtil {
         return dir;
     }
 
+    /**
+     * 拼接文件路径，如果有重复 //，则去除一个/
+     * concatPath("/imgs", "name.jpg")          = /imgs/name.jpg
+     * concatPath("/imgs", "/name.jpg")          = /imgs/name.jpg
+     * concatPath("/imgs/", "/name.jpg")          = /imgs/name.jpg
+     * @return 拼接后路径
+     */
+    public static String concatPath(String basePath, String pathToAdd) {
+        String filePathTem = StringUtils.stripStart(pathToAdd, "/\\");
+        String baseTem = StringUtils.endsWithAny(basePath, "/", "\\") ? basePath : basePath + "/";
+        return baseTem + filePathTem;
+    }
+
+    /**
+     * 自动组装文件路径， parentPath/yyyy/MM/dd/[prefix_]yyyyMMddHHmmssSSSXXXX.extension
+     * @param parentPath 父路径
+     * @param prefix 前缀，一般是设备ID
+     * @param extension 后缀，可不带.
+     * @return 组装完成路径
+     */
+    public static String getFilePath(String parentPath, String prefix, String extension) {
+        int ran = RandomUtils.nextInt(100, 999);
+        Date now = new Date();
+
+        StringBuilder filePathTem = new StringBuilder(concatPath(parentPath, DateTimeUtil.format2(now)));
+        if (StringUtils.isNotEmpty(prefix)) {
+            filePathTem.append("/").append(prefix).append("_");
+        }
+        filePathTem.append(DateTimeUtil.formatFilename(now)).append(ran);
+        if (!StringUtils.startsWith(extension, ".")) {
+            filePathTem.append(".");
+        }
+        filePathTem.append(extension);
+
+        return filePathTem.toString();
+    }
 }

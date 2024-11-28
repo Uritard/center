@@ -4,9 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.FtpsUtil;
-import com.yjh.platform.common.utils.HttpAysncClientUtil;
+import com.yjh.platform.common.utils.*;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.task.entity.TWarnInfo;
@@ -18,7 +16,6 @@ import com.yjh.platform.module.video.entity.CameraConInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.dom4j.Document;
@@ -229,11 +226,8 @@ public class SilentAlarmThread implements Runnable {
             if (StringUtils.equalsAny(eventType, "fielddetection", "mixedTargetDetection", "anquanmao", "renyuan", "audioexception")) {
                 byte[] image = imageBuf.getBytes(StandardCharsets.ISO_8859_1);
 
-                int max = 9999, min = 1;
-                int ran = (int) (Math.random() * (max - min) + min);
-                Date now = new Date();
-                String filePathTem = "resultImg/silentTask/" + DateTimeUtil.format2(now) + "/" + cameraConInfo.getCameraId() + "_" + DateTimeUtil.formatFilename(now) + ran + ".jpg";
-                String filePath = FilenameUtils.concat(SysParamConfig.getSysContent("prefixAbsolutePath"), filePathTem);
+                String filePathTem = FileUtil.getFilePath("resultImg/silentTask/", String.valueOf(cameraConInfo.getCameraId()), "jpg");
+                String filePath = FileUtil.concatPath(SysParamConfig.getSysContent("prefixAbsolutePath"), filePathTem);
                 log.info("filePath:{}", filePath);
                 File file = new File(filePath);
                 FileUtils.writeByteArrayToFile(file, image);

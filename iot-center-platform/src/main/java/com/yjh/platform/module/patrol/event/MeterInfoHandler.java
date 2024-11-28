@@ -52,6 +52,9 @@ public class MeterInfoHandler {
     public void handleResultEvent(InspectionResultEvent event) {
         try {
             // 巡视结果
+            if (Constant.logUpLv3()) {
+                log.info("电表的数据处理: {}", event);
+            }
             if (StringUtils.isNotEmpty(event.getResult()) && StringUtils.isNotEmpty(event.getInstanceId())) {
                 String value = getNumeric(event.getResult());
                 if (StringUtils.isEmpty(value)) {
@@ -97,7 +100,6 @@ public class MeterInfoHandler {
         List<IotDeviceDataEx> list = new ArrayList<>();
         list.add(iotDeviceDataEx);
         iotDeviceDataService.addToRedis(list);
-        iotDeviceDataUpload(list);
     }
 
     public static String getNumeric(String str) {
