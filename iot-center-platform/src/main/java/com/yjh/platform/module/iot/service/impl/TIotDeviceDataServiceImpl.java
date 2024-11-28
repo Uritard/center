@@ -177,20 +177,22 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                     List<TIotDeviceData> lastList = timeGroupMap.get(DateTimeUtil.lastDay(time));
                     if (CollectionUtils.isNotEmpty(lastList)) {
                         List<TIotDeviceData> list =  lastList.stream().filter(o -> Objects.equals(o.getPointId(), key)).collect(Collectors.toList());
-                        TIotDeviceData lastData = list.get(0);
-                        if (StringUtils.isNotBlank(data.getValue()) && StringUtils.isNotBlank(lastData.getValue()) ){
-                            double num = Double.parseDouble(data.getValue()) - Double.parseDouble(lastData.getValue());
-                            TIotDeviceData realData = new TIotDeviceData()
-                                    .setPointId(data.getPointId()).setPointName(data.getPointName())
-                                    .setCreateTime(data.getCreateTime()).setUnit(data.getUnit());
-                            if (num < 0 || num > 10) {
-                                realData.setValue("0.00");
-                            } else {
-                                DecimalFormat decimalFormat = new DecimalFormat("#0.00");
-                                float nc = Objects.nonNull(data.getMagnificationCoefficient()) ? data.getMagnificationCoefficient() : 1;
-                                realData.setValue(decimalFormat.format(num * nc));
+                        if (CollectionUtils.isNotEmpty(list)) {
+                            TIotDeviceData lastData = list.get(0);
+                            if (StringUtils.isNotBlank(data.getValue()) && StringUtils.isNotBlank(lastData.getValue())) {
+                                double num = Double.parseDouble(data.getValue()) - Double.parseDouble(lastData.getValue());
+                                TIotDeviceData realData = new TIotDeviceData()
+                                        .setPointId(data.getPointId()).setPointName(data.getPointName())
+                                        .setCreateTime(data.getCreateTime()).setUnit(data.getUnit());
+                                if (num < 0 || num > 10) {
+                                    realData.setValue("0.00");
+                                } else {
+                                    DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+                                    float nc = Objects.nonNull(data.getMagnificationCoefficient()) ? data.getMagnificationCoefficient() : 1;
+                                    realData.setValue(decimalFormat.format(num * nc));
+                                }
+                                tIotDeviceList.add(realData);
                             }
-                            tIotDeviceList.add(realData);
                         }
                     }
                 });
