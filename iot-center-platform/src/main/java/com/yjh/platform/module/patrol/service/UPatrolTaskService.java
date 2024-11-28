@@ -2358,9 +2358,11 @@ public class UPatrolTaskService {
             event.setTaskId(MapUtils.getString(cruiseResultMap,"taskId"));
             event.setInstanceId(MapUtils.getString(cruiseResultMap,"devicePointId"));
             event.setResult(MapUtils.getString(cruiseResultMap,"resultNum"));
+            if (Constant.logUpLv3()) {
+                log.info("电表的数据推送: {}", event);
+            }
             eventPublisher.publishEvent(event);
         }
-
 
         patrolTaskResultHandler(Collections.singletonList(cruiseResultMap), MapUtils.getIntValue(cruiseResultMap, "cruiseResult", CRUISE_RESULT_NORMAL));
     }

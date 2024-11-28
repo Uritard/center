@@ -2,6 +2,7 @@ package com.yjh.platform.module.patrol.service;
 
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
@@ -48,11 +49,8 @@ public class VoiceHttpWarnService {
             log.info("未查到 {} 声纹设备的测点信息！", voiceAlarm.getHcCode());
             return 0;
         }
-        int max = 9999, min = 1;
-        int ran = (int) (Math.random() * (max - min) + min);
-        SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
-        String filePathTem = "/" + formatter.format(new Date()) + ran + ".wav";
-        String filePath = SysParamConfig.getSysContent("resultImgPath") + filePathTem;
+        String parentPath = FileUtil.concatPath(SysParamConfig.getSysContent("resultImgPath"), "resultImg/silentTask/");
+        String filePath = FileUtil.getFilePath(parentPath, voiceAlarm.getHcCode(), "wav");
         try {
             File file = new File(filePath);
             URL url = new URL(voiceAlarm.getRawDataUrl());
