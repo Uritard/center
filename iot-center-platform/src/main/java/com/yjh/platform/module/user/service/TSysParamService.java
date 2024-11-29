@@ -262,9 +262,9 @@ public class TSysParamService{
 
         result.put("systemName", SysParamConfig.getSysContent("stationName"));
 
-        result.put("logoImage", redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "logoImage"));
-        result.put("loginLogoImage", redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "loginLogoImage"));
-        result.put("iconLogoImage", redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "iconLogoImage"));
+        result.put("logoImage", SysParamConfig.getSysContent("logoImage"));
+        result.put("loginLogoImage", SysParamConfig.getSysContent("loginLogoImage"));
+        result.put("iconLogoImage", SysParamConfig.getSysContent("iconLogoImage"));
 
         result.put("serviceAddress", SysParamConfig.getSysContent("serviceAddress"));
         result.put("vocalPrintSrc", SysParamConfig.getSysContent("vocalPrintSrc"));
