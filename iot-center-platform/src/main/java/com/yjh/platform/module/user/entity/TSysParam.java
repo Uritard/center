@@ -48,7 +48,7 @@ public class TSysParam implements Serializable {
     @TableField(value = "param_name",updateStrategy = FieldStrategy.IGNORED)
     private String paramName;
 
-    @Length(max = 1000,message = "content长度必须小于等于1000")
+    @Length(max = 1000000,message = "content长度必须小于等于1000000")
     @ApiModelProperty(value = "参数内容")
     @TableField(value = "content",updateStrategy = FieldStrategy.IGNORED)
     private String content;
