@@ -177,6 +177,22 @@ public class TIotDeviceController {
         return result;
     }
 
+    @ApiOperation(value = "同步其他设备的联动规则")
+    @PostMapping(value = "/linkageConfigSync")
+    @Logs(title = "同步其他设备的联动规则",content = "根据用户传递的参数同步其他设备的联动规则",logType = 1)
+    public Result linkageConfigSync(@RequestParam(value = "ip", required = false) String ip) {
+        Result result = new Result();
+        try {
+            tIotDeviceService.envDeviceControl(ip);
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            log.info("同步其他设备的联动规则异常", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        }
+        return result;
+    }
+
     @ApiOperation(value = "查询其他设备的联动规则")
     @PostMapping(value = "/linkageConfigQuery")
     @Logs(title = "查询其他设备的联动规则",content = "根据用户传递的参数查询其他设备的联动规则",logType = 1)

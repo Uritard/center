@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.web.bind.annotation.*;
+import sun.awt.SunHints;
 
 import javax.annotation.Resource;
 import java.util.Map;
@@ -146,6 +147,26 @@ public class IotDeviceCollectController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("增加物联设备失败：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "同步其他设备的联动规则")
+    @PostMapping(value = "/linkageSync")
+    public Result linkageSync(@RequestBody Map<String, Object> map) {
+        log.info("同步其他设备的联动规则");
+        Result result = new Result();
+        try {
+            String ip = null;
+            if (map.get("ip") != null){
+                ip = map.get("ip").toString();
+            }
+            sensorCollectService.envDeviceControl(ip);
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            log.info("智能环境设备控制异常", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         }
         return result;
     }

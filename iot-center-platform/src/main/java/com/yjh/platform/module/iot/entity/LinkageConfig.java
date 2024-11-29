@@ -47,6 +47,6 @@ public class LinkageConfig {
      */
     private String data;
 
-    private LinkageConfigResp.LinkageListData linkageListData;
+    private LinkageConfigResp.Body linkageListData;
 
 }

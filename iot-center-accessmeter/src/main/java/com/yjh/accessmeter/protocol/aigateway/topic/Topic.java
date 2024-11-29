@@ -45,7 +45,7 @@ public interface Topic {
     /**
      * 联动列表
      */
-    public final static String CONFIG = "/gateway/%s/config";
-    public final static String CONFIG_ACK = "/gateway/%s/configAck";
+//    public final static String CONFIG = "/v1/devices/%s/command";
+//    public final static String CONFIG_ACK = "/v1/devices/%s/commandResponse";
 
 }

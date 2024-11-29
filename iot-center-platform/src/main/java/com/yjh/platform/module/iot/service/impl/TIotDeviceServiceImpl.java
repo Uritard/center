@@ -64,6 +64,7 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
     private static final String DEVICE_UPDATE = "/update?id={0}";
     private static final String DEVICE_DELETE = "/delete?id={0}";
     private static final String DEVICE_CONTROL = "/envDeviceControl";
+    private static final String DEVICE_LINKAGE_SYNC_CONTROL = "/linkageSync";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -315,10 +316,17 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
     }
 
     @Override
+    public Result envDeviceControl(String ip) {
+        Map<String,Object> param = new HashMap<>(1);
+        param.put("ip",ip);
+        return serviceRestTemplate.postForObject(Constant.SEND_IOTDEVICE_URL + DEVICE_LINKAGE_SYNC_CONTROL, param, Result.class);
+    }
+
+    @Override
     public List<LinkageConfig> selectLinkageConfig() {
         List<LinkageConfig> list = baseMapper.selectLinkageConfig();
         list.forEach(linkageConfig -> {
-            linkageConfig.setLinkageListData(JSONObject.parseObject(linkageConfig.getData(), LinkageConfigResp.LinkageListData.class));
+            linkageConfig.setLinkageListData(JSONObject.parseObject(linkageConfig.getData(), LinkageConfigResp.Body.class));
         });
         return list;
     }

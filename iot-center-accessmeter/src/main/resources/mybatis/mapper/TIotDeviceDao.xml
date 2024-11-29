@@ -35,6 +35,19 @@
         from t_iot_device
     </select>
 
+    <select id="selectDeviceByIp" resultMap="BaseResultMap">
+        select distinct
+            id,
+            ip,
+            port,
+            address,
+        protocol_model
+        from t_iot_device where 1=1
+        <if test="ip != null" >and ip =#{ip}</if>
+        <if test="protocolModel != null" >and protocol_model =#{protocolModel}</if>
+        group by address
+    </select>
+
     <select id="selectAllMeter" resultType="com.yjh.accessmeter.module.device.entity.IotDevice">
         select
         <include refid="Base_Column_List"/>
@@ -144,7 +157,7 @@
     <insert id="banchInsertLinkageConfig" useGeneratedKeys="true" keyProperty="id" parameterType="com.yjh.accessmeter.module.device.entity.LinkageConfig">
         insert into linkage_config(
             type,
-            ip,
+            address,
             remark,
             edge_code,
             data
@@ -152,7 +165,7 @@
         <foreach collection="list" separator="," item="item">
                 (
             #{item.type, jdbcType=INTEGER},
-            #{item.ip, jdbcType=VARCHAR},
+            #{item.address, jdbcType=VARCHAR},
             #{item.remark, jdbcType=VARCHAR},
             #{item.edgeCode, jdbcType=VARCHAR},
             #{item.data, jdbcType=VARCHAR}
@@ -160,7 +173,7 @@
         </foreach>
     </insert>
 
-    <delete id="deleteLinkageConfigByIp" >
-        delete from linkage_config where ip = #{ip}
+    <delete id="deleteLinkageConfigByAddress" >
+        delete from linkage_config where address = #{address}
     </delete>
 </mapper>

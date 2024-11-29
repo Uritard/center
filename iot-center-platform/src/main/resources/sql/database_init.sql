@@ -2935,7 +2935,7 @@ DROP TABLE IF EXISTS `linkage_config`;
 CREATE TABLE `linkage_config` (
  `id` int NOT NULL  AUTO_INCREMENT,
  `type` int(6) DEFAULT '0' COMMENT '设备类型 0-智能网关',
- `ip` varchar(48) DEFAULT '' COMMENT '网关ip',
+ `address` varchar(48) DEFAULT '' COMMENT '网关编码',
  `remark` varchar(48) DEFAULT '' COMMENT '备注解释',
  `edge_code` varchar(48) DEFAULT '' COMMENT '区域编码',
  `data` text COMMENT '内容',

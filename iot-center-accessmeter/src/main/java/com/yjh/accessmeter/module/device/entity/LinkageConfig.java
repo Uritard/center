@@ -35,9 +35,9 @@ public class LinkageConfig {
     private Integer type;
 
     /**
-     * 网关ip
+     * 网关地址 通过网关地址区分
      */
-    private String ip;
+    private String address;
     /**
      * 备注解释
      */
