@@ -37,5 +37,7 @@ public interface TIotDeviceDao {
     List<IotDeviceDataEx> selectByIpAndAddress(@Param("ip") String ip,@Param("address") String address);
     List<String> selectGatewayIdByIp(@Param("ip") String ip);
     int banchInsertLinkageConfig(@Param("list") List<LinkageConfig> list);
-    int deleteLinkageConfigByIp(@Param("ip") String ip);
+    int deleteLinkageConfigByAddress(@Param("address") String address);
+
+    List<IotDevice> selectDeviceByIp(@Param("ip") String ip,@Param("protocolModel") String protocolModel);
 }

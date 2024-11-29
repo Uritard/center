@@ -123,6 +123,7 @@ public class DataCollectTask implements Runnable {
         List<ResultMete> resultMetes) {
         if (CollectionUtils.isEmpty(resultMetes)) {
             log.error("未采集到任何数据， device: {}", device);
+            return;
         }
 
         IotDeviceDataEx baseData = new IotDeviceDataEx();

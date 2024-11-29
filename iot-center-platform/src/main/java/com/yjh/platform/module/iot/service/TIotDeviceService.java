@@ -21,6 +21,7 @@ public interface TIotDeviceService extends IService<TIotDevice> {
     void deviceUpload();
 
     Result envDeviceControl(Map<String, Object> map);
+    Result envDeviceControl(String ip);
 
     List<LinkageConfig> selectLinkageConfig();
 }

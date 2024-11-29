@@ -182,7 +182,7 @@ public class SensorCollectService {
         }
         log.info("更新数据采集 device:{}", device);
         delete(device);
-        return add(device, false);
+        return add(device, true);
     }
 
     public void collect(Long id) {
@@ -213,6 +213,24 @@ public class SensorCollectService {
         }
 
         return sensorProtocol.sendControl(device, map);
+    }
+
+    public void envDeviceControl(String ip) {
+        List<IotDevice> deviceList = iotDeviceDao.selectDeviceByIp(ip,ProtocolEnum.AI_GATEWAY.getCode());
+        if (deviceList.isEmpty()) {
+            log.error("没有查到设备配置 ip:{}", ip);
+            throw new BusinessException(ResultCodeEnum.CODE10005.getCode(), "没有查到设备配置");
+        }
+        Map<String,Object> param = new HashMap<>();
+        param.put("linkageType","linkageType");
+        deviceList.forEach(device -> {
+            ISensorProtocol sensorProtocol =
+                    SensorProtocolFactory.CREATE.createProtocol(ProtocolEnum.getEnum(device.getProtocolModel()));
+            if (sensorProtocol == null || !sensorProtocol.isInit()) {
+                log.error("协议不支持控制指令下发 device:{}", device);
+            }
+            sensorProtocol.sendControl(device, param);
+        });
     }
 
     public String getMeterCode(Long iotDeviceId, String channelNum, String value) {
@@ -289,21 +307,40 @@ public class SensorCollectService {
         return hex;
     }
 
-    public void linkageConfigSync(ConfigResp configResp,String ip){
-        List<ConfigResp.LinkageListData> list = configResp.getLinkageList();
-        List<LinkageConfig> linkageConfigList = new ArrayList<>();
-        list.forEach(linkageListData -> {
-            LinkageConfig config = new LinkageConfig();
-            config.setType(0);
-            config.setIp(ip);
-            config.setData(JSON.toJSONString(linkageListData));
-            linkageConfigList.add(config);
+    /**
+     * 处理联动规则上报信息
+     * @param configResp 联动规则上报信息
+     * @param address 网关地址
+     */
+    public void linkageConfigSync(ConfigResp configResp,String address,String ip){
+        ConfigResp.Body body = configResp.getBody();
+        //给body里的deviceName赋值
+        List<IotDeviceDataEx> list = iotDeviceDao.selectByIpAndAddress(ip,address);
+        Map<String,String> nodeIdToPointNameMap = new HashMap<>();
+        list.forEach(iotDeviceDataEx -> {
+            if (StringUtils.isNotEmpty(iotDeviceDataEx.getChannelNum())){
+                nodeIdToPointNameMap.put(iotDeviceDataEx.getChannelNum().split("_")[0],iotDeviceDataEx.getPointName());
+            }
         });
+        body.getConfigContent().forEach(configContent -> {
+            configContent.getTrigger().forEach(trigger -> {
+                trigger.setNodeName(nodeIdToPointNameMap.get(trigger.getNodeId()));
+            });
+            configContent.getStopDgt().forEach(trigger -> {
+                trigger.setNodeName(nodeIdToPointNameMap.get(trigger.getNodeId()));
+            });
+            configContent.getStartRly().setNodeName(nodeIdToPointNameMap.get(configContent.getStartRly().getNodeId()));
+            configContent.getStopRly().setNodeName(nodeIdToPointNameMap.get(configContent.getStopRly().getNodeId()));
+        });
+        List<LinkageConfig> linkageConfigList = new ArrayList<>();
+        LinkageConfig config = new LinkageConfig();
+        config.setType(0);
+        config.setAddress(address);
+        config.setData(JSON.toJSONString(body));
+        linkageConfigList.add(config);
         //先删除 再添加
-        iotDeviceDao.deleteLinkageConfigByIp(ip);
-        if (!linkageConfigList.isEmpty()){
-            iotDeviceDao.banchInsertLinkageConfig(linkageConfigList);
-        }
+        iotDeviceDao.deleteLinkageConfigByAddress(address);
+        iotDeviceDao.banchInsertLinkageConfig(linkageConfigList);
     }
 
     public void aIGatewayResultHandler(DataInfo dataInfo,String ip,String gatewayId){
@@ -329,22 +366,39 @@ public class SensorCollectService {
                 }
                 if (deviceIdDataMap.containsKey(channel)){
                     device.setId(null);
+                    device.setCreateTime(new Date());
                     DeviceExtend deviceExtend = JSONObject.parseObject(device.getExtend(), DeviceExtend.class);
                     AtomicReference<String> value = new AtomicReference<>("");
                     String finalExtendValue = deviceExtend.getValue();
+                    String modeValue = "";//空调制冷制热用的
+                    if (deviceExtend.getValue().contains(",")){
+                        String[] str = deviceExtend.getValue().split(",");
+                        finalExtendValue = str[0];
+                        modeValue = str[1];
+                    }
+                    String finalExtendValue1 = finalExtendValue;
+                    String finalModeValue = modeValue;
                     deviceIdDataMap.get(channel).forEach(map ->{
-                        if (map.containsKey(finalExtendValue)){
-                            value.set(map.get(finalExtendValue));
+                        if (map.containsKey(finalExtendValue1)){
+                            value.set(map.get(finalExtendValue1));
+                        }
+                        if (device.getIotDeviceType() == 856  && map.get(finalModeValue) != null){
+                            //空调制冷 制热  将模式返回的值修改为负数
+                            //0-自动 1-制冷 2-制热 3-通风 4-除湿 网管上报的
+                            //-5-自动 -4-制冷 -3-制热 -2-通风 -1-除湿 修改后的 (网关上报的值-5)
+                            Integer gatewayValue = Integer.parseInt(map.get(finalModeValue)) -5;
+                            value.set(gatewayValue.toString());
                         }
                     });
                     if (!value.get().isEmpty()){
                         String valueTemp = value.get();
-                        if (device.getControllable() == 1){
+                        if (device.getControllable() == 1 && Integer.parseInt(valueTemp) >= 0){
                             //控制的 开关转换  前段 1-关 2-开 网关要求 1-开 0-关
                             valueTemp = "1".equals(valueTemp) ? "2" : "1";
                             device.setState(valueTemp);
+                        } else {
+                            device.setValue(valueTemp);
                         }
-                        device.setValue(valueTemp);
                         resultList.add(device);
                     }
                 }
