@@ -111,8 +111,12 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
                     SpringBeanUtils.getBean(SensorCollectService.class).aIGatewayResultHandler(dataInfo,ip,gatewayId);
                 } else if (topic.equals(String.format(Topic.COMMAND_ACk,gatewayId))){
                     //联动规则
-                    ConfigResp configResp = JSONObject.parseObject(String.valueOf(message), ConfigResp.class);
-                    SpringBeanUtils.getBean(SensorCollectService.class).linkageConfigSync(configResp, gatewayId,ip);
+                    try {
+                        ConfigResp configResp = JSONObject.parseObject(String.valueOf(message), ConfigResp.class);
+                        SpringBeanUtils.getBean(SensorCollectService.class).linkageConfigSync(configResp, gatewayId, ip);
+                    }catch (Exception e){
+                        log.error("消息解析出错！不是对应的消息！ {}",message,e);
+                    }
                 }
             }
         }catch (Exception e){

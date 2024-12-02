@@ -145,8 +145,10 @@ public class SensorCollectService {
                         return v1;
                     }
                 });
-                taskScheduler.scheduleAtFixedRate(dataCollectTask,
-                        Instant.ofEpochMilli(System.currentTimeMillis() + 15000), Duration.ofMinutes(device.getCollectionFrequency()));
+                if (device.getCollectionFrequency() > 0){
+                    taskScheduler.scheduleAtFixedRate(dataCollectTask,
+                            Instant.ofEpochMilli(System.currentTimeMillis() + 15000), Duration.ofMinutes(device.getCollectionFrequency()));
+                }
             }
         } else {
             dataCollectTask.addDevice(device, collectImmediate);
