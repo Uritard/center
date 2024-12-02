@@ -23,10 +23,12 @@ import com.yjh.accessmeter.protocol.SensorProtocolFactory;
 import com.yjh.accessmeter.protocol.aigateway.info.ConfigResp;
 import com.yjh.accessmeter.protocol.aigateway.info.DataInfo;
 import com.yjh.accessmeter.protocol.aigateway.info.DeviceExtend;
+import com.yjh.accessmeter.protocol.impl.AIGatewayProtocolImpl;
 import io.netty.buffer.ByteBufUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -41,6 +43,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+
+import static com.yjh.accessmeter.protocol.ProtocolEnum.AI_GATEWAY;
 
 /**
  * <功能描述>
@@ -173,6 +177,18 @@ public class SensorCollectService {
             }
         });
         log.info("已删除数据采集 device:{}", device);
+        //删除了设备 网关设备判断要不要断开mqtt连接
+        if (AI_GATEWAY.getCode().equals(device.getProtocolModel())){
+            List<IotDeviceDataEx> list = iotDeviceDao.selectByIpAndAddress(device.getIp(),device.getAddress());
+            if (list.isEmpty() || (list.size() == 1 && Objects.equals(list.get(0).getId(), device.getId()))){
+                try {
+                    MqttClient client = AIGatewayProtocolImpl.mqttClientMap.get(device.getIp());
+                    client.disconnect();
+                }catch (Exception e){
+                    log.error("断开链接失败！设备={}",device,e);
+                }
+            }
+        }
         return deleted.get();
     }
 
@@ -218,7 +234,7 @@ public class SensorCollectService {
     }
 
     public void envDeviceControl(String ip) {
-        List<IotDevice> deviceList = iotDeviceDao.selectDeviceByIp(ip,ProtocolEnum.AI_GATEWAY.getCode());
+        List<IotDevice> deviceList = iotDeviceDao.selectDeviceByIp(ip, AI_GATEWAY.getCode());
         if (deviceList.isEmpty()) {
             log.error("没有查到设备配置 ip:{}", ip);
             throw new BusinessException(ResultCodeEnum.CODE10005.getCode(), "没有查到设备配置");
