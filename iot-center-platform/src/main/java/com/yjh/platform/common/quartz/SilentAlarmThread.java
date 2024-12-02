@@ -529,7 +529,7 @@ public class SilentAlarmThread implements Runnable {
                 return;
             }
             FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
-                    upFtpsConfig.getUserName(), upFtpsConfig.getPassword());
+                    upFtpsConfig.getUserName(), upFtpsConfig.getPassword(), upFtpsConfig.isResolveLocal());
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误: ", e);
         }

@@ -182,8 +182,9 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
             String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");
             String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
             String upSystemFtpsPassword = upSystemFtps.get("upSystemFtpsPassword");
+            boolean resolveLocal = Boolean.parseBoolean(upSystemFtps.get("upSystemFtpsResolveLocal"));
             FtpsUtil.putFile(sourcePath, targetPathName, upSystemFtpsIp, Integer.parseInt(upSystemFtpsPort),
-                    upSystemFtpsUsername, upSystemFtpsPassword);
+                    upSystemFtpsUsername, upSystemFtpsPassword, resolveLocal);
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误: ", e);
         }

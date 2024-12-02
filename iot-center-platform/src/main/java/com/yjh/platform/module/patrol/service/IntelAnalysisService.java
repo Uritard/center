@@ -1484,7 +1484,7 @@ public class IntelAnalysisService {
         try {
             if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
             FtpsUtil.putFile(sourcePath, targetPathName, ftpsConfig.getIp(), ftpsConfig.getPort()
-                    , ftpsConfig.getUserName(), ftpsConfig.getPassword());
+                    , ftpsConfig.getUserName(), ftpsConfig.getPassword(), ftpsConfig.isResolveLocal());
         } catch (Exception e) {
             log.error("将文件上传至巡视主机ftp服务器错误: ", e);
         }
@@ -1503,7 +1503,8 @@ public class IntelAnalysisService {
                 log.info("上级系统开关未开！ {}",applicationProperties.getUpSystemFtps().getFlag());
                 return;
             }
-            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(), upFtpsConfig.getUserName(), upFtpsConfig.getPassword());
+            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(), upFtpsConfig.getUserName(),
+                upFtpsConfig.getPassword(), upFtpsConfig.isResolveLocal());
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误: ", e);
         }

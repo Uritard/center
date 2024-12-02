@@ -2500,17 +2500,19 @@ public class RobotService {
                     Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("systemConfigKey:upSystem");
                     String ftpsLocalPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
                     String upSystemFtpsFlag = upSystemFtps.get("upSystemFlag");
-                    if ("0".equals(upSystemFtpsFlag)){
-                        log.info("上级系统开关未开! {}",upSystemFtpsFlag);
+                    if ("0".equals(upSystemFtpsFlag)) {
+                        log.info("上级系统开关未开! {}", upSystemFtpsFlag);
                         return;
                     }
                     String upSystemFtpsIp = upSystemFtps.get("upSystemFtpsIp");
                     String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");
                     String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
                     String upSystemFtpsPassword = upSystemFtps.get("upSystemFtpsPassword");
-                    FtpsUtil.putFile(ftpsLocalPath + "/" + localPath, targetName, upSystemFtpsIp, Integer.parseInt(upSystemFtpsPort), upSystemFtpsUsername, upSystemFtpsPassword);
+                    boolean resolveLocal = Boolean.parseBoolean(upSystemFtps.get("upSystemFtpsResolveLocal"));
+                    FtpsUtil.putFile(ftpsLocalPath + "/" + localPath, targetName, upSystemFtpsIp, Integer.parseInt(upSystemFtpsPort),
+                        upSystemFtpsUsername, upSystemFtpsPassword, resolveLocal);
                 } catch (Exception e) {
-                    log.error("上传至ftps错误 " + e);
+                    log.error("上传至ftps错误 ", e);
                 }
             }
         };
@@ -2522,13 +2524,14 @@ public class RobotService {
             if ("".equals(localPath)) {
                 return;
             }
-            Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("systemConfigKey:managerSystem");
-            String managerSystemFtpsIp = upSystemFtps.get("managerSystemFtpsIp");
-            String managerSystemFtpsPort = upSystemFtps.get("managerSystemFtpsPort");
-            String managerSystemFtpsUsername = upSystemFtps.get("managerSystemFtpsUsername");
-            String managerSystemFtpsPassword = upSystemFtps.get("managerSystemFtpsPassword");
+            Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("systemConfigKey:algorithmSystem");
+            String managerSystemFtpsIp = upSystemFtps.get("algorithmSystemFtpsIp");
+            String managerSystemFtpsPort = upSystemFtps.get("algorithmSystemFtpsPort");
+            String managerSystemFtpsUsername = upSystemFtps.get("algorithmSystemFtpsUsername");
+            String managerSystemFtpsPassword = upSystemFtps.get("algorithmSystemFtpsPassword");
+            boolean resolveLocal = Boolean.parseBoolean(upSystemFtps.get("algorithmSystemFtpsResolveLocal"));
             FtpsUtil.downloadFile(localPath, remoteFilename, managerSystemFtpsIp,
-                Integer.parseInt(managerSystemFtpsPort), managerSystemFtpsUsername, managerSystemFtpsPassword);
+                Integer.parseInt(managerSystemFtpsPort), managerSystemFtpsUsername, managerSystemFtpsPassword, resolveLocal);
         } catch (Exception e) {
             log.error("下载ftp文件s错误 " + e);
         }
