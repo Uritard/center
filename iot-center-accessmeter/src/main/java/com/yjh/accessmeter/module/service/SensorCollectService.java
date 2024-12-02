@@ -322,9 +322,11 @@ public class SensorCollectService {
                 nodeIdToPointNameMap.put(iotDeviceDataEx.getChannelNum().split("_")[0],iotDeviceDataEx.getPointName());
             }
         });
+        StringBuilder remarkBuilder = new StringBuilder();
         body.getConfigContent().forEach(configContent -> {
             configContent.getTrigger().forEach(trigger -> {
                 trigger.setNodeName(nodeIdToPointNameMap.get(trigger.getNodeId()));
+                remarkBuilder.append(trigger.getNodeName()).append(" ");
             });
             configContent.getStopDgt().forEach(trigger -> {
                 trigger.setNodeName(nodeIdToPointNameMap.get(trigger.getNodeId()));
@@ -332,6 +334,7 @@ public class SensorCollectService {
             configContent.getStartRly().setNodeName(nodeIdToPointNameMap.get(configContent.getStartRly().getNodeId()));
             configContent.getStopRly().setNodeName(nodeIdToPointNameMap.get(configContent.getStopRly().getNodeId()));
         });
+        body.setRemark(remarkBuilder.toString());
         List<LinkageConfig> linkageConfigList = new ArrayList<>();
         LinkageConfig config = new LinkageConfig();
         config.setType(0);
