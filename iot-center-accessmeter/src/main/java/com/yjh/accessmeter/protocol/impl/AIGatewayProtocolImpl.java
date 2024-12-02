@@ -37,7 +37,7 @@ import static com.yjh.accessmeter.common.result.ResultCodeEnum.SYSTEMERROR;
 @Slf4j
 @ProtocolType({ProtocolEnum.AI_GATEWAY})
 public class AIGatewayProtocolImpl implements ISensorProtocol {
-    private static Map<String, MqttClient> mqttClientMap = new HashMap<>();
+    public static Map<String, MqttClient> mqttClientMap = new HashMap<>();
     private static Map<String, String> gatewayIdMap = new HashMap<>();
     private volatile boolean inited = false;
     private static Integer midNumber = 1;
