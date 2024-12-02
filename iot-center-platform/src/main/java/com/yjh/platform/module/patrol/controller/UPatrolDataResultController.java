@@ -159,24 +159,8 @@ public class UPatrolDataResultController {
         Result result = new Result();
         try {
             DateTimeUtil.checkDate(startTime, endTime);
-            List<Long> deviceIdList = new ArrayList<>();
-            if (regionId == null){
-                //查询该regionId的子节点
-                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
-                deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
-            }else {
-                //查询该regionId的子节点
-                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
-                if (regionIdList != null && !regionIdList.isEmpty()){
-                    deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
-                }else {
-                    deviceIdList.add(regionId);
-                }
-            }
-
-            List<Map<String, Object>> cruiseResultAnalyzeInfoList = uPatrolDataResultService.exportCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName, stationName);
             String userId = request.getHeader("userId") + "_" + request.getHeader("token");
-            uPatrolDataResultService.createCruiseDataReport(userId, cruiseResultAnalyzeInfoList, typeString);
+            uPatrolDataResultService.createCruiseDataReport(userId, cType, meteType, meterType, endTime, startTime, regionId, instanceName, stationName, typeString);
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {

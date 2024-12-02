@@ -14,6 +14,7 @@ import com.yjh.platform.common.utils.*;
 import com.yjh.platform.common.utils.smUtil.report.ExportUtil;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.entity.TStdRegion;
+import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.dao.UPatrolDataResultDao;
 import com.yjh.platform.module.patrol.entity.LineKeyValue;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -53,11 +55,16 @@ public class UPatrolDataResultService {
     private TStdRegionService regionService;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Resource
+    private TStdRegionService tStdRegionService;
+    @Resource
+    private TStdDeviceService tStdDeviceService;
 
     public static final String REGION_PREFIX = "region";
 
     @Autowired
-    public UPatrolDataResultService(UPatrolDataResultDao uPatrolDataResultDao, TStdDevicemeteDao tStdDevicemeteDao, RestTemplate restTemplate) {
+    public UPatrolDataResultService(UPatrolDataResultDao uPatrolDataResultDao, TStdDevicemeteDao tStdDevicemeteDao,
+        RestTemplate restTemplate) {
         this.uPatrolDataResultDao = uPatrolDataResultDao;
         this.tStdDevicemeteDao = tStdDevicemeteDao;
     }
@@ -65,14 +72,19 @@ public class UPatrolDataResultService {
     private Logger log = LoggerFactory.getLogger(UPatrolDataResultService.class);
 
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultAnalyzeMeteInfo> selectCruiseResultAnalyze(List<Long> deviceIdList, Integer deviceType, String meteType, Integer meterType, Integer cruiseRes, Long customId,String meteName) {
+    public List<CruiseResultAnalyzeMeteInfo> selectCruiseResultAnalyze(List<Long> deviceIdList, Integer deviceType, String meteType,
+        Integer meterType, Integer cruiseRes, Long customId, String meteName) {
         List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = new ArrayList<>();
         if (deviceIdList != null && !deviceIdList.isEmpty()) {
             //cruiseRes:-1全部,1正常,0异常
             if (cruiseRes == 1) {
-                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList, deviceType, meteType, meterType, cruiseRes, customId, meteName);
+                cruiseResultAnalMeteInfoList =
+                    tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList, deviceType, meteType, meterType, cruiseRes, customId,
+                        meteName);
             } else {
-                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze2(deviceIdList, deviceType, meteType, meterType, cruiseRes, customId, meteName);
+                cruiseResultAnalMeteInfoList =
+                    tStdDevicemeteDao.selectCruiseResultAnalyze2(deviceIdList, deviceType, meteType, meterType, cruiseRes, customId,
+                        meteName);
             }
             for (CruiseResultAnalyzeMeteInfo item : cruiseResultAnalMeteInfoList) {
                 if (item.getFinalState() == 246 || item.getFinalState() == 261) {
@@ -86,16 +98,19 @@ public class UPatrolDataResultService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultAnalyzeInfo> selectCruiseDataReport(Integer cType, String meteType, Integer meterType, String endTime, String startTime, List<Long> deviceIdList, String instanceName, String stationName) {
+    public List<CruiseResultAnalyzeInfo> selectCruiseDataReport(Integer cType, String meteType, Integer meterType, String endTime,
+        String startTime, List<Long> deviceIdList, String instanceName, String stationName) {
 
-        List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName, stationName);
+        List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList =
+            uPatrolDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName,
+                stationName);
 
         for (CruiseResultAnalyzeInfo cruiseResultAnalyzeInfo : cruiseResultAnalyzeInfoList) {
             if (Objects.nonNull(cruiseResultAnalyzeInfo.getRegionId())) {
                 TStdRegion tStdRegion = regionService.getRegion(cruiseResultAnalyzeInfo.getRegionId(), new TStdRegion());
                 Long upRegionId = tStdRegion.getUpRegionId();
                 String upRegionName = regionService.getRegionName(upRegionId);
-                if (StringUtils.isNotEmpty(upRegionName)){
+                if (StringUtils.isNotEmpty(upRegionName)) {
                     cruiseResultAnalyzeInfo.setRegionName(upRegionName);
                 } else {
                     cruiseResultAnalyzeInfo.setRegionName(tStdRegion.getRegionName());
@@ -104,124 +119,129 @@ public class UPatrolDataResultService {
             cruiseResultAnalyzeInfo.setEvaluationState("257".equals(cruiseResultAnalyzeInfo.getEvaluationState()) ? "未审核" : "已审核");
         }
 
-        DictConvertUtil.DictOptional optional = DictConvertUtil
-            .optional("cruiseType")
-            .add("planType","taskType","cTypeName")
-            .add("identifyResult")
-            .add("cruiseResult")
-            .add("meteType")
-            .add("meterType")
-            .add("deviceType")
-            .add("alarmLevel");
-        DictConvertUtil.DICT.covertToDict(cruiseResultAnalyzeInfoList,optional);
+        DictConvertUtil.DictOptional optional =
+            DictConvertUtil.optional("cruiseType").add("planType", "taskType", "cTypeName").add("identifyResult").add("cruiseResult")
+                .add("meteType").add("meterType").add("deviceType").add("alarmLevel");
+        DictConvertUtil.DICT.covertToDict(cruiseResultAnalyzeInfoList, optional);
 
         return cruiseResultAnalyzeInfoList;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String, Object>> exportCruiseDataReport(Integer cType, String meteType, Integer meterType, String endTime, String startTime, List<Long> deviceIdList, String instanceName, String stationName) {
+    public List<Map<String, Object>> exportCruiseDataReport(Integer cType, String meteType, Integer meterType, String endTime,
+        String startTime, List<Long> deviceIdList, String instanceName, String stationName) {
 
         List<Map<String, Object>> cruiseResultAnalyzeInfoList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(deviceIdList)) {
 
-            cruiseResultAnalyzeInfoList = uPatrolDataResultDao.exportCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName, stationName);
+            cruiseResultAnalyzeInfoList =
+                uPatrolDataResultDao.exportCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName,
+                    stationName);
 
             cruiseResultAnalyzeInfoList.forEach(cruiseResultAnalyzeInfoMap -> {
 
                 if (Objects.nonNull(cruiseResultAnalyzeInfoMap.get("regionId"))) {
-                    TStdRegion tStdRegion = regionService.getRegion(MapUtils.getLongValue(cruiseResultAnalyzeInfoMap, "regionId"), new TStdRegion());
+                    TStdRegion tStdRegion =
+                        regionService.getRegion(MapUtils.getLongValue(cruiseResultAnalyzeInfoMap, "regionId"), new TStdRegion());
                     Long upRegionId = tStdRegion.getUpRegionId();
                     String upRegionName = regionService.getRegionName(upRegionId);
-                    if (StringUtils.isNotEmpty(upRegionName)){
+                    if (StringUtils.isNotEmpty(upRegionName)) {
                         cruiseResultAnalyzeInfoMap.put("regionName", upRegionName);
                     } else {
                         cruiseResultAnalyzeInfoMap.put("regionName", tStdRegion.getRegionName());
                     }
                 }
-                cruiseResultAnalyzeInfoMap.put("evaluationState", "257".equals(MapUtils.getString(cruiseResultAnalyzeInfoMap, "evaluationState")) ? "未审核" : "已审核");
+                cruiseResultAnalyzeInfoMap.put("evaluationState",
+                    "257".equals(MapUtils.getString(cruiseResultAnalyzeInfoMap, "evaluationState")) ? "未审核" : "已审核");
             });
         }
-        DictConvertUtil.DictOptional optional = DictConvertUtil
-                .optional("cruiseType")
-                .add("planType", "taskType", "cTypeName")
-                .add("identifyResult")
-                .add("cruiseResult")
-                .add("meteType")
-                .add("meterType")
-                .add("deviceType")
-                .add("alarmLevel");
+        DictConvertUtil.DictOptional optional =
+            DictConvertUtil.optional("cruiseType").add("planType", "taskType", "cTypeName").add("identifyResult").add("cruiseResult")
+                .add("meteType").add("meterType").add("deviceType").add("alarmLevel");
         DictConvertUtil.DICT.covertToDict(cruiseResultAnalyzeInfoList, optional);
 
         return cruiseResultAnalyzeInfoList;
     }
 
     @Async
-    public void createCruiseDataReport(String userId, List<Map<String, Object>> cruiseResultAnalyzeInfoList, String typeString) {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    //创建本地文件路径
-                    Map<String, String> resMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
-                    String filePathAndName = resMap.get("content") + File.separator;
-                    //创建文件夹
-                    FileUtil.mkdir(filePathAndName);
-                    //拼接Excel文件名
-                    String fileName = "巡检点列表数据" + System.currentTimeMillis() + ".xlsx";
-                    String fileNamePath = filePathAndName + fileName;
-
-                    //设置表头
-                    List<List<String>> heads = Lists.newArrayList();
-                    List<String> strings = Arrays.asList(typeString.split(","));
-                    strings.forEach(s -> heads.add(Lists.newArrayList(s)));
-                    //设置内容
-                    List<List<Object>> contents = Lists.newArrayList();
-                    cruiseResultAnalyzeInfoList.forEach(cruiseResult -> {
-                        List<Object> content = Lists.newArrayList();
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        strings.forEach(s -> {
-                            String value =  String.valueOf(cruiseResult.getOrDefault(ExportUtil.map.get(s), ""));
-                            if (StringUtils.contains(s, "图片")) {
-                                content.add(new ImageFile(value));
-                            } else {
-                                content.add(value);
-                            }
-                        });
-                        contents.add(content);
-                    });
-                    ExcelWriter excelWriter = EasyExcel.write(fileNamePath).build();
-                    WriteSheet writeSheet = EasyExcel.writerSheet(0, "巡检点列表数据")
-                            .includeColumnFiledNames(ExportUtil.getCruiseDataReportModel(strings))
-                            .registerWriteHandler(new SimpleColumnWidthStyleStrategy(25))
-                            .registerWriteHandler(new SimpleRowHeightStyleStrategy((short) 25, (short) 100))
-                            .registerConverter(new ImageConverter())
-                            .head(heads).registerWriteHandler(ExportUtil.getCellStyle()).build();
-                    excelWriter.write(contents, writeSheet);
-                    //关闭写excel
-                    excelWriter.finish();
-                    Map<String, String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
-                    String fileRelativePath = map.get("content") + "/" + fileName;
-
-                    Map<String, Object> jasonMap = new HashMap<>(4);
-                    jasonMap.put("type", "cruiseDataReport");
-                    jasonMap.put("url", new String[] {fileRelativePath});
-                    log.info("发送给前端的消息:{}", jasonMap);
-                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap, userId);
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
+    public void createCruiseDataReport(String userId, Integer cType, String meteType, Integer meterType, String endTime, String startTime,
+        Long regionId, String instanceName, String stationName, String typeString) {
+        try {
+            List<Long> deviceIdList = new ArrayList<>();
+            if (regionId == null) {
+                //查询该regionId的子节点
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
+                deviceIdList = tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+            } else {
+                //查询该regionId的子节点
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
+                if (regionIdList != null && !regionIdList.isEmpty()) {
+                    deviceIdList = tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                } else {
+                    deviceIdList.add(regionId);
                 }
             }
-        };
-        ThreadPoolUtil.PATROL_POOL.addThread(runnable);
-    }
-    @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultAnalyzeInfo> selectCruiseDataResultByList(Integer cruiseType, Integer cType, String deviceMeteIds, String meteType, Integer meterType, String endTime, String startTime) {
+            List<Map<String, Object>> cruiseResultAnalyzeInfoList =
+                this.exportCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName, stationName);
+            //创建本地文件路径
+            Map<String, String> resMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
+            String filePathAndName = resMap.get("content") + File.separator;
+            //创建文件夹
+            FileUtil.mkdir(filePathAndName);
+            //拼接Excel文件名
+            String fileName = "巡检点列表数据" + System.currentTimeMillis() + ".xlsx";
+            String fileNamePath = filePathAndName + fileName;
 
-        List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataResultByList(cruiseType, cType,
-            splitToLong(deviceMeteIds), meteType, meterType, endTime, startTime);
-        DictConvertUtil.optional("cruiseType").add("identifyResult")
-            .add("cruiseResult").add("meteType").add("meterType")
-                .add("planType", "taskType", "cTypeName").covertToDict(cruiseResultAnalyzeInfoList);
+            //设置表头
+            List<List<String>> heads = Lists.newArrayList();
+            List<String> strings = Arrays.asList(typeString.split(","));
+            strings.forEach(s -> heads.add(Lists.newArrayList(s)));
+            //设置内容
+            List<List<Object>> contents = Lists.newArrayList();
+            cruiseResultAnalyzeInfoList.forEach(cruiseResult -> {
+                List<Object> content = Lists.newArrayList();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                strings.forEach(s -> {
+                    String value = String.valueOf(cruiseResult.getOrDefault(ExportUtil.map.get(s), ""));
+                    if (StringUtils.contains(s, "图片")) {
+                        content.add(new ImageFile(value));
+                    } else {
+                        content.add(value);
+                    }
+                });
+                contents.add(content);
+            });
+            ExcelWriter excelWriter = EasyExcel.write(fileNamePath).build();
+            WriteSheet writeSheet =
+                EasyExcel.writerSheet(0, "巡检点列表数据").includeColumnFiledNames(ExportUtil.getCruiseDataReportModel(strings))
+                    .registerWriteHandler(new SimpleColumnWidthStyleStrategy(25))
+                    .registerWriteHandler(new SimpleRowHeightStyleStrategy((short)25, (short)100)).registerConverter(new ImageConverter())
+                    .head(heads).registerWriteHandler(ExportUtil.getCellStyle()).build();
+            excelWriter.write(contents, writeSheet);
+            //关闭写excel
+            excelWriter.finish();
+            Map<String, String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
+            String fileRelativePath = map.get("content") + "/" + fileName;
+
+            Map<String, Object> jasonMap = new HashMap<>(4);
+            jasonMap.put("type", "cruiseDataReport");
+            jasonMap.put("url", new String[] {fileRelativePath});
+            log.info("发送给前端的消息:{}", jasonMap);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap, userId);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<CruiseResultAnalyzeInfo> selectCruiseDataResultByList(Integer cruiseType, Integer cType, String deviceMeteIds,
+        String meteType, Integer meterType, String endTime, String startTime) {
+
+        List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList =
+            uPatrolDataResultDao.selectCruiseDataResultByList(cruiseType, cType, splitToLong(deviceMeteIds), meteType, meterType, endTime,
+                startTime);
+        DictConvertUtil.optional("cruiseType").add("identifyResult").add("cruiseResult").add("meteType").add("meterType")
+            .add("planType", "taskType", "cTypeName").covertToDict(cruiseResultAnalyzeInfoList);
 
         for (CruiseResultAnalyzeInfo cruiseResultAnalInfo : cruiseResultAnalyzeInfoList) {
             if (Objects.isNull(cruiseResultAnalInfo.getIdentifyResult())) {
@@ -242,8 +262,8 @@ public class UPatrolDataResultService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<KeyValue<String, List<List<String>>>> selectBrokenLine(Integer cruiseType, Integer cType, String deviceMeteIds, String startTime, String endTime,
-        String meteType, Integer meterType) {
+    public List<KeyValue<String, List<List<String>>>> selectBrokenLine(Integer cruiseType, Integer cType, String deviceMeteIds,
+        String startTime, String endTime, String meteType, Integer meterType) {
         List<Long> meteIds = splitToLong(deviceMeteIds);
         List<BrokenLineInfo> brokenLineInfos =
             uPatrolDataResultDao.selectBrokenLine(cruiseType, cType, meteIds, startTime, endTime, meteType, meterType);
@@ -356,6 +376,7 @@ public class UPatrolDataResultService {
         }
         return listFir;
     }
+
     @Transactional(rollbackFor = Exception.class)
     public List<UPatrolDataResult> selectByCameraIdNew(Long cameraId, String startDate, String endDate) {
         List<UPatrolDataResult> list = uPatrolDataResultDao.selectByCameraIdNew(cameraId, startDate, endDate);
@@ -382,7 +403,7 @@ public class UPatrolDataResultService {
         }
     }
 
-    public List<Long> splitToLong(String strs){
+    public List<Long> splitToLong(String strs) {
         String[] ss = StringUtils.split(strs, ",");
         return Arrays.stream(ss).map(NumberUtils::toLong).collect(Collectors.toList());
     }
@@ -414,7 +435,7 @@ public class UPatrolDataResultService {
                 String fileName = "巡视结果分析" + System.currentTimeMillis() + ".xlsx";
                 String fileNamePath = filePathAndName + fileName;
 
-                String absPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content");
+                String absPath = (String)redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content");
                 String relPath = Constant.PREFIX_RELATIVE_PATH;
 
                 //设置表头
@@ -462,7 +483,8 @@ public class UPatrolDataResultService {
                 //关闭写excel
                 excelWriter.finish();
 
-                String fileRelativePath = redisTemplate.opsForHash().get("t_sys_param:meteModelPath", "content") + "/" + URLEncodeUtil.encode(fileName);
+                String fileRelativePath =
+                    redisTemplate.opsForHash().get("t_sys_param:meteModelPath", "content") + "/" + URLEncodeUtil.encode(fileName);
                 Map<String, Object> jasonMap = new HashMap<>(4);
                 jasonMap.put("type", "cruiseDataReport");
                 jasonMap.put("url", new String[] {fileRelativePath});
@@ -498,9 +520,8 @@ public class UPatrolDataResultService {
             }
 
             try {
-                byte[] imageByte =
-                    GenerateChartUtil.createLineChart(name, legendNameList, xAxisNameList, dataList, JFreeChartUtil.createChartTheme("宋体"),
-                        "", "", 1000, 600);
+                byte[] imageByte = GenerateChartUtil.createLineChart(name, legendNameList, xAxisNameList, dataList,
+                    JFreeChartUtil.createChartTheme("宋体"), "", "", 1000, 600);
                 imageBytes.add(imageByte);
             } catch (Exception e) {
                 log.error("生成图片失败", e);
@@ -510,22 +531,22 @@ public class UPatrolDataResultService {
         return imageBytes;
     }
 
-    public List<CruiseResultAnalyzeInfo> selectIdentifyAbnormal(Integer cType, String meteType, Integer meterType, String endTime, String startTime, List<Long> deviceIdList, String meteName) {
+    public List<CruiseResultAnalyzeInfo> selectIdentifyAbnormal(Integer cType, String meteType, Integer meterType, String endTime,
+        String startTime, List<Long> deviceIdList, String meteName) {
 
-        List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectIdentifyAbnormal(cType, meteType, meterType, DateTimeUtil.parse(endTime), DateTimeUtil.parse(startTime), deviceIdList, meteName);
+        List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList =
+            uPatrolDataResultDao.selectIdentifyAbnormal(cType, meteType, meterType, DateTimeUtil.parse(endTime),
+                DateTimeUtil.parse(startTime), deviceIdList, meteName);
 
-        DictConvertUtil.DictOptional optional = DictConvertUtil
-            .optional("meteType")
-            .add("meterType")
-            .add("deviceType");
-        DictConvertUtil.DICT.covertToDict(cruiseResultAnalyzeInfoList,optional);
+        DictConvertUtil.DictOptional optional = DictConvertUtil.optional("meteType").add("meterType").add("deviceType");
+        DictConvertUtil.DICT.covertToDict(cruiseResultAnalyzeInfoList, optional);
 
         for (CruiseResultAnalyzeInfo info : cruiseResultAnalyzeInfoList) {
             if (Objects.nonNull(info.getRegionId())) {
                 TStdRegion tStdRegion = regionService.getRegion(info.getRegionId(), new TStdRegion());
                 Long upRegionId = tStdRegion.getUpRegionId();
                 String upRegionName = regionService.getRegionName(upRegionId);
-                if (StringUtils.isNotEmpty(upRegionName)){
+                if (StringUtils.isNotEmpty(upRegionName)) {
                     info.setRegionName(upRegionName);
                 } else {
                     info.setRegionName(tStdRegion.getRegionName());
@@ -544,13 +565,16 @@ public class UPatrolDataResultService {
         return cruiseResultAnalyzeInfoList;
     }
 
-    public List<CruiseResultDetail> selectIdentifyAbnormalByMeteId(Integer cruiseType, Long deviceMeteId, String endTime, String startTime) {
-        List<CruiseResultDetail> cruiseResultList = uPatrolDataResultDao.selectIdentifyAbnormalDetails(cruiseType, deviceMeteId, DateTimeUtil.parse(endTime), DateTimeUtil.parse(startTime));
+    public List<CruiseResultDetail> selectIdentifyAbnormalByMeteId(Integer cruiseType, Long deviceMeteId, String endTime,
+        String startTime) {
+        List<CruiseResultDetail> cruiseResultList =
+            uPatrolDataResultDao.selectIdentifyAbnormalDetails(cruiseType, deviceMeteId, DateTimeUtil.parse(endTime),
+                DateTimeUtil.parse(startTime));
 
         DictConvertUtil.DictOptional optional = DictConvertUtil.optional("cruiseType").add("cruiseResult").add("evaluationState")
-            .add("abnormalType", "cruiseAbnormal", "abnormalType").add("identifyResult").add("meteKind").add("meteType")
-            .add("meterType").add("identifyState");
-        DictConvertUtil.DICT.covertToDict(cruiseResultList,optional);
+            .add("abnormalType", "cruiseAbnormal", "abnormalType").add("identifyResult").add("meteKind").add("meteType").add("meterType")
+            .add("identifyState");
+        DictConvertUtil.DICT.covertToDict(cruiseResultList, optional);
         for (CruiseResultDetail info : cruiseResultList) {
             if (StringUtils.isNotEmpty(info.getMeterTypeName())) {
                 String meteTypeName = CommonUtils.concat(info.getMeteTypeName(), info.getMeterTypeName());
@@ -569,5 +593,6 @@ public class UPatrolDataResultService {
     public Map<String, Object> selectWaitAndAbnormalByTaskId(String taskId) {
         return uPatrolDataResultDao.selectWaitAndAbnormalByTaskId(taskId);
     }
+
 }
 
