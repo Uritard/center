@@ -971,13 +971,15 @@ public class TCameraPresetService {
             String ftpsLocalPath = urlPath.replaceAll(Constant.PRESET_REAL_IMG_PATH, redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content").toString());
             String romotePath = presetImgHttpUrl.replaceAll(Constant.PRESET_REAL_IMG_PATH, "");
 
-            FtpsUtil.putFile(ftpsLocalPath, romotePath, applicationProperties.getIntelAnalysisFtps().getIp(), applicationProperties.getIntelAnalysisFtps().getPort(),
-                applicationProperties.getIntelAnalysisFtps().getUserName(), applicationProperties.getIntelAnalysisFtps().getPassword());
+            FtpsUtil.putFile(ftpsLocalPath, romotePath, applicationProperties.getIntelAnalysisFtps().getIp(),
+                applicationProperties.getIntelAnalysisFtps().getPort(), applicationProperties.getIntelAnalysisFtps().getUserName(),
+                applicationProperties.getIntelAnalysisFtps().getPassword(), applicationProperties.getIntelAnalysisFtps().isResolveLocal());
 
             log.info("ftpsUtil.downloadFile(, localPath: {}, romotePath: {}, ftpsLocalPath: {}", localPath, romotePath, ftpsLocalPath);
             // localPath: 本地需要覆盖到的地址， romotePath:ftps间接地址
-            FtpsUtil.downloadFile(localPath, romotePath, applicationProperties.getIntelAnalysisFtps().getIp(), applicationProperties.getIntelAnalysisFtps().getPort(),
-                applicationProperties.getIntelAnalysisFtps().getUserName(), applicationProperties.getIntelAnalysisFtps().getPassword());
+            FtpsUtil.downloadFile(localPath, romotePath, applicationProperties.getIntelAnalysisFtps().getIp(),
+                applicationProperties.getIntelAnalysisFtps().getPort(), applicationProperties.getIntelAnalysisFtps().getUserName(),
+                applicationProperties.getIntelAnalysisFtps().getPassword(), applicationProperties.getIntelAnalysisFtps().isResolveLocal());
             return romotePath;
         } catch (Exception e) {
             log.info("将相机采集到的图片覆盖到原预置位图片失败, ", e);

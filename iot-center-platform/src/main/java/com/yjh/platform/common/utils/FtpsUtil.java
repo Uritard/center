@@ -3,13 +3,12 @@ package com.yjh.platform.common.utils;
 import cn.hutool.core.io.FileUtil;
 import com.yjh.platform.common.Constant;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.ftp.FTPReply;
-import org.apache.commons.net.ftp.FTPSClient;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.net.ftp.*;
 
 import javax.net.ssl.*;
 import java.io.*;
+import java.net.InetAddress;
 import java.nio.file.Files;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
@@ -32,35 +31,14 @@ public class FtpsUtil {
 
     private static String key_pw = "1";
 
-    private static KeyManager getKeyManager() throws Exception {
-        KeyStore key_ks = KeyStore.getInstance("JKS");
-        key_ks.load(new FileInputStream(key_path), key_pw.toCharArray());
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(key_ks, key_pw.toCharArray());
-        KeyManager[] km = kmf.getKeyManagers();
-        System.out.println("km len: " + km.length);
-        return km[0];
-    }
-
-
-    private static TrustManager getTrustManager() throws Exception {
-        KeyStore trust_ks = KeyStore.getInstance("JKS");
-        trust_ks.load(new FileInputStream(key_path), key_pw.toCharArray());
-        TrustManagerFactory tf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tf.init(trust_ks);
-        TrustManager[] tm = tf.getTrustManagers();
-        System.out.println("tm len: " + tm.length);
-        return tm[0];
-    }
-
-    public static void putFile(String filepath, String remoteFilename, String host, int port, String username, String password) {
+    public static void putFile(String filepath, String remoteFilename, String host, int port, String username, String password, boolean resolveLocal) {
         log.info("------------------------文件上传开始 filepath:{},remoteFilename:{},host:{},port:{},key_pw:{},username:{},password:{}", filepath,
             remoteFilename, host, port, key_pw, username, password);
-        fileUpload(filepath, remoteFilename, host, port, username, password, 0);
+        fileUpload(filepath, remoteFilename, host, port, username, password, 0, resolveLocal);
     }
 
     private static void fileUpload(String filepath, String remoteFilename, String host, int port, String username, String password,
-        int retry) {
+        int retry, boolean resolveLocal) {
         if (retry >= 3) {
             String ftpsPath = CommonUtils.concatPath(Constant.getFtpsFilePath(), remoteFilename);
             log.error("文件上传失败，重试无效 retryCount：{}, copyto：{}", retry, ftpsPath);
@@ -72,7 +50,7 @@ public class FtpsUtil {
         boolean upflag = false;
         FTPSClient ftpClient = null;
         try {
-            ftpClient = loginFtps(host, port, username, password);
+            ftpClient = loginFtps(host, port, username, password, resolveLocal);
 
             // Store file on host
             String fileName = remoteFilename;
@@ -125,13 +103,17 @@ public class FtpsUtil {
         }
         if (!upflag) {
             log.error("文件上传失败，重试 retry：{}, filepath: {}", retry, filepath);
-            fileUpload(filepath, remoteFilename, host, port, username, password, retry);
+            fileUpload(filepath, remoteFilename, host, port, username, password, retry, resolveLocal);
         }
     }
 
-    private static FTPSClient loginFtps(String host, int port, String username, String password) throws IOException {
+    private static FTPSClient loginFtps(String host, int port, String username, String password, boolean resolveLocal) throws IOException {
         FTPSClient ftpClient = new FTPSClient("TLS", true);
         ftpClient.setAuthValue("TLS");
+        if (resolveLocal) {
+            ftpClient.setRemoteVerificationEnabled(false);
+            ftpClient.setPassiveNatWorkaroundStrategy(new LocalServerResolverImpl(ftpClient));
+        }
         ftpClient.connect(host, port);
         // Connect to host
         int reply = ftpClient.getReplyCode();
@@ -172,12 +154,15 @@ public class FtpsUtil {
         return ftpClient;
     }
 
-    public static boolean isFTPFileExist(String filePath,String host,int port,String username,String password) {
+    public static boolean isFTPFileExist(String filePath,String host,int port,String username,String password, boolean resolveLocal) {
         try {
-            FTPSClient ftpClient = null;
-                ftpClient = new FTPSClient("TLS", true);
+            FTPSClient ftpClient = new FTPSClient("TLS", true);
 
             ftpClient.setAuthValue("TLS");
+            if (resolveLocal) {
+                ftpClient.setRemoteVerificationEnabled(false);
+                ftpClient.setPassiveNatWorkaroundStrategy(new LocalServerResolverImpl(ftpClient));
+            }
             ftpClient.connect(host, port);
             // Connect to host
             int reply = ftpClient.getReplyCode();
@@ -212,13 +197,9 @@ public class FtpsUtil {
                     ftpClient.setFileTransferMode(FTP.STREAM_TRANSFER_MODE);
 
                     // 提取绝对地址的目录以及文件名
-                    filePath = filePath.replace("ftp://"+host+":"+port+"/", "");
-                    String file = filePath.substring(filePath.lastIndexOf("/")+1);
-                    FTPFile[] list = ftpClient.listFiles(filePath);
-                    for (FTPFile ftpFile : list) {
-                        if (ftpFile.getName().equals(file)) {
-                            return true;
-                        }
+                    String[] list = ftpClient.listNames(filePath);
+                    if (ArrayUtils.isNotEmpty(list)) {
+                        return true;
                     }
 
                     // Logout
@@ -239,15 +220,19 @@ public class FtpsUtil {
     }
 
 
-    public static void downloadFile(String filepath, String remoteFilename, String host, int port, String username, String password) {
+    public static void downloadFile(String filepath, String remoteFilename, String host, int port, String username, String password, boolean resolveLocal) {
         try {
             log.info("-------------------------------文件下载开始");
             log.info("filepath：{}，remoteFilename：{}，host：{}，port:{},key_pw:{},username：{}，password：{}", filepath, remoteFilename, host,
                 port, key_pw, username, password);
-            File file = new File(filepath);
+
             try {
                 FTPSClient ftpClient = new FTPSClient("TLS",true);
                 ftpClient.setAuthValue("TLS");
+                if (resolveLocal) {
+                    ftpClient.setRemoteVerificationEnabled(false);
+                    ftpClient.setPassiveNatWorkaroundStrategy(new LocalServerResolverImpl(ftpClient));
+                }
                 ftpClient.connect(host, port);
                 // Connect to host
                 int reply = ftpClient.getReplyCode();
@@ -310,7 +295,22 @@ public class FtpsUtil {
             log.error("FTPS上传文件参数有误", e);
         }
     }
-        public static void main(String[] args) throws NoSuchAlgorithmException {
+
+    public static class LocalServerResolverImpl extends FTPClient.NatServerResolverImpl {
+        private FTPClient client;
+        public LocalServerResolverImpl(FTPClient client) {
+            super(client);
+            this.client = client;
+        }
+
+        @Override
+        public String resolve(String hostname) {
+            InetAddress remote = this.client.getRemoteAddress();
+            return remote.getHostAddress();
+        }
+    }
+
+    public static void main(String[] args) throws NoSuchAlgorithmException {
         String path = "D://test/test.txt";
         String fileName = "/3/E200/test.txt";
         File file = new File(path);

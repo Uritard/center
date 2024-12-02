@@ -185,8 +185,9 @@ public class SilentTaskJob implements Runnable {
             if ("0".equals(applicationProperties.getUpSystemFtps().getFlag())){
                 log.info("上级系统开关未开！ {}",applicationProperties.getUpSystemFtps().getFlag());
             }else {
-                FtpsUtil.putFile(absPath, ftpsTarPath, applicationProperties.getUpSystemFtps().getIp(), applicationProperties.getUpSystemFtps().getPort(),
-                        applicationProperties.getUpSystemFtps().getUserName(), applicationProperties.getUpSystemFtps().getPassword());
+                FtpsUtil.putFile(absPath, ftpsTarPath, applicationProperties.getUpSystemFtps().getIp(),
+                    applicationProperties.getUpSystemFtps().getPort(), applicationProperties.getUpSystemFtps().getUserName(),
+                    applicationProperties.getUpSystemFtps().getPassword(), applicationProperties.getUpSystemFtps().isResolveLocal());
             }
             xmlItem.put("file_path", ftpsTarPath);
             xmlItem.put("monitor_type", "");

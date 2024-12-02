@@ -93,8 +93,9 @@ public class DeviceModelService {
             String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");
             String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
             String upSystemFtpsPassword = upSystemFtps.get("upSystemFtpsPassword");
+            boolean resolveLocal = Boolean.parseBoolean(upSystemFtps.get("upSystemFtpsResolveLocal"));
             FtpsUtil.downloadFile(sourcePath, targetPathName, upSystemFtpsIp, Integer.parseInt(upSystemFtpsPort),
-                    upSystemFtpsUsername, upSystemFtpsPassword);
+                    upSystemFtpsUsername, upSystemFtpsPassword, resolveLocal);
         } catch (Exception e) {
             log.error("将文件从上级系统ftp服务器下载错误：", e);
         }

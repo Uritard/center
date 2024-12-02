@@ -97,6 +97,10 @@ public class ApplicationProperties {
         private Integer port;
         private String userName;
         private String password;
+        /**
+         * 使用登录IP作为数据传输的地址，不使用隐式传输返回的IP，避免外网可以访问而内网不可以
+         */
+        private boolean resolveLocal;
 
         public boolean isEnable() {
             return "1".equals(flag);
@@ -217,7 +221,8 @@ public class ApplicationProperties {
                 .setFlag(redisMap.get("upSystemFlag"))
                 .setPort(ValueUtil.toInteger(redisMap.get("upSystemFtpsPort"),10012))
                 .setUserName(redisMap.get("upSystemFtpsUsername"))
-                .setPassword(redisMap.get("upSystemFtpsPassword"));
+                .setPassword(redisMap.get("upSystemFtpsPassword"))
+                .setResolveLocal(Boolean.parseBoolean(redisMap.get("upSystemFtpsResolveLocal")));
         this.upSystemFtps = upSystemFtps;
 
         redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"algorithmSystem");
@@ -225,7 +230,8 @@ public class ApplicationProperties {
         intelAnalysisFtps.setIp(redisMap.get("algorithmSystemFtpsIp"))
                 .setPort(ValueUtil.toInteger(redisMap.get("algorithmSystemFtpsPort"),10012))
                 .setUserName(redisMap.get("algorithmSystemFtpsUsername"))
-                .setPassword(redisMap.get("algorithmSystemFtpsPassword"));
+                .setPassword(redisMap.get("algorithmSystemFtpsPassword"))
+                .setResolveLocal(Boolean.parseBoolean(redisMap.get("algorithmSystemFtpsResolveLocal")));
         this.intelAnalysisFtps = intelAnalysisFtps;
 
         try {
@@ -251,7 +257,8 @@ public class ApplicationProperties {
         managerSystemFtps.setIp(redisMap.get("managerSystemFtpsIp"))
                 .setPort(ValueUtil.toInteger(redisMap.get("managerSystemFtpsPort"),10012))
                 .setUserName(redisMap.get("managerSystemFtpsUsername"))
-                .setPassword(redisMap.get("managerSystemFtpsPassword"));
+                .setPassword(redisMap.get("managerSystemFtpsPassword"))
+                .setResolveLocal(Boolean.parseBoolean(redisMap.get("managerSystemFtpsResolveLocal")));
         this.managerSystemFtps = managerSystemFtps;
 
         redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"managerSystem");

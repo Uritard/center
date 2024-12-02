@@ -337,7 +337,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                 return;
             }
             FtpsUtil.putFile(sourcePath, targetPathName, ftpsConfig.getIp(), ftpsConfig.getPort(),
-                ftpsConfig.getUserName(), ftpsConfig.getPassword());
+                ftpsConfig.getUserName(), ftpsConfig.getPassword(), ftpsConfig.isResolveLocal());
         } catch (Exception e) {
             log.error("将文件上传至巡视主机ftp服务器错误:", e);
         }

@@ -26,7 +26,8 @@ public class FtpsService {
             FtpsUtil.putFile(filePath, remoteFileName, applicationProperties.getManagerSystemFtps().getIp()
                     , applicationProperties.getManagerSystemFtps().getPort(),
                     applicationProperties.getManagerSystemFtps().getUserName(),
-                    applicationProperties.getManagerSystemFtps().getPassword());
+                    applicationProperties.getManagerSystemFtps().getPassword(),
+                    applicationProperties.getManagerSystemFtps().isResolveLocal());
         } catch (Exception e) {
             log.error("上传至ftps错误: {}, {}", applicationProperties.getManagerSystemFtps(), e);
         }
@@ -37,7 +38,8 @@ public class FtpsService {
             FtpsUtil.downloadFile(filePath, remoteFileName, applicationProperties.getManagerSystemFtps().getIp()
                     , applicationProperties.getManagerSystemFtps().getPort(),
                     applicationProperties.getManagerSystemFtps().getUserName(),
-                    applicationProperties.getManagerSystemFtps().getPassword());
+                    applicationProperties.getManagerSystemFtps().getPassword(),
+                    applicationProperties.getManagerSystemFtps().isResolveLocal());
         } catch (Exception e) {
             log.error("下载ftps错误: {}, {}", applicationProperties.getManagerSystemFtps(), e);
         }
@@ -47,7 +49,8 @@ public class FtpsService {
         return FtpsUtil.isFTPFileExist(filepath,applicationProperties.getManagerSystemFtps().getIp()
                 , applicationProperties.getManagerSystemFtps().getPort(),
                 applicationProperties.getManagerSystemFtps().getUserName(),
-                applicationProperties.getManagerSystemFtps().getPassword());
+                applicationProperties.getManagerSystemFtps().getPassword(),
+                applicationProperties.getManagerSystemFtps().isResolveLocal());
     }
 
 
@@ -66,7 +69,9 @@ public class FtpsService {
             }
 
             log.info("开始执行：FtpsUtil.downloadFile");
-            FtpsUtil.downloadFile(localPath, ftpsPath, applicationProperties.getIntelAnalysisFtps().getIp(), applicationProperties.getIntelAnalysisFtps().getPort(), applicationProperties.getIntelAnalysisFtps().getUserName(), applicationProperties.getIntelAnalysisFtps().getPassword());
+            FtpsUtil.downloadFile(localPath, ftpsPath, applicationProperties.getIntelAnalysisFtps().getIp(),
+                applicationProperties.getIntelAnalysisFtps().getPort(), applicationProperties.getIntelAnalysisFtps().getUserName(),
+                applicationProperties.getIntelAnalysisFtps().getPassword(), applicationProperties.getIntelAnalysisFtps().isResolveLocal());
             log.info("结束执行：FtpsUtil.downloadFile");
         } catch (Exception e) {
             log.error("将文件从 platform ftp 服务器下载到本地错误: {}  {}", applicationProperties.getIntelAnalysisFtps(), e);
@@ -88,7 +93,9 @@ public class FtpsService {
             }
 
             log.info("开始执行：FtpsUtil.putFile");
-            FtpsUtil.putFile(localPath, ftpsPath, applicationProperties.getIntelAnalysisFtps().getIp(), applicationProperties.getIntelAnalysisFtps().getPort() , applicationProperties.getIntelAnalysisFtps().getUserName(), applicationProperties.getIntelAnalysisFtps().getPassword());
+            FtpsUtil.putFile(localPath, ftpsPath, applicationProperties.getIntelAnalysisFtps().getIp(),
+                applicationProperties.getIntelAnalysisFtps().getPort(), applicationProperties.getIntelAnalysisFtps().getUserName(),
+                applicationProperties.getIntelAnalysisFtps().getPassword(), applicationProperties.getIntelAnalysisFtps().isResolveLocal());
             log.info("结束执行：FtpsUtil.putFile");
         } catch (Exception e) {
             log.error("将文件上传至 platform ftp 服务器错误: {}  {}", applicationProperties.getIntelAnalysisFtps(), e);

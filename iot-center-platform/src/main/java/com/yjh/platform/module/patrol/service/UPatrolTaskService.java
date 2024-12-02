@@ -3591,7 +3591,9 @@ public class UPatrolTaskService {
 
     public String downloadPicture(String target, String source) {
         try {
-            FtpsUtil.downloadFile(target, source, applicationProperties.getIntelAnalysisFtps().getIp(), applicationProperties.getIntelAnalysisFtps().getPort(), applicationProperties.getIntelAnalysisFtps().getUserName(), applicationProperties.getIntelAnalysisFtps().getPassword());
+            FtpsUtil.downloadFile(target, source, applicationProperties.getIntelAnalysisFtps().getIp(),
+                applicationProperties.getIntelAnalysisFtps().getPort(), applicationProperties.getIntelAnalysisFtps().getUserName(),
+                applicationProperties.getIntelAnalysisFtps().getPassword(), applicationProperties.getIntelAnalysisFtps().isResolveLocal());
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }

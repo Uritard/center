@@ -751,8 +751,9 @@ public class AnalyseDataOperateService {
                 log.info("上级系统开关未开！ {}",applicationProperties.getUpSystemFtps().getFlag());
                 return;
             }
-            FtpsUtil.putFile(sourcePath, targetPathName, applicationProperties.getUpSystemFtps().getIp(), applicationProperties.getUpSystemFtps().getPort(),
-                    applicationProperties.getUpSystemFtps().getUserName(), applicationProperties.getUpSystemFtps().getPassword());
+            FtpsUtil.putFile(sourcePath, targetPathName, applicationProperties.getUpSystemFtps().getIp(),
+                applicationProperties.getUpSystemFtps().getPort(), applicationProperties.getUpSystemFtps().getUserName(),
+                applicationProperties.getUpSystemFtps().getPassword(), applicationProperties.getUpSystemFtps().isResolveLocal());
 
             TimeUnit.MILLISECONDS.sleep(600);
         } catch (Exception e) {

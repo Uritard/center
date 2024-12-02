@@ -1985,8 +1985,9 @@ public class SendToUpSystemServices {
             String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");
             String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
             String upSystemFtpsPassword = upSystemFtps.get("upSystemFtpsPassword");
+            boolean resolveLocal = Boolean.parseBoolean(upSystemFtps.get("upSystemFtpsResolveLocal"));
             FtpsUtil.putFile(sourcePath, targetPathName, upSystemFtpsIp, Integer.parseInt(upSystemFtpsPort),
-                    upSystemFtpsUsername, upSystemFtpsPassword);
+                    upSystemFtpsUsername, upSystemFtpsPassword, resolveLocal);
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误：", e);
         }
@@ -2012,8 +2013,9 @@ public class SendToUpSystemServices {
             String upCloudSystemFtpsPort = upCloudSystemFtps.get("upCloudSystemFtpsPort");
             String upCloudSystemFtpsUsername = upCloudSystemFtps.get("upCloudSystemFtpsUsername");
             String upCloudSystemFtpsPassword = upCloudSystemFtps.get("upCloudSystemFtpsPassword");
+            boolean resolveLocal = Boolean.parseBoolean(upCloudSystemFtps.get("upCloudSystemFtpsResolveLocal"));
             FtpsUtil.putFile(sourcePath, targetPathName, upCloudSystemFtpsIp, Integer.parseInt(upCloudSystemFtpsPort),
-                    upCloudSystemFtpsUsername, upCloudSystemFtpsPassword);
+                    upCloudSystemFtpsUsername, upCloudSystemFtpsPassword, resolveLocal);
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误：", e);
         }
@@ -2034,8 +2036,9 @@ public class SendToUpSystemServices {
             String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");
             String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
             String upSystemFtpsPassword = upSystemFtps.get("upSystemFtpsPassword");
+            boolean resolveLocal = Boolean.parseBoolean(upSystemFtps.get("upSystemFtpsResolveLocal"));
             FtpsUtil.downloadFile(sourcePath, targetPathName, upSystemFtpsIp, Integer.parseInt(upSystemFtpsPort),
-                    upSystemFtpsUsername, upSystemFtpsPassword);
+                    upSystemFtpsUsername, upSystemFtpsPassword, resolveLocal);
         } catch (Exception e) {
             log.error("将文件从上级系统ftp服务器下载错误：", e);
         }

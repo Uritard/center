@@ -16,6 +16,7 @@ import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,8 +143,9 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
             String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");
             String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
             String upSystemFtpsPassword = upSystemFtps.get("upSystemFtpsPassword");
+            boolean resolveLocal = MapUtils.getBooleanValue(upSystemFtps, "upSystemFtpsResolveLocal");
             FtpsUtil.putFile(sourcePath, targetPathName, upSystemFtpsIp, Integer.parseInt(upSystemFtpsPort),
-                    upSystemFtpsUsername, upSystemFtpsPassword);
+                    upSystemFtpsUsername, upSystemFtpsPassword, resolveLocal);
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误：", e);
         }
