@@ -2052,7 +2052,7 @@ CREATE TABLE `t_sys_param` (
   `param_type` int(11) DEFAULT '1' COMMENT '参数编码',
   `param_code` varchar(50) DEFAULT '' COMMENT '参数类型',
   `param_name` varchar(50) DEFAULT '' COMMENT '参数名称',
-  `content` text COMMENT '参数内容',
+  `content` mediumtext COMMENT '参数内容',
   `remark` varchar(255) DEFAULT '' COMMENT '描述',
   `rules` varchar(1024) DEFAULT NULL COMMENT '校验规则',
   PRIMARY KEY (`param_id`) USING BTREE
