@@ -24,6 +24,7 @@ public class LinkageConfigResp {
         private String deviceId;
         private String configType;
         private String sessionId;
+        private String remark;
         private List<ConfigContent> configContent;
     }
 
