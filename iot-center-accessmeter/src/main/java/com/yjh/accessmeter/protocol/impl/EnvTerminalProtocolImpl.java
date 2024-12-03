@@ -224,4 +224,9 @@ public class EnvTerminalProtocolImpl implements ISensorProtocol {
         return result;
     }
 
+    @Override
+    public void delete(IotDevice device) {
+        // do nothing
+    }
+
 }

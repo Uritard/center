@@ -90,7 +90,7 @@ public class IotDevice {
     /**
      * 采集频率 单位:分钟
      */
-    private Integer collectionFrequency;
+    private int collectionFrequency;
     /**
      * 单位
      */

@@ -110,6 +110,11 @@ public class ModbusRtuProtocolImpl implements ISensorProtocol {
         return new Result(ResultCodeEnum.CODE10009.getCode(), "协议不支持");
     }
 
+    @Override
+    public void delete(IotDevice device) {
+        // do nothing
+    }
+
     private ModbusMaster master(IotDevice device) {
         String key = device.getIp() + ":" + device.getPort() + ":" + device.getProtocolModel();
         return MASTER_MAP.computeIfAbsent(key, k -> {

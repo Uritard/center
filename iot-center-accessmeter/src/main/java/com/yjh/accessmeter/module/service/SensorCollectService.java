@@ -23,12 +23,10 @@ import com.yjh.accessmeter.protocol.SensorProtocolFactory;
 import com.yjh.accessmeter.protocol.aigateway.info.ConfigResp;
 import com.yjh.accessmeter.protocol.aigateway.info.DataInfo;
 import com.yjh.accessmeter.protocol.aigateway.info.DeviceExtend;
-import com.yjh.accessmeter.protocol.impl.AIGatewayProtocolImpl;
 import io.netty.buffer.ByteBufUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -92,13 +90,15 @@ public class SensorCollectService {
             });
 
             Map<Integer, List<IotDevice>> freSet = iotDeviceList.stream().filter(
-                    i -> i.getCollectionFrequency() != null && i.getCollectionFrequency() > 0
-                        && Optional.ofNullable(ProtocolEnum.getEnum(i.getProtocolModel())).map(ProtocolEnum::getType).orElse(0) != 0)
+                    i -> Optional.ofNullable(ProtocolEnum.getEnum(i.getProtocolModel())).map(ProtocolEnum::getType).orElse(0) != 0)
                 .collect(Collectors.groupingBy(IotDevice::getCollectionFrequency));
 
-            freSet.forEach((k, v) -> taskScheduler.scheduleAtFixedRate(
-                COLLECT_TASK_MAP.compute(k, (k1, v1) -> new DataCollectTask(v, iotDeviceDao, asyncExecutor, platformProxy)),
-                Instant.ofEpochMilli(System.currentTimeMillis() + 15000), Duration.ofMinutes(k)));
+            freSet.forEach((k, v) -> {
+                DataCollectTask task = COLLECT_TASK_MAP.compute(k, (k1, v1) -> new DataCollectTask(v, iotDeviceDao, asyncExecutor, platformProxy));
+                if (k > 0) {
+                    taskScheduler.scheduleAtFixedRate(task, Instant.ofEpochMilli(System.currentTimeMillis() + 15000), Duration.ofMinutes(k));
+                }
+            });
         } catch (Exception e) {
             log.error("初始化设备连接出错", e);
         }
@@ -163,7 +163,7 @@ public class SensorCollectService {
     }
 
     public boolean delete(Long id) {
-        IotDevice device = new IotDevice().setId(id);
+        IotDevice device = iotDeviceDao.selectByPrimaryKey(id);
         return delete(device);
     }
 
@@ -177,18 +177,6 @@ public class SensorCollectService {
             }
         });
         log.info("已删除数据采集 device:{}", device);
-        //删除了设备 网关设备判断要不要断开mqtt连接
-        if (AI_GATEWAY.getCode().equals(device.getProtocolModel())){
-            List<IotDeviceDataEx> list = iotDeviceDao.selectByIpAndAddress(device.getIp(),device.getAddress());
-            if (list.isEmpty() || (list.size() == 1 && Objects.equals(list.get(0).getId(), device.getId()))){
-                try {
-                    MqttClient client = AIGatewayProtocolImpl.mqttClientMap.get(device.getIp());
-                    client.disconnect();
-                }catch (Exception e){
-                    log.error("断开链接失败！设备={}",device,e);
-                }
-            }
-        }
         return deleted.get();
     }
 
