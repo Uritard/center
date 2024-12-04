@@ -1139,7 +1139,7 @@ public class DateTimeUtil {
     }
 
     /**
-     * 获取间隔内的所有时间
+     * 获取间隔内的所有时间  开始时间超过当前时间 开始时间为当前时间
      *
      * @param interval  间隔类型  类型,间隔数量
      * @param dayBefore 开始时间
@@ -1155,6 +1155,24 @@ public class DateTimeUtil {
                 validTimeList.add(dd);
             }
             dd = addHour(dd, intervalNumber);
+        }
+        return validTimeList;
+    }
+
+    /**
+     * 获取间隔内的所有时间
+     *
+     * @param interval  间隔类型  类型,间隔数量
+     * @param dayBefore 开始时间
+     * @param dayAfter  结束时间
+     * @return list
+     */
+    public static List<Date> intervalAllTime(String interval, Date dayBefore, Date dayAfter) {
+        List<Date> validTimeList = new ArrayList<>();
+        int intervalNumber = getIntervalNumber(interval);
+        while (dayBefore.getTime() <= dayAfter.getTime()) {
+            validTimeList.add(dayBefore);
+            dayBefore = addHour(dayBefore, intervalNumber);
         }
         return validTimeList;
     }

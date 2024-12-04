@@ -968,6 +968,15 @@ INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('2024', 'api_type', '2024版本协议', 0, '协议版本', 1);
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('8', 'protocol_model', '巡视结果', '0', '设备连接协议', '8');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('9', 'protocol_model', '智能网关', '0', '设备连接协议', '9');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('1', 'meter_num_type', '正向有功总', '0', '电表数值类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('2', 'meter_num_type', '正向无功总', '0', '电表数值类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('3', 'meter_num_type', '反向无功总', '0', '电表数值类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('4', 'meter_num_type', '反向有功总', '0', '电表数值类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('5', 'meter_num_type', '无功I总', '0', '电表数值类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('6', 'meter_num_type', '无功II总', '0', '电表数值类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('7', 'meter_num_type', '无功III总', '0', '电表数值类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('8', 'meter_num_type', '无功IV总', '0', '电表数值类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('9', 'meter_num_type', '正向有功总需量', '0', '电表数值类型', '1');
 
 -- ----------------------------
 -- Records of t_period_model
