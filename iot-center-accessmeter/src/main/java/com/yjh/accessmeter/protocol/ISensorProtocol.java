@@ -55,4 +55,10 @@ public interface ISensorProtocol {
         }
         return decimal.setScale(scale, RoundingMode.HALF_UP).toPlainString();
     }
+
+    /**
+     * 删除设备
+     * @param device 设备
+     */
+    void delete(IotDevice device);
 }

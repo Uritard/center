@@ -5,6 +5,7 @@ import com.yjh.accessmeter.common.result.Result;
 import com.yjh.accessmeter.logs.SpringBeanUtils;
 import com.yjh.accessmeter.module.dao.TIotDeviceDao;
 import com.yjh.accessmeter.module.device.entity.IotDevice;
+import com.yjh.accessmeter.module.device.entity.IotDeviceDataEx;
 import com.yjh.accessmeter.module.device.entity.IotDevicePoint;
 import com.yjh.accessmeter.module.service.SensorCollectService;
 import com.yjh.accessmeter.protocol.ISensorProtocol;
@@ -23,12 +24,10 @@ import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.yjh.accessmeter.common.result.ResultCodeEnum.SYSTEMERROR;
+import static com.yjh.accessmeter.protocol.ProtocolEnum.AI_GATEWAY;
 
 /**
  * @Author: lqh
@@ -168,10 +167,10 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
                 DeviceExtend deviceExtend = JSONObject.parseObject(point.getExtend(), DeviceExtend.class);
                 String ctrlCmd = deviceExtend.getCtrl();
                 String state = params.get("deviceStatus").toString();
-                if (device.getIotDeviceType() == 856){
+                if (device.getIotDeviceType() == 856){//856空调类型
                     String attr = params.get("deviceAttr").toString();
                     String[] cmd = ctrlCmd.split(",");
-                    //空调的话要区分控制开关 还是制冷制热
+                    //空调的话要区分控制开关 还是制冷-2 制热-1
                     if ("1".equals(state) && "12".contains(attr) && StringUtils.isNotEmpty(attr)){
                         ctrlCmd = cmd[1];
                         state = "1".equals(attr)?"2":"1";
@@ -222,5 +221,24 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
             log.error("控制：{} ,参数：{} 出错", device, params, e);
         }
         return result;
+    }
+
+    @Override
+    public void delete(IotDevice device) {
+        //删除了设备 网关设备判断要不要断开mqtt连接
+        if (AI_GATEWAY.getCode().equals(device.getProtocolModel())){
+            List<IotDeviceDataEx> list = SpringBeanUtils.getBean(TIotDeviceDao.class).selectByIpAndAddress(device.getIp(),device.getAddress());
+            if (list.isEmpty() || (list.size() == 1 && Objects.equals(list.get(0).getId(), device.getId()))){
+                try {
+                    MqttClient client = mqttClientMap.get(device.getIp());
+                    if (client != null){
+                        client.disconnect();
+                    }
+                    mqttClientMap.remove(device.getIp());
+                }catch (Exception e){
+                    log.error("断开链接失败！设备={}",device,e);
+                }
+            }
+        }
     }
 }

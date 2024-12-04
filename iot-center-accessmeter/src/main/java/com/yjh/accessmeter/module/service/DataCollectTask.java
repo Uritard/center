@@ -229,6 +229,13 @@ public class DataCollectTask implements Runnable {
 
     public boolean removeDevice(IotDevice device) {
         IotDevice d = devices.remove(device.getId());
+        ProtocolEnum protocolEnum = ProtocolEnum.getEnum(device.getProtocolModel());
+        ISensorProtocol sensorProtocol = SensorProtocolFactory.CREATE.createProtocol(protocolEnum);
+        if (sensorProtocol == null) {
+            log.warn("协议类型无需主动建立连接或未实现，请检查协议是否正确: {}, device: {}", protocolEnum, device);
+            return true;
+        }
+        sensorProtocol.delete(device);
         return d != null;
     }
 

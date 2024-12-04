@@ -84,4 +84,9 @@ public class MeterProtocolImpl implements ISensorProtocol {
         return new Result(ResultCodeEnum.CODE10009.getCode(), "协议不支持");
     }
 
+    @Override
+    public void delete(IotDevice device) {
+        // do nothing
+    }
+
 }
