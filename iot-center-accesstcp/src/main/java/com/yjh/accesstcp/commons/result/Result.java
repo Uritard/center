@@ -12,6 +12,10 @@ import lombok.Data;
 @Data
 public class Result {
     /**
+     * 成功状态码
+     */
+    public static final int SUCCESS = 200;
+    /**
      * 默认返回状态码
      */
     private int code = 200;

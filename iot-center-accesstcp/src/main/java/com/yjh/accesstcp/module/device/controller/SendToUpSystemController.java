@@ -8,14 +8,19 @@ import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.commons.result.ResultCodeEnum;
 import com.yjh.accesstcp.module.device.callback.handler.SyncSendHandler;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
+import com.yjh.accesstcp.module.device.service.IUpSystemService;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
+import com.yjh.accesstcp.module.device.service.UpSystemServiceFactory;
+import com.yjh.accesstcp.module.device.service.impl.UpType;
 import com.yjh.accesstcp.netty.TCPClientHandler;
 import com.yjh.accesstcp.netty.entiy.MessageHeader;
 import com.yjh.accesstcp.netty.handler.ProtocolEnum;
 import com.yjh.accesstcp.thread.MessageThread;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.slf4j.Logger;
@@ -36,20 +41,16 @@ import java.util.Objects;
  * @since 2021/1/12
  */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/sendToUpSystem/v1")
 @Api(value = "/sendToUpSystem", description = "上报服务")
 public class SendToUpSystemController {
 
-    @Autowired
     private final SendToUpSystemServices sendToUpSystemService;
-    @Autowired
-    private RedisTemplate redisTemplate;
+    private final RedisTemplate redisTemplate;
+    private final UpSystemServiceFactory upSystemServiceFactory;
 
     private Logger log = LoggerFactory.getLogger(SendToUpSystemController.class);
-
-    public SendToUpSystemController(SendToUpSystemServices sendToUpSystemService) {
-        this.sendToUpSystemService = sendToUpSystemService;
-    }
 
     @ApiOperation(value = "发送")
     @RequestMapping(value = "/send", method = RequestMethod.GET)
@@ -74,12 +75,13 @@ public class SendToUpSystemController {
     public Result sendXML(@RequestBody Map<String,List<XMLBaseModel>> robotMap) {
         Result result = new Result();
         try {
-            String flag = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemFlag");
-            if (Objects.isNull(flag) || "0".equals(flag)){
-                log.error("上级系统连接开关为空或者没开！{}",flag);
+            String flag = Constant.upSystemFlag();
+            if (StringUtils.isEmpty(flag) || Constant.ZERO.equals(flag)){
+                log.error("上级系统连接开关为空或者没开！{}", flag);
             } else {
                 XMLBaseModel xmlBaseModel = robotMap.get("list").get(0);
-                sendToUpSystemService.sendXML(xmlBaseModel);
+                IUpSystemService upSystemService = upSystemServiceFactory.getService(UpType.getEnum(NumberUtils.toInt(flag)));
+                upSystemService.sendUp(xmlBaseModel);
             }
             result.setData(1);
         } catch (Exception e) {
