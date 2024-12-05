@@ -34,23 +34,22 @@ import static com.yjh.accessmeter.protocol.ProtocolEnum.AI_GATEWAY;
  * @Date: 2024/10/21
  */
 @Slf4j
-@ProtocolType({ProtocolEnum.AI_GATEWAY})
+@ProtocolType({AI_GATEWAY})
 public class AIGatewayProtocolImpl implements ISensorProtocol {
     public static Map<String, MqttClient> mqttClientMap = new HashMap<>();
     private static Map<String, String> gatewayIdMap = new HashMap<>();
     private volatile boolean inited = false;
     private static Integer midNumber = 1;
 
-
     @Override
     public ISensorProtocol init(List<IotDevice> devices) {
         for (IotDevice device : devices) {
             if (!mqttClientMap.containsKey(device.getIp())) {
                 try {
-                    log.info("{}开始注册mqtt",device);
+                    log.info("{}开始注册mqtt", device);
                     //注册
                     String url = "tcp://" + device.getIp() + ":" + device.getPort();
-                    MqttClient client = new MqttClient(url, Topic.serverClientId+System.currentTimeMillis(), new MemoryPersistence());
+                    MqttClient client = new MqttClient(url, Topic.serverClientId + System.currentTimeMillis(), new MemoryPersistence());
                     MqttConnectOptions options = new MqttConnectOptions();
                     options.setCleanSession(true);
                     client.setCallback(new MqttCallback() {
@@ -79,20 +78,37 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
                     client.connect(options);
                     //查询注册到这个ip的网关
                     List<String> gatewayIds = SpringBeanUtils.getBean(TIotDeviceDao.class).selectGatewayIdByIp(device.getIp());
-                    if (!gatewayIds.isEmpty()){
-                        for (String gatewayId:gatewayIds){
-                            String dataTopic = String.format(Topic.DATA,gatewayId);
-                            String unionTopic = String.format(Topic.COMMAND_ACk,gatewayId);
+                    if (!gatewayIds.isEmpty()) {
+                        for (String gatewayId : gatewayIds) {
+                            String dataTopic = String.format(Topic.DATA, gatewayId);
+                            String unionTopic = String.format(Topic.COMMAND_ACk, gatewayId);
                             client.subscribe(dataTopic);
                             client.subscribe(unionTopic);
-                            gatewayIdMap.put(dataTopic,gatewayId);
-                            gatewayIdMap.put(unionTopic,gatewayId);
+                            gatewayIdMap.put(dataTopic, gatewayId);
+                            gatewayIdMap.put(unionTopic, gatewayId);
                         }
                     }
-                    mqttClientMap.put(device.getIp(),client);
+                    mqttClientMap.put(device.getIp(), client);
                 } catch (Exception e) {
                     log.error("设备：{} 建立mqtt链接出错！=》{}", device, e);
                 }
+            } else {
+                //已经注册了 检查话题是否订阅
+                String gatewayId = device.getAddress();
+                String dataTopic = String.format(Topic.DATA, gatewayId);
+                String unionTopic = String.format(Topic.COMMAND_ACk, gatewayId);
+                MqttClient client = mqttClientMap.get(device.getIp());
+                if (client != null && !gatewayIdMap.containsKey(dataTopic)) {
+                    try {
+                        client.subscribe(dataTopic);
+                        client.subscribe(unionTopic);
+                        gatewayIdMap.put(dataTopic, gatewayId);
+                        gatewayIdMap.put(unionTopic, gatewayId);
+                    } catch (Exception e) {
+                        log.error("订阅话题出错！ 设备：{}", device, e);
+                    }
+                }
+
             }
         }
         inited = true;
@@ -102,27 +118,25 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
     private void msgHandler(String ip, MqttClient client, String topic, MqttMessage message) {
         try {
             if (gatewayIdMap.containsKey(topic)) {
-
                 String gatewayId = gatewayIdMap.get(topic);
-                if (topic.equals(String.format(Topic.DATA,gatewayId))){
+                if (topic.equals(String.format(Topic.DATA, gatewayId))) {
                     //数据上报消息
                     DataInfo dataInfo = JSONObject.parseObject(String.valueOf(message), DataInfo.class);
-                    SpringBeanUtils.getBean(SensorCollectService.class).aIGatewayResultHandler(dataInfo,ip,gatewayId);
-                } else if (topic.equals(String.format(Topic.COMMAND_ACk,gatewayId))){
+                    SpringBeanUtils.getBean(SensorCollectService.class).aIGatewayResultHandler(dataInfo, ip, gatewayId);
+                } else if (topic.equals(String.format(Topic.COMMAND_ACk, gatewayId))) {
                     //联动规则
                     try {
                         ConfigResp configResp = JSONObject.parseObject(String.valueOf(message), ConfigResp.class);
                         SpringBeanUtils.getBean(SensorCollectService.class).linkageConfigSync(configResp, gatewayId, ip);
-                    }catch (Exception e){
-                        log.error("消息解析出错！不是对应的消息！ {}",message,e);
+                    } catch (Exception e) {
+                        log.error("消息解析出错！不是对应的消息！ {}", message, e);
                     }
                 }
             }
-        }catch (Exception e){
-            log.error("处理消息出错：topic = {}，message{}",topic,message,e);
+        } catch (Exception e) {
+            log.error("处理消息出错：topic = {}，message{}", topic, message, e);
         }
     }
-
 
     @Override
     public boolean isInit() {
@@ -145,7 +159,7 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
     public Result sendControl(IotDevice device, Map<String, Object> params) {
         Result result = new Result();
         try {
-            if (params.get("linkageType") == null){
+            if (params.get("linkageType") == null) {
                 //为空 控制的就是设备
                 List<IotDevicePoint> list = SpringBeanUtils.getBean(TIotDeviceDao.class).selectPointByDeviceId(device.getId());
                 if (list.isEmpty()) {
@@ -167,23 +181,23 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
                 DeviceExtend deviceExtend = JSONObject.parseObject(point.getExtend(), DeviceExtend.class);
                 String ctrlCmd = deviceExtend.getCtrl();
                 String state = params.get("deviceStatus").toString();
-                if (device.getIotDeviceType() == 856){//856空调类型
+                if (device.getIotDeviceType() == 856) {//856空调类型
                     String attr = params.get("deviceAttr").toString();
                     String[] cmd = ctrlCmd.split(",");
                     //空调的话要区分控制开关 还是制冷-2 制热-1
-                    if ("1".equals(state) && "12".contains(attr) && StringUtils.isNotEmpty(attr)){
+                    if ("1".equals(state) && "12".contains(attr) && StringUtils.isNotEmpty(attr)) {
                         ctrlCmd = cmd[1];
-                        state = "1".equals(attr)?"2":"1";
+                        state = "1".equals(attr) ? "2" : "1";
                     } else {
                         ctrlCmd = cmd[0];
-                        state = "1".equals(state)?"1":"0";
+                        state = "1".equals(state) ? "1" : "0";
                     }
                 } else {
-                    state = "1".equals(state)?"1":"0";
+                    state = "1".equals(state) ? "1" : "0";
                 }
-                Map<String,String> paras = new HashMap<>();
+                Map<String, String> paras = new HashMap<>();
                 //前段传来 1-开 2-关 网关要求 1-开 0-关
-                paras.put(ctrlCmd,state);
+                paras.put(ctrlCmd, state);
                 controlReq.setParas(paras);
 
                 MqttMessage mqttMessage = new MqttMessage();
@@ -226,17 +240,18 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
     @Override
     public void delete(IotDevice device) {
         //删除了设备 网关设备判断要不要断开mqtt连接
-        if (AI_GATEWAY.getCode().equals(device.getProtocolModel())){
-            List<IotDeviceDataEx> list = SpringBeanUtils.getBean(TIotDeviceDao.class).selectByIpAndAddress(device.getIp(),device.getAddress());
-            if (list.isEmpty() || (list.size() == 1 && Objects.equals(list.get(0).getId(), device.getId()))){
+        if (AI_GATEWAY.getCode().equals(device.getProtocolModel())) {
+            List<IotDeviceDataEx> list =
+                SpringBeanUtils.getBean(TIotDeviceDao.class).selectByIpAndAddress(device.getIp(), device.getAddress());
+            if (list.isEmpty() || (list.size() == 1 && Objects.equals(list.get(0).getId(), device.getId()))) {
                 try {
                     MqttClient client = mqttClientMap.get(device.getIp());
-                    if (client != null){
+                    if (client != null) {
                         client.disconnect();
                     }
                     mqttClientMap.remove(device.getIp());
-                }catch (Exception e){
-                    log.error("断开链接失败！设备={}",device,e);
+                } catch (Exception e) {
+                    log.error("断开链接失败！设备={}", device, e);
                 }
             }
         }
