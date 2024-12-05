@@ -176,4 +176,12 @@
     <delete id="deleteLinkageConfigByAddress" >
         delete from linkage_config where address = #{address}
     </delete>
+
+    <select id="selectDataByType" resultType="java.lang.String">
+        SELECT
+        `value`
+        FROM
+        `t_iot_device_data`
+        where iot_device_type = 856 and iot_device_id =#{iotDeviceId} and point_id = #{pointId} and `value` &lt; 0
+    </select>
 </mapper>

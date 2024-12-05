@@ -396,16 +396,28 @@ public class SensorCollectService {
                             //0-自动 1-制冷 2-制热 3-通风 4-除湿 网管上报的
                             //-5-自动 -4-制冷 -3-制热 -2-通风 -1-除湿 修改后的 (网关上报的值-5)
                             Integer gatewayValue = Integer.parseInt(map.get(finalModeValue)) -5;
-                            value.set(gatewayValue.toString());
+                            value.set(StringUtils.isNotEmpty(value.get())?value.get()+"_"+gatewayValue:gatewayValue.toString());
                         }
                     });
                     if (!value.get().isEmpty()){
-                        String valueTemp = value.get();
-                        if (device.getControllable() == 1 && Integer.parseInt(valueTemp) >= 0){
-                            //控制的 开关转换  前段 1-关 2-开 网关要求 1-开 0-关
-                            valueTemp = "1".equals(valueTemp) ? "2" : "1";
-                            device.setState(valueTemp);
-                        } else {
+                        if (value.get().contains("_")){
+                            //空调的在一块上报的
+                            String[] str = value.get().split("_");
+                            String state = str[0];
+                            String dataValue = str[1];
+                            device.setState("1".equals(state) ? "2" : "1");
+                            device.setValue(dataValue);
+                        }else {
+                            String valueTemp = value.get();
+                            if (device.getControllable() == 1 && Integer.parseInt(valueTemp) >= 0) {
+                                //控制的 开关转换  前段 1-关 2-开 网关要求 1-开 0-关
+                                valueTemp = "1".equals(valueTemp) ? "2" : "1";
+                                device.setState(valueTemp);
+                                if (device.getIotDeviceType() == 856 && dataInfo.getDevices().size() == 1) {
+                                    //空调的开关值 需要去找上一次的上报的制冷制热的值
+                                    valueTemp = iotDeviceDao.selectDataByType(device.getIotDeviceId(), device.getPointId());
+                                }
+                            }
                             device.setValue(valueTemp);
                         }
                         resultList.add(device);
