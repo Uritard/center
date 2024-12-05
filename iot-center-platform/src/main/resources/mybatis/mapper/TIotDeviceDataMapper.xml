@@ -207,4 +207,19 @@
         WHERE b.state = 1
         GROUP BY a.edge_code
     </select>
+    <select id="selectMasterMeterList" resultType="com.yjh.platform.module.iot.entity.TIotDeviceData">
+        SELECT
+            a.iot_device_id,
+            a.iot_device_name,
+            a.point_id,
+            a.point_name,
+            a.`value`,
+            a.create_time,
+            DATE_FORMAT(a.create_time, '%Y-%m-%d') AS lastTime
+        FROM
+            t_iot_device_data a
+                LEFT JOIN t_iot_device b ON a.iot_device_id = b.id
+        WHERE b.meter_type =1
+          AND a.create_time BETWEEN #{startTime} AND #{endTime}
+    </select>
 </mapper>

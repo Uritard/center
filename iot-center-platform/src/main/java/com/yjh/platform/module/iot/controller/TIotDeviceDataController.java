@@ -185,4 +185,22 @@ public class TIotDeviceDataController {
         return result;
     }
 
+
+    @ApiOperation(value = "导出电表报表")
+    @GetMapping(value = "/exportMeterReport")
+    @Logs(title = "导出电表报表", content = "根据用户传递的参数导出电表报表", logType = 9)
+    public Result exportMeterReport(@RequestParam(value = "year") Integer year,
+                                    @RequestParam(value = "month") Integer month) {
+        Result result = new Result();
+        try {
+            result.setData(tIotDeviceDataService.exportMeterReport(year, month));
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            log.info("导出电表报表异常", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        }
+        return result;
+    }
+
 }

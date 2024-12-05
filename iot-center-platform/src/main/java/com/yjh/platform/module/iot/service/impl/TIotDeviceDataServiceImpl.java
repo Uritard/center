@@ -7,6 +7,7 @@ import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.dao.TMeterDao;
 import com.yjh.platform.module.device.dao.TMeterLogDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
@@ -21,15 +22,23 @@ import com.yjh.platform.module.iot.service.TIotDevicePointService;
 import com.yjh.platform.module.iot.service.TIotDeviceService;
 import com.yjh.platform.module.patrol.entity.LineKeyValue;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
+import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.EnvDeviceStatus;
-import com.yjh.platform.module.task.entity.RealTimeWarn;
+import com.yjh.platform.module.task.service.StatisticsService;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.KeyValue;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
@@ -37,6 +46,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.stereotype.Service;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Function;
@@ -526,6 +538,93 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
         });
         this.saveBatch(dataList);
         addToRedis(redisList);
+    }
+
+    @Override
+    public String exportMeterReport(Integer year, Integer month) {
+        Map<String, Object> objectMap = StatisticsService.getDateByMonth(1, year, month);
+        Date startTime = (Date)objectMap.get("startTime");
+        Date endTime = (Date)objectMap.get("endTime");
+        List<Date> dateList = DateTimeUtil.intervalAllTime(UPatrolTaskService.INTERVAL + "2,1", startTime, endTime);
+        // 模板文件路径
+        String templatePath = "/home/yjh_iot_center/iotCenter-web/dist/static/files/" + "template_" + dateList.size() + ".xlsx";
+        String fileName = "meter_output_" + year + "_" + month + ".xlsx";
+        // 输出文件路径
+        String outputPath = SysParamConfig.getSysContent("tempReflect") + "/" + fileName;
+        //当月数据
+        List<TIotDeviceData> dataList = getBaseMapper().selectMasterMeterList(startTime, endTime);
+        //次月一号数据
+        Date nextEndTime = DateTimeUtil.getNextDate(endTime);
+        Date nextStartTime = DateTimeUtil.parseFormat(DateTimeUtil.formatYMD(nextEndTime),DateTimeUtil.getDatePattern());
+        List<TIotDeviceData> nextDataList = getBaseMapper().selectMasterMeterList(nextStartTime, nextEndTime);
+
+        dateList.add(nextStartTime);
+        dataList.addAll(nextDataList);
+        Map<Date, List<TIotDeviceData>> timeGroupMap =
+            dataList.stream().collect(Collectors.groupingBy(TIotDeviceData::getLastTime, TreeMap::new, Collectors.toList()));
+        //填充模板
+        fillTemplate(templatePath, outputPath, timeGroupMap, dateList, year, month);
+
+        outputPath = SysParamConfig.getSysContent("meteModelPath") + "/" + fileName;
+        return outputPath;
+    }
+
+    public static void fillTemplate(String templatePath, String outputPath, Map<Date, List<TIotDeviceData>> timeGroupMap,
+        List<Date> dateList, Integer year, Integer month) {
+        try (FileInputStream fis = new FileInputStream(templatePath); Workbook workbook = new XSSFWorkbook(fis)) {
+            workbook.setSheetName(0, year + "年" + "-" + month + "月");
+            Sheet sheet = workbook.getSheetAt(0);
+            Row rowStation = sheet.getRow(3);
+            Cell cell = rowStation.getCell(1);
+            cell.setCellValue(SysParamConfig.getSysContent("stationName"));
+
+            // 从第8行开始（索引为7）
+            int rowIndex = 7;
+            for (Date date : dateList) {
+                List<TIotDeviceData> list = timeGroupMap.get(date);
+                if (CollectionUtils.isEmpty(list)) {
+                    // 间隔一行
+                    rowIndex += 2;
+                    continue;
+                }
+                Map<String, List<TIotDeviceData>> dailyDataMap =
+                    list.stream().sorted(Comparator.comparing(TIotDeviceData::getIotDeviceName, Comparator.reverseOrder()))
+                        .collect(Collectors.groupingBy(TIotDeviceData::getIotDeviceName));
+                Row row = sheet.getRow(rowIndex);
+                if (row == null) {
+                    row = sheet.createRow(rowIndex);
+                }
+                int num = 1;
+                for (Map.Entry<String, List<TIotDeviceData>> entry : dailyDataMap.entrySet()) {
+                    int start = 5 + (num - 1) * 5;
+                    sheet.getRow(5).getCell(num).setCellValue(entry.getKey());
+                    Map<String, String> dataMap = entry.getValue().stream()
+                        .collect(Collectors.toMap(TIotDeviceData::getPointName, TIotDeviceData::getValue, (e1, e2) -> e1));
+                    setCellValue(row, num, MapUtils.getDoubleValue(dataMap, "正向有功总"));
+                    setCellValue(row, start, MapUtils.getDoubleValue(dataMap, "无功I总"));
+                    setCellValue(row, start + 1, MapUtils.getDoubleValue(dataMap, "无功II总"));
+                    setCellValue(row, start + 2, MapUtils.getDoubleValue(dataMap, "无功III总"));
+                    setCellValue(row, start + 3, MapUtils.getDoubleValue(dataMap, "无功IV总"));
+                    sheet.getRow(5).getCell(4 * num + num).setCellValue(entry.getKey());
+                    num++;
+                }
+                // 间隔一行
+                rowIndex += 2;
+            }
+            try (FileOutputStream fos = new FileOutputStream(outputPath)) {
+                workbook.write(fos);
+            }
+        } catch (Exception e) {
+            log.error("电表报表生成失败", e);
+        }
+    }
+
+    private static void setCellValue(Row row, int columnIndex, double value) {
+        Cell cell = row.getCell(columnIndex);
+        if (cell == null) {
+            cell = row.createCell(columnIndex);
+        }
+        cell.setCellValue(value);
     }
 }
 
