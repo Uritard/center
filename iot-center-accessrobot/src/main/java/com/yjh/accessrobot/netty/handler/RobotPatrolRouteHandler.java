@@ -21,7 +21,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -61,8 +60,6 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
         log.info("本级系统给下级{}响应了", sendCode);
 
         // 处理数据
-        Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
-        
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
 
         String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
@@ -90,14 +87,14 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
 
                 String todayTime = DateTimeUtil.format(new Date(), "yyyy/MM/dd");
                 // 开发环境图片相对路径文件目录
-                String developRelativeUrl = Constant.FTP_IMAGE_RELATIVE + "/" + todayTime + "/" + taskId + "/Road";
+                String developRelativeUrl = Constant.FTP_IMAGE_RELATIVE + "/" + todayTime + "/" + taskId + "/Road/" + fileName;
                 // 开发环境图片绝对路径文件目录
-                String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/" + taskId + "/Road";
+                String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/" + taskId + "/Road/" + fileName;
                 // 将ftp服务器上的文件复制到开发环境
                 robotService.downloadFile(developAbsoluteUrl, filePath);
 
-                robotRoadMap.put("relativePath", developRelativeUrl + "/" + fileName);
-                robotRoadMap.put("absolutePath", developAbsoluteUrl + "/" + fileName);
+                robotRoadMap.put("relativePath", developRelativeUrl);
+                robotRoadMap.put("absolutePath", developAbsoluteUrl);
             } else {
                 robotRoadMap.put("relativePath", "");
                 robotRoadMap.put("absolutePath", "");
