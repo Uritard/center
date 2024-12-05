@@ -40,4 +40,7 @@ public interface TIotDeviceDao {
     int deleteLinkageConfigByAddress(@Param("address") String address);
 
     List<IotDevice> selectDeviceByIp(@Param("ip") String ip,@Param("protocolModel") String protocolModel);
+
+    String selectDataByType(@Param("iotDeviceId") Long iotDeviceId,
+        @Param("pointId") Long pointId);
 }
