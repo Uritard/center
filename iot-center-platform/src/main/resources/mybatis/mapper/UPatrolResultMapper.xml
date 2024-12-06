@@ -980,9 +980,11 @@
         d.check_user as reviewer,
         d.weather as envInfo,
         d.check_date as reviewTime,
-        d.remark as cruiseConclusion
+        d.remark as cruiseConclusion,
+        a.execute_type
         from
         u_patrol_result d
+        left join u_patrol_task a on a.task_id = d.task_id
         WHERE 1 = 1
         <if test="taskId != null and taskId != ''"> and d.task_id = #{taskId, jdbcType=VARCHAR}</if>
         limit 1

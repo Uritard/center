@@ -102,4 +102,9 @@ public class TaskVO implements Serializable {
      */
     private Integer unReview;
 
+    /**
+     * 执行类型（172.周期，173.立即，174.定期）
+     */
+    private Integer executeType;
+
 }
