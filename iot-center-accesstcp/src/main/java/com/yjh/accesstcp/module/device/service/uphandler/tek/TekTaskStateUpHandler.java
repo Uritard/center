@@ -13,7 +13,7 @@ import com.yjh.accesstcp.module.device.dao.PatrolTaskDao;
 import com.yjh.accesstcp.module.device.entity.UPatrolTask;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.uphandler.UpHandlerEnum;
-import com.yjh.accesstcp.module.device.service.uphandler.tek.entitiy.TaskStatusEntity;
+import com.yjh.accesstcp.module.device.service.uphandler.tek.entity.TaskStatusEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
