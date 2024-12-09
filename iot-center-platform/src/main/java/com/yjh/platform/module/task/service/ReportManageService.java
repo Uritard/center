@@ -19,6 +19,7 @@ import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.LineKeyValue;
 import com.yjh.platform.module.patrol.entity.NonhomologousInfo;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
+import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.ReportManageDao;
 import com.yjh.platform.module.task.entity.*;
@@ -59,6 +60,8 @@ public class ReportManageService {
     private UPatrolTaskService uPatrolTaskService;
     @Autowired
     private TStdRegionService stdRegionService;
+    @Autowired
+    private AnalyseDataOperateService analyseDataOperateService;
 
     public static final Cache<String, Integer> REPORT_CACHE = CacheUtil.newFIFOCache(1000);
 
@@ -190,6 +193,7 @@ public class ReportManageService {
 
         ScheduledMapConfig.schedule(15, Triple.of(taskId, userId, downLoad), tri -> ThreadPoolUtil.PATROL_POOL.addThread(() -> {
             TaskVO taskVO = cruiseReportGenerate(tri.getLeft(), tri.getMiddle());
+            uploadReport(taskVO);
             pushDownload(taskVO, tri.getLeft(), tri.getMiddle(), tri.getRight());
         }));
 
@@ -261,7 +265,7 @@ public class ReportManageService {
             ReportHelper.createDocument(contentDataList, file, taskId, uPatrolTask.getTaskName(), userId);
             try {
                 //将任务下的巡视原图图片 打包成一份zip
-                FileUtil.zip(originalImgList, taskId + ".zip", taskId, reportPath, uPatrolTask.getTaskName(), userId);
+                FileUtil.zip(originalImgList, getReportName(taskBaseVO) + ".zip", taskId, reportPath, uPatrolTask.getTaskName(), userId);
                 Constant.sendProcess(uPatrolTask.getTaskName(), userId, 1, 100);
             }catch (Exception e){
                 log.info("压缩任务下图片失败：",e);
@@ -278,16 +282,20 @@ public class ReportManageService {
     }
 
     private File reportFile(TaskVO taskVO) {
-        // 报告名称:站所名称+任务名称+巡视时间
-        String fileNameTemp = taskVO.getStationName() + "-" + taskVO.getTaskName();
-        String reportName = fileNameTemp + "-" + DateTimeUtil.format3(taskVO.getCruiseDate()) + ".xlsx";
-
         String reportPath = (String) redisTemplate.opsForHash().get("t_sys_param:tempReflect", "content");
         log.info("reportPath:{}", reportPath);
 
-        String newReportPath = CommonUtils.concatPath(reportPath, reportName);
+        String newReportPath = CommonUtils.concatPath(reportPath, getReportName(taskVO) + ".xlsx");
         return new File(newReportPath);
     }
+
+    public String getReportName(TaskVO taskVO) {
+        // 报告名称:站所名称+任务名称+巡视时间
+        String taskName =
+            taskVO.getExecuteType() == 172 ? StringUtils.substringBeforeLast(taskVO.getTaskName(), "_") : taskVO.getTaskName();
+        return taskVO.getStationName() + "-" + taskName + "-" + DateTimeUtil.format3(taskVO.getCruiseDate());
+    }
+
 
     private void delaCount(TaskVO taskVO,List<TCruiseDataResultDetail> detailList){
         List<TCruiseDataResultDetail> abnormalList = new ArrayList<>();
@@ -505,15 +513,11 @@ public class ReportManageService {
 
     public String[] reportFilePath(TaskVO taskVO, String taskId) {
         try {
-            // 报告名称:站所名称+任务名称+巡视时间
-            String reportName =
-                taskVO.getStationName() + "-" + taskVO.getTaskName() + "-" + DateTimeUtil.format3(taskVO.getCruiseDate()) + ".xlsx";
-
             String fileRelativePathTemp = SysParamConfig.getSysContent("meteModelPath");
-            String fileRelativePath = CommonUtils.concatPath(fileRelativePathTemp, URLEncodeUtil.encode(reportName));
+            String fileRelativePath = CommonUtils.concatPath(fileRelativePathTemp, URLEncodeUtil.encode(getReportName(taskVO) + ".xlsx"));
             log.info("excel文件下载路径是==={}", fileRelativePath);
 
-            String zipName = taskId + ".zip";
+            String zipName = getReportName(taskVO) + ".zip";
             String zipRelativePath = CommonUtils.concatPath(fileRelativePathTemp, URLEncodeUtil.encode(zipName));
             log.info("zip文件下载路径是==={}", zipRelativePath);
 
@@ -537,6 +541,26 @@ public class ReportManageService {
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
             }
+        }
+    }
+
+    /**
+     * 巡视报告上传至上级系统
+     *
+     * @param taskVO
+     */
+    public void uploadReport(TaskVO taskVO) {
+        if (Constant.reportStateFlag() == 2) {
+            log.info("巡视报告上传至上级系统");
+            String tempReflect = SysParamConfig.getSysContent("tempReflect");
+            String edgeId = SysParamConfig.getSysContent("edgeId");
+            String fileName = getReportName(taskVO);
+            String xlsxFilePath = CommonUtils.concatPath(tempReflect, fileName + ".xlsx");
+            String xlsxFileTagPath = edgeId + "/Report/" + fileName + ".xlsx";
+            analyseDataOperateService.uploadFileToUpFtps(xlsxFilePath, xlsxFileTagPath);
+            String zipFilePath = CommonUtils.concatPath(tempReflect, fileName + ".zip");
+            String zipFileTagPath = edgeId + "/Report/" + fileName + ".zip";
+            analyseDataOperateService.uploadFileToUpFtps(zipFilePath, zipFileTagPath);
         }
     }
 }

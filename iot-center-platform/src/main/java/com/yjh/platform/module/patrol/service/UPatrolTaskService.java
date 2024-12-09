@@ -49,6 +49,7 @@ import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
 import com.yjh.platform.module.task.dao.TPeriodModelDao;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.service.ReportManageService;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.SysUser;
@@ -2750,6 +2751,11 @@ public class UPatrolTaskService {
         jasonMap.put("taskId", taskId);
         log.info("最后一个点-前端推送：{}", JSON.toJSONString(jasonMap));
         Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
+        if (Constant.reportStateFlag() == 1 || Constant.reportStateFlag() == 2) {
+            ReportManageService reportManageService = StaticContextAccessor.getBean(ReportManageService.class);
+            reportManageService.reportCheckGenerate(taskId, null, false);
+            log.info("{} 的巡视报告自动生成", taskId);
+        }
     }
 
     private boolean canFinish(Integer taskState) {

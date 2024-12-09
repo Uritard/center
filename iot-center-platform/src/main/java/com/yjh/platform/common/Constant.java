@@ -414,6 +414,20 @@ public class Constant {
     }
 
     /**
+     *   0 不生成  1：自动生成  2：自动生成且上传上级
+     * @return int
+     */
+    public static int reportStateFlag() {
+        int report = 0;
+        try {
+            report = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:reportStateFlag", "content"), report);
+        } catch (Exception e) {
+            log.warn("reportStateFlag not setting, reportStateFlag: {} ", report);
+        }
+        return report;
+    }
+
+    /**
      * 声纹采样前后字段反转，500 声纹接口采样需前后反转
      */
     public static boolean voiceByteReverse() {
