@@ -10,7 +10,9 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -18,6 +20,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -130,6 +133,47 @@ public class HttpClientUtils {
             throw new BusinessException(ex.getMessage());
         } finally {
                 closeHttpClient(httpClient);
+        }
+        return content;
+    }
+
+    public String doPost(String url, Map<String, Object> params) {
+        String content = null;
+        CloseableHttpClient httpClient = getHttpClient();
+        try {
+            HttpPost post = new HttpPost(url);
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+
+                if (value instanceof File) {
+                    File file = (File) value;
+                    builder.addBinaryBody(key, file, ContentType.MULTIPART_FORM_DATA, file.getName());
+                } else if (value instanceof String) {
+                    builder.addTextBody(key, (String) value, ContentType.TEXT_PLAIN);
+                } else if (value instanceof Integer) {
+                    // 将Integer类型的参数转换为字符串并添加
+                    builder.addTextBody(key, value.toString(), ContentType.TEXT_PLAIN);
+                } else {
+                    // 可以添加更多类型的处理逻辑
+                    throw new IllegalArgumentException("Unsupported parameter type: " + value.getClass().getSimpleName());
+                }
+            }
+            post.setEntity(builder.build());
+
+            CloseableHttpResponse httpResponse = httpClient.execute(post);
+            try {
+                //读取内容
+                content = EntityUtils.toString(httpResponse.getEntity());
+            } finally {
+                httpResponse.close();
+            }
+        } catch (IOException ex) {
+            throw new BusinessException(ex.getMessage());
+        } finally {
+            closeHttpClient(httpClient);
         }
         return content;
     }
