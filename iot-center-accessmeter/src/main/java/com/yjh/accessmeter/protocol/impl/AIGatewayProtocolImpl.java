@@ -52,6 +52,7 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
                     MqttClient client = new MqttClient(url, Topic.serverClientId + System.currentTimeMillis(), new MemoryPersistence());
                     MqttConnectOptions options = new MqttConnectOptions();
                     options.setCleanSession(true);
+                    options.setConnectionTimeout(6);
                     client.setCallback(new MqttCallback() {
                         @Override
                         public void connectionLost(Throwable throwable) {
@@ -240,20 +241,32 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
     @Override
     public void delete(IotDevice device) {
         //删除了设备 网关设备判断要不要断开mqtt连接
-        if (AI_GATEWAY.getCode().equals(device.getProtocolModel())) {
-            List<IotDeviceDataEx> list =
-                SpringBeanUtils.getBean(TIotDeviceDao.class).selectByIpAndAddress(device.getIp(), device.getAddress());
-            if (list.isEmpty() || (list.size() == 1 && Objects.equals(list.get(0).getId(), device.getId()))) {
+        MqttClient client = mqttClientMap.get(device.getIp());
+        if (client != null){
+            List<IotDeviceDataEx> addressList =SpringBeanUtils.getBean(TIotDeviceDao.class).selectByIpAndAddress(null, device.getAddress());
+            List<IotDeviceDataEx> ipList =SpringBeanUtils.getBean(TIotDeviceDao.class).selectByIpAndAddress(device.getIp(), null);
+            if (addressList.isEmpty() || (addressList.size() == 1 && Objects.equals(addressList.get(0).getId(), device.getId()))){
+                //这个网关id下的设备都已删除 取消订阅
                 try {
-                    MqttClient client = mqttClientMap.get(device.getIp());
-                    if (client != null) {
-                        client.disconnect();
-                    }
+                    String gatewayId = device.getAddress();
+                    String dataTopic = String.format(Topic.DATA, gatewayId);
+                    String unionTopic = String.format(Topic.COMMAND_ACk, gatewayId);
+                    client.unsubscribe(dataTopic);
+                    client.unsubscribe(unionTopic);
+                }catch (Exception e){
+                    log.error("取消注册失败！设备={}", device, e);
+                }
+            }
+            if (ipList.isEmpty() || (ipList.size() == 1 && Objects.equals(ipList.get(0).getId(), device.getId()))) {
+                //这个ip下的设备都已删除 断开连接
+                try {
+                    client.disconnect();
                     mqttClientMap.remove(device.getIp());
                 } catch (Exception e) {
                     log.error("断开链接失败！设备={}", device, e);
                 }
             }
+
         }
     }
 }
