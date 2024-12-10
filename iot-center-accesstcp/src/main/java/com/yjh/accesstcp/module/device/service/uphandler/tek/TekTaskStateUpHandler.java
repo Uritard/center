@@ -14,6 +14,7 @@ import com.yjh.accesstcp.module.device.entity.UPatrolTask;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.uphandler.UpHandlerEnum;
 import com.yjh.accesstcp.module.device.service.uphandler.tek.entity.TaskStatusEntity;
+import com.yjh.accesstcp.module.device.service.uphandler.tek.entity.TekResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
@@ -28,6 +29,7 @@ import java.util.Map;
 
 /**
  * <功能描述>
+ *
  * @author Chenfei
  * @date 2024/12/5
  * @since [产品/模块版本] （可选）
@@ -39,8 +41,11 @@ public class TekTaskStateUpHandler extends AbstractTekHandler {
 
     @Resource
     private PatrolTaskDao patrolTaskDao;
+    @Resource
+    private UrlPathHandler urlPathHandler;
 
-    private final static String TASK_STATUS_URL ="/distribute/data/service/taskStatus/receive";
+    private final static String TASK_STATUS_URL = "/distribute/data/service/taskStatus/receive";
+
     @Override
     public UpHandlerEnum subType() {
         return UpHandlerEnum.TASK_STATE;
@@ -48,49 +53,51 @@ public class TekTaskStateUpHandler extends AbstractTekHandler {
 
     @Override
     public int sendUpHandler(XMLBaseModel xmlBaseModel) {
-        if (xmlBaseModel.getItems() == null || xmlBaseModel.getItems().isEmpty() || !"102".equals(xmlBaseModel.getCommand())){
+        //102 自定义的 不处理
+        if (xmlBaseModel.getItems() == null || xmlBaseModel.getItems().isEmpty() || "102".equals(xmlBaseModel.getCommand())) {
             return -1;
         }
-        TaskStatusEntity entity = new TaskStatusEntity();
-        Map<String,Object> item = xmlBaseModel.getItems().get(0);
-        entity.setPlanNo(MapUtils.getString(item,"task_code"));
-        entity.setTaskNo(MapUtils.getString(item,"task_patrolled_id"));
-        entity.setPatrolDeviceType(isRobotOrCameraTask(entity.getPlanNo(),entity.getTaskNo()));
-        String taskStatus = MapUtils.getString(item,"task_state");
-        entity.setTaskStatus(aInterfaceApiToUP(taskStatus));
-        String startDateStr = MapUtils.getString(item,"start_time");
-        Date startTime = DateTimeUtil.parse(startDateStr);
-        entity.setTaskStart(startTime.getTime());
-        if ("".contains(taskStatus)){
-            //任务结束状态
-            entity.setTaskStop(System.currentTimeMillis());
-        }
-        List<TaskStatusEntity> list = new ArrayList<>();
-        list.add(entity);
         try {
-            String result = HttpClientUtils.getInstance().postUrl(TASK_STATUS_URL, JSON.toJSONString(list));
-            log.info("发送任务状态返回： {}",result);
-            JSONObject jsonObject = JSON.parseObject(result);
-            if (jsonObject == null || !"0".equals(jsonObject.getString("code"))){
-                log.info("上级返回失败！");
+            TaskStatusEntity entity = new TaskStatusEntity();
+            Map<String, Object> item = xmlBaseModel.getItems().get(0);
+            entity.setPlanNo(MapUtils.getString(item, "task_code"));
+            entity.setTaskNo(MapUtils.getString(item, "task_patrolled_id"));
+            entity.setPatrolDeviceType(isRobotOrCameraTask(entity.getPlanNo(), entity.getTaskNo()));
+            String taskStatus = MapUtils.getString(item, "task_state");
+            entity.setTaskStatus(aInterfaceApiToUP(taskStatus));
+            String startDateStr = MapUtils.getString(item, "start_time");
+            Date startTime = DateTimeUtil.parse(startDateStr);
+            entity.setTaskStart(startTime.getTime());
+            if ("146".contains(taskStatus)) {
+                //任务结束状态 1-已执行 4-终止 6-超期
+                entity.setTaskStop(System.currentTimeMillis());
             }
-        }catch (Exception e){
-            log.error("发送任务状态失败！ xml=>{}",xmlBaseModel,e);
+            List<TaskStatusEntity> list = new ArrayList<>();
+            list.add(entity);
+            String result = HttpClientUtils.getInstance().postUrl(urlPathHandler.getTekUrl(TASK_STATUS_URL), JSON.toJSONString(list));
+            log.info("发送任务状态返回： {}", result);
+            TekResult tekResult = JSON.parseObject(result,TekResult.class);
+            if (tekResult == null || !(0 == tekResult.getCode())) {
+                log.info("上级返回失败！");
+                return -1;
+            }
+        } catch (Exception e) {
+            log.error("发送任务状态失败！ xml=>{}", xmlBaseModel, e);
+            return -1;
         }
         return Result.SUCCESS;
     }
 
     /**
      * 将A接口任务状态转换为科大状态
+     * A接口状态        1-已执行 2-正在执行 3-暂停 4-终止 5-未执行 6-超期
+     * 科大上级状态      2-已检测 1-检测中  4-已暂停 3-已取消 0-待检测 2-超期
+     *
      * @param aTaskStatus A接口任务状态
-     * @return
+     * @return 科大上级状态
      */
-    private String aInterfaceApiToUP(String aTaskStatus){
-        /**
-         * A接口状态        1-已执行 2-正在执行 3-暂停 4-终止 5-未执行 6-超期
-         * 科大上级状态      2-已检测 1-检测中  4-已暂停 3-已取消 0-待检测 2-超期
-         */
-        switch (aTaskStatus){
+    private String aInterfaceApiToUP(String aTaskStatus) {
+        switch (aTaskStatus) {
             case "1":
             case "6":
                 return "2";
@@ -101,7 +108,6 @@ public class TekTaskStateUpHandler extends AbstractTekHandler {
             case "4":
                 return "3";
             case "5":
-                return "0";
             default:
                 return "0";
         }
@@ -110,10 +116,11 @@ public class TekTaskStateUpHandler extends AbstractTekHandler {
     /**
      * 判断任务相机任务还是机器人任务
      * 包含机器人就是机器人任务
+     *
      * @param taskCode 任务编码
      * @return
      */
-    private String isRobotOrCameraTask(String taskCode,String taskPatrolledId){
+    private String isRobotOrCameraTask(String taskCode, String taskPatrolledId) {
         // 增加时间判断，避免预先初始化导致数据传入下一个任务
         String timeStr = StringUtils.substringAfterLast(taskPatrolledId, "_");
         Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
@@ -123,7 +130,7 @@ public class TekTaskStateUpHandler extends AbstractTekHandler {
         List<Integer> cruiseTypeList = patrolTaskDao.selectCruiseType(uPatrolTask.getTaskId());
         String type = "0";
         //包含相机就是相机任务 其他的视为机器人任务
-        if (cruiseTypeList.contains(230) || cruiseTypeList.contains(229)){
+        if (cruiseTypeList.contains(230) || cruiseTypeList.contains(229)) {
             type = "1";
         }
         return type;
