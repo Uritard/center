@@ -145,7 +145,9 @@
         b.extend
         from t_iot_device a
         left join t_iot_device_point b on b.iot_device_id = a.id
-        where ip = #{ip} and address = #{address} and protocol_model = 9
+        where protocol_model = 9
+        <if test="ip != null and ip != ''"> and ip = #{ip}</if>
+        <if test="address != null and address != ''"> and address = #{address}</if>
     </select>
     <select id="selectGatewayIdByIp" resultType="java.lang.String">
         select distinct
