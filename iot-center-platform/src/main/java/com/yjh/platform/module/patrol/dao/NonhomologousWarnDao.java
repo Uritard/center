@@ -24,8 +24,7 @@ public interface NonhomologousWarnDao {
 
     List<Map<String,Object>> selectWarnResults(Map<String,Object> intervalResultsParam);
 
-    Map<String,String> selectLastResultNum(@Param(value = "instanceId") String instanceId,
-                               @Param(value = "list") String[] list);
+    Map<String,Object> selectLastResultNum(@Param(value = "instanceId") String instanceId);
 
     List<Map<String, Object>> getInstanceIdByDeviceId(@Param(value = "deviceId") String deviceId,
                                                       @Param(value = "taskId") String taskId);

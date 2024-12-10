@@ -103,15 +103,14 @@
     </select>
     <select id="selectLastResultNum"  resultType="java.util.HashMap">
         select
-        a.result_num as lastValue,
-        a.task_id as taskId
+        a.task_id as taskId,
+        a.instance_id as inspectionId,
+        a.result_num as resultValue
         from u_patrol_data_result a
         where a.instance_id = #{instanceId}
-        and result_num in
-        <foreach collection="list" separator="," open="(" close=")" item="resultNum">
-        #{resultNum}
-        </foreach>
-        order by a.cruise_time desc
+        and a.createtime is not null
+        and a.cruise_result = 246
+        order by a.createtime desc
         limit 1
     </select>
 

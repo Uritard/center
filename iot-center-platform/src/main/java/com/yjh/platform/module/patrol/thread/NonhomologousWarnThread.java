@@ -14,7 +14,6 @@ import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.dao.NonhomologousWarnDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
-import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
@@ -314,54 +313,55 @@ public class NonhomologousWarnThread implements Runnable{
                         }
                         break;
                     case "6":
-                        if(!isNumeric(robotInsResult)){
-                            //特殊走特殊的逻辑
-                            if (Constant.nonhomologousWarn.contains(robotInsResult)){
-                               Map<String,String> lastValue = nonhomologousWarnDao.selectLastResultNum(robotInstanceId,Constant.nonhomologousWarn.split(","));
-                               if (lastValue != null){
-                                   log.info("lastValue===={}  thisValue==={} lastTaskId==={}",lastValue.get("lastValue"),robotInsResult,lastValue.get("taskId"));
-                                   if (StringUtils.isNotEmpty(lastValue.get("lastValue")) && !robotInsResult.equals(lastValue.get("lastValue"))){
-                                       //告警
-                                       Map<String,Object> warn = new HashMap<>(4);
-                                       warn.put("warnId", warnId);
-                                       warn.put("warnType", 6);
-                                       warn.put("instanceId", Long.parseLong(instanceId));
-                                       warn.put("warnContent", "时间范围内识别结果趋势不一致：" + lastValue.get("lastValue")+"->"+robotInsResult);
-                                       warn.put("value",robotInsResult);
+                        // 1-天 2-周 3-月 4-上次
+                        String timeType = String.valueOf(map.get("intervalType"));
+                        // 加入当前结果对象
+                        Map<String, Object> nowResult = new HashMap<>(4);
+                        nowResult.put("taskId", taskCode);
+                        nowResult.put("inspectionId", robotInstanceId);
+                        nowResult.put("resultValue", StringUtils.substringBefore(robotInsResult, ","));
+                        nowResult.put("warnId", warnId);
+                        if ("4".equals(timeType)) {
+                            //上次对比处理
+                            Map<String, Object> lastResult = nonhomologousWarnDao.selectLastResultNum(robotInstanceId);
+                            if (lastResult != null) {
+                                log.info("lastValue===={}  thisValue==={} lastTaskId==={}", lastResult.get("resultValue"), robotInsResult,
+                                    lastResult.get("taskId"));
+                                if (Objects.nonNull(lastResult.get("resultValue"))) {
+                                    float difference = NumberUtils.toFloat(robotInsResult) - NumberUtils.toFloat(
+                                        String.valueOf(lastResult.get("resultValue")));
+                                    String dvalStr = CommonUtils.percentFormat(difference, "#.##");
+                                    if (difference - threshold > 1e-5) {
+                                        //告警
+                                        Map<String, Object> warn = new HashMap<>(4);
+                                        warn.put("warnId", warnId);
+                                        warn.put("warnType", 6);
+                                        warn.put("instanceId", Long.parseLong(instanceId));
+                                        warn.put("warnContent", "本次结果与上次结果差值超过阈值告警：" + dvalStr + "，阈值：" + warnThreshold);
+                                        List<Map<String, Object>> insResults = new ArrayList<>();
+                                        lastResult.put("warnId", warnId);
+                                        insResults.add(lastResult);
+                                        insResults.add(nowResult);
+                                        warn.put("resultsInfo", insResults);
+                                        warn.put("value", dvalStr);
+                                        warn.put("deviceMeteId", deviceMeteId);
+                                        warn.put("oneCruiseDeviceName", oneCruiseName);
+                                        warn.put("twoCruiseDeviceName", twoCruiseName);
 
-                                       List<Map<String,Object>> resultsInfo = new ArrayList<>();
-                                       HashMap<String,Object> mapItem1 = new HashMap<>();
-                                       mapItem1.put("warnId",warnId);
-                                       mapItem1.put("taskId",taskCode);
-                                       mapItem1.put("inspectionId",robotInstanceId);
-                                       resultsInfo.add(mapItem1);
+                                        warn.put("deviceName", deviceName);
+                                        warn.put("deviceTypeName", deviceTypeName);
+                                        warn.put("deviceMeteName", deviceMeteName);
 
-                                       HashMap<String,Object> mapItem2 = new HashMap<>();
-                                       mapItem2.put("warnId",warnId);
-                                       mapItem2.put("taskId",lastValue.get("taskId"));
-                                       mapItem2.put("inspectionId",robotInstanceId);
-                                       resultsInfo.add(mapItem2);
-                                       warn.put("resultsInfo",resultsInfo);
-                                       warn.put("deviceMeteId", deviceMeteId);
-                                       warn.put("oneCruiseDeviceName", oneCruiseName);
-                                       warn.put("twoCruiseDeviceName", twoCruiseName);
+                                        warn.put("regionName", regionName);
+                                        warn.put("customName", customName);
 
-                                       warn.put("deviceName", deviceName);
-                                       warn.put("deviceTypeName", deviceTypeName);
-                                       warn.put("deviceMeteName", deviceMeteName);
-
-                                       warn.put("regionName", regionName);
-                                       warn.put("customName", customName);
-
-                                       insertNonhomologousWarnInfo(warn, NONHOMOLOGOUS_TREND_OUTLIMIT);
-                                   }
-                               }
+                                        insertNonhomologousWarnInfo(warn, NONHOMOLOGOUS_TREND_OUTLIMIT);
+                                    }
+                                }
                             }
-                            log.info("区间非同源告警--数据非指定汉字");
+                            log.info("区间非同源告警--与上一次数据进行比较");
                             break;
                         }
-                        // 1-天 2-周 3-月
-                        String timeType = String.valueOf(map.get("intervalType"));
                         Date endTime= new Date();
                         Date startTime = null;
                         switch (timeType) {
@@ -397,19 +397,13 @@ public class NonhomologousWarnThread implements Runnable{
                             log.info("区间非同源告警--历史数据为空");
                             break;
                         }
-                        // 加入当前结果对象
-                        Map<String,Object> nowResult = new HashMap<>(4);
-                        nowResult.put("taskId", taskCode);
-                        nowResult.put("inspectionId", robotInstanceId);
-                        nowResult.put("resultValue", robotInsResult);
                         // 过滤非数字结果
                         intervalResults.add(nowResult);
                         intervalResults.forEach(m ->{
                             m.put("resultValue",m.get("resultValue").toString().split(",")[0]);
                         });
-                        List<Map<String,Object>> numResults= intervalResults;
-                        Optional<Map<String,Object>> maxValueResultInfo = numResults.stream().reduce((x, y) -> Double.parseDouble(x.get("resultValue").toString()) > Double.parseDouble(y.get("resultValue").toString()) ? x : y);
-                        Optional<Map<String,Object>> minValueResultInfo = numResults.stream().reduce((x, y) -> Double.parseDouble(x.get("resultValue").toString()) < Double.parseDouble(y.get("resultValue").toString()) ? x : y);
+                        Optional<Map<String,Object>> maxValueResultInfo = intervalResults.stream().reduce((x, y) -> Double.parseDouble(x.get("resultValue").toString()) > Double.parseDouble(y.get("resultValue").toString()) ? x : y);
+                        Optional<Map<String,Object>> minValueResultInfo = intervalResults.stream().reduce((x, y) -> Double.parseDouble(x.get("resultValue").toString()) < Double.parseDouble(y.get("resultValue").toString()) ? x : y);
                         log.info("区间非同源判断：maxInsResult为==={},minInsResult为==={},阈值是==={}", maxValueResultInfo, minValueResultInfo, warnThreshold);
                         float dval = NumberUtils.toFloat(maxValueResultInfo.get().get("resultValue").toString()) -
                                 NumberUtils.toFloat(minValueResultInfo.get().get("resultValue").toString());
@@ -421,7 +415,7 @@ public class NonhomologousWarnThread implements Runnable{
                             warn.put("instanceId", Long.parseLong(instanceId));
                             warn.put("warnContent", "时间范围内识别结果差值超过阈值告警：" + dvalStr + "，阈值：" + warnThreshold);
                             intervalResults.forEach(i -> i.put("warnId", warn.get("warnId")));
-                            List<Map<String, Object>> insResults = new ArrayList<>(numResults);
+                            List<Map<String, Object>> insResults = new ArrayList<>(intervalResults);
                             warn.put("resultsInfo", insResults);
                             warn.put("value", dvalStr);
                             warn.put("deviceMeteId", deviceMeteId);
