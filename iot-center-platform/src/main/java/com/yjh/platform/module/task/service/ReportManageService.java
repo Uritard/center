@@ -293,7 +293,7 @@ public class ReportManageService {
         // 报告名称:站所名称+任务名称+巡视时间
         String taskName =
             taskVO.getExecuteType() == 172 ? StringUtils.substringBeforeLast(taskVO.getTaskName(), "_") : taskVO.getTaskName();
-        return taskVO.getStationName() + "-" + taskName + "-" + DateTimeUtil.format3(taskVO.getCruiseDate());
+        return taskVO.getStationName() + "-" + taskName + "-" + DateTimeUtil.format3(taskVO.getStartTime());
     }
 
 
