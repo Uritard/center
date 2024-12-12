@@ -166,7 +166,7 @@
                  FROM (
                           SELECT a.point_id,
                                  a.`value`,
-                                 a.magnification_coefficient,
+                                 c.magnification_coefficient,
                                  a.create_time,
                                  a.edge_code,
                                  DATE_FORMAT(a.create_time, '%Y-%m-%d') AS lastTime
@@ -185,7 +185,7 @@
                       (
                           SELECT a.point_id,
                                  a.`value`,
-                                 a.magnification_coefficient,
+                                 c.magnification_coefficient,
                                  a.create_time,
                                  a.edge_code,
                                  DATE_FORMAT(a.create_time, '%Y-%m-%d') AS lastTime

@@ -1188,8 +1188,8 @@
         where a.up_region_id = -1
     </select>
     <select id="selectAllCount" resultType="com.yjh.platform.module.device.entity.TaskInfoBean">
-        SELECT a.curAlarmCount + b.curAlarmCount AS curAlarmCount,
-               a.untreatedAlarmCount + b.untreatedAlarmCount AS untreatedAlarmCount
+        SELECT a.curAlarmCount + b.curAlarmCount + c.curAlarmCount AS curAlarmCount,
+               a.untreatedAlarmCount + b.untreatedAlarmCount + c.untreatedAlarmCount AS untreatedAlarmCount
         FROM(
              (
                  SELECT
@@ -1203,8 +1203,12 @@
                 count(IF (conf_mode = 275,NULL,conf_mode)) AS untreatedAlarmCount
              FROM
                 t_defect_info
-             )b
-             )
+                )b,
+                ( select count(IF(DATE(alarm_time) = CURDATE(),alarm_time,null)) AS curAlarmCount,
+                count(IF (delete_flag = 1,delete_flag,null)) AS untreatedAlarmCount
+                FROM t_iot_device_warn
+                ) c
+        )
     </select>
     <select id="selectWarnIdByTaskId" resultType="java.lang.Long">
         select warn_id from t_warn_info where task_id = #{taskId}
