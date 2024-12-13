@@ -95,6 +95,36 @@ public class SsoAuthController {
         return result;
     }
 
+    @ApiOperation(value = "生成sso授权信息noAuth")
+    @GetMapping(value = "/generate_noAuth")
+    public Result generateNoAuth(@RequestParam(value = "path") String path,
+                                 @RequestParam(value = "username") String username) {
+        Result result = new Result();
+        try {
+
+            Map<String, Object> loginMap = new HashMap<>(8);
+
+            loginMap.put("toPath", path);
+            loginMap.put("username", username);
+            loginMap.put("timestamp", System.currentTimeMillis());
+            loginMap.put("replayAvoid", RandomUtil.randomString(6));
+            loginMap.put("address", IPUtil.getIp());
+
+            String jsonStr = JSON.toJSONString(loginMap);
+
+            String ssoPublicKey = SysParamConfig.getSysContent("ssoPublicKey");
+
+            String secretData = SM2Utils.encrypt(Base64.decode(ssoPublicKey), jsonStr.getBytes(StandardCharsets.UTF_8));
+            result.setData(secretData);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("生成sso登录信息失败:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "sso鉴权")
     @GetMapping(value = "/authority")
     public Result authority(@RequestParam(value = "secret") String secret, HttpServletRequest request) {

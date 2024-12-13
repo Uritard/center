@@ -138,4 +138,38 @@
         delete from a_interface_task_info where task_code = #{taskCode}
     </delete>
 
+    <select id="selectTaskIdByTaskCode" parameterType="java.lang.String" resultType="com.yjh.accesstcp.module.device.entity.UPatrolTask">
+        SELECT
+        a.task_id,
+        a.task_code,
+        a.task_name,
+        a.plan_id,
+        a.area_id,
+        a.task_type,
+        a.execute_type,
+        a.robot_id,
+        a.date_type,
+        a.task_source,
+        a.task_level,
+        a.start_time,
+        a.create_time,
+        a.end_time,
+        a.create_user_id
+        FROM
+        u_patrol_result b left join u_patrol_task a on a.task_id = b.task_id
+        WHERE a.task_code = #{robotTaskId, jdbcType=VARCHAR} and b.task_state in (238,239,240,241)
+        <if test="executeTime != null">
+            and a.start_time <![CDATA[<=]]> DATE_ADD(#{executeTime, jdbcType=TIMESTAMP}, INTERVAL 5 second)
+        </if>
+        ORDER BY b.create_time desc
+        LIMIT 1
+    </select>
+
+    <select id="selectCruiseType" resultType="java.lang.Integer">
+        select
+            point_type
+        from
+        u_patrol_task_attr where task_id = #{taskId}
+        GROUP BY point_type
+    </select>
 </mapper>

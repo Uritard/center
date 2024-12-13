@@ -28,4 +28,6 @@ public interface TIotDeviceDataService extends IService<TIotDeviceData> {
     void deviceConverted();
 
     void insertDataFromMeterLog();
+
+    String exportMeterReport(Integer year, Integer month);
 }

@@ -12,7 +12,7 @@
             <result property="address" column="address" jdbcType="VARCHAR"/>
             <result property="iotDeviceType" column="iot_device_type" jdbcType="INTEGER"/>
             <result property="protocolModel" column="protocol_model" jdbcType="VARCHAR"/>
-            <result property="deviceId" column="device_id" jdbcType="BIGINT"/>
+            <result property="meterType" column="meter_type" jdbcType="BIGINT"/>
             <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
             <result property="upRegionName" column="up_region_name" jdbcType="VARCHAR"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>

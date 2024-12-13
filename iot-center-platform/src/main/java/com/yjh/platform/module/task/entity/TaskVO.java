@@ -70,6 +70,11 @@ public class TaskVO implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date cruiseEndTime;
     /**
+     * 开始时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date startTime;
+    /**
      * 巡视统计
      */
     private String cruiseStatistics;
@@ -101,5 +106,10 @@ public class TaskVO implements Serializable {
      * 待人工确认点位
      */
     private Integer unReview;
+
+    /**
+     * 执行类型（172.周期，173.立即，174.定期）
+     */
+    private Integer executeType;
 
 }

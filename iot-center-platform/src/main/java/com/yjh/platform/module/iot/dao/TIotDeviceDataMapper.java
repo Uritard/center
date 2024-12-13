@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,9 @@ public interface TIotDeviceDataMapper extends BaseMapper<TIotDeviceData> {
 
     List<Map<String,String>> countPowerTotalByEdge(@Param(value = "startTime") LocalDateTime startTime,
                                                    @Param(value = "endTime")LocalDateTime endTime);
+
+    List<TIotDeviceData> selectMasterMeterList(@Param(value = "startTime") Date startTime,
+                                               @Param(value = "endTime") Date endTime);
 }
 
 

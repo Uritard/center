@@ -62,7 +62,7 @@ public class zuulFilter extends ZuulFilter {
 
     private static final String[] NO_AUTH =
         new String[] {"/sysUser/v1/randomNumbers", "/sysUser/v1/getPubk", "/tSysParam/v1/sysConfig", "/tSysParam/v1/homePageInfo",
-            "/ssoAuth/v1/authority"};
+            "/ssoAuth/v1/authority", "/ssoAuth/v1/generate_noAuth"};
 
     private static final String[] LOGIN_PATH = new String[] {"/sysUser/v1/login", "/sysUser/v1/loginChangePassword"};
 
