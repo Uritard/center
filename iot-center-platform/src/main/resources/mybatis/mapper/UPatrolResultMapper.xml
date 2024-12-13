@@ -981,6 +981,7 @@
         d.weather as envInfo,
         d.check_date as reviewTime,
         d.remark as cruiseConclusion,
+        a.start_time as startTime,
         a.execute_type
         from
         u_patrol_result d
