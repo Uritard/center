@@ -460,6 +460,7 @@
         address = #{address},
         iot_device_type = #{iotDeviceType},
         magnification_coefficient = #{magnificationCoefficient},
+        meter_type = #{meterType},
         controllable = #{controllable}
         where origin_id = #{originId} and edge_code = #{edgeCode}
     </update>
