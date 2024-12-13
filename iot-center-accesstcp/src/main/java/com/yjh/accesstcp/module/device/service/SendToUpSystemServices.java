@@ -17,6 +17,8 @@ import com.yjh.accesstcp.commons.utils.CommonUtils;
 import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.dao.*;
 import com.yjh.accesstcp.module.device.entity.*;
+import com.yjh.accesstcp.module.device.service.impl.UpType;
+import com.yjh.accesstcp.module.device.service.uphandler.tek.UrlPathHandler;
 import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import com.yjh.accesstcp.module.device.utils.ValueUtil;
 import com.yjh.accesstcp.netty.NettyClient;
@@ -82,6 +84,8 @@ public class SendToUpSystemServices {
 
     @Autowired
     private PatrolTaskDao patrolTaskDao;
+    @Autowired
+    private UrlPathHandler urlPathHandler;
 
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -2055,23 +2059,29 @@ public class SendToUpSystemServices {
             String port = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemPort");
             if (Objects.nonNull(flag) && Objects.nonNull(ip) && Objects.nonNull(port)) {
                 SocketAddress socketAddress = new InetSocketAddress(ip, Integer.parseInt(port));
+                int upflag = NumberUtils.toInt(Constant.upSystemFlag());
                 if (!Constant.upSystemFlag().equals(flag)) {
                     //flag 改动 由0 -> 1 启动 由1 -> 0 关闭
-                    if (Constant.ONE.equals(flag)) {
+                    if (UpType.STATE_GRID.getType() == upflag) {
                         this.start(socketAddress, "upSystem");
-                    } else {
+                    } else if (UpType.TEK.getType() == upflag) {
+                        urlPathHandler.authToken();
                         this.stop(socketAddress);
                     }
                     Constant.upSystemFlag = flag;
                 }
-                boolean isChange = Constant.ONE.equals(flag) && !Constant.upSystemIp().equals(ip) || !String.valueOf(Constant.upSystemPort()).equals(port);
+                boolean isChange = !Constant.ZERO.equals(flag) && (!Constant.upSystemIp().equals(ip) || !String.valueOf(Constant.upSystemPort()).equals(port));
                 if (isChange) {
-                    //ip 端口修改 变更连接
-                    if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.get(socketAddress))) {
-                        this.stop(socketAddress);
-                        this.start(socketAddress, "upSystem");
+                    if (UpType.STATE_GRID.getType() == upflag) {
+                        //ip 端口修改 变更连接
+                        if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.get(socketAddress))) {
+                            this.stop(socketAddress);
+                            this.start(socketAddress, "upSystem");
+                        } else {
+                            this.start(socketAddress, "upSystem");
+                        }
                     } else {
-                        this.start(socketAddress, "upSystem");
+                        urlPathHandler.authToken();
                     }
                     Constant.upSystemIp = ip;
                     Constant.upSystemPort = Integer.valueOf(port);
@@ -2149,7 +2159,7 @@ public class SendToUpSystemServices {
                     registerManager.terminate(tcpClientHandler.getServer());
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
             }
         }
         ReContentManager.terminate(socketAddress);

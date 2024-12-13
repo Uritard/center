@@ -1,11 +1,14 @@
 package com.yjh.accesstcp;
 
 import com.yjh.accesstcp.common.Constant;
+import com.yjh.accesstcp.module.device.service.impl.UpType;
+import com.yjh.accesstcp.module.device.service.uphandler.tek.UrlPathHandler;
 import com.yjh.accesstcp.netty.NettyClient;
 import com.yjh.accesstcp.netty.algorithm.StateGridAlgorithmHandlerImpl;
 import com.yjh.accesstcp.netty.iot.StateGridADecoder;
 import com.yjh.accesstcp.netty.iot.StateGridAHandlerImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -37,6 +40,8 @@ public class AccessTcpApplication implements CommandLineRunner {
     @SuppressWarnings("rawtypes")
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private UrlPathHandler urlPathHandler;
 
     public static void main(String[] args) {
         SpringApplication.run(AccessTcpApplication.class, args);
@@ -47,12 +52,15 @@ public class AccessTcpApplication implements CommandLineRunner {
         String url = getLocalIp();
         log.info("local ip is : {}", url);
         Constant.redisTemplate = redisTemplate;
+        int upflag = NumberUtils.toInt(Constant.upSystemFlag());
         //上级系统连接
-        if(Constant.ONE.equals(Constant.upSystemFlag())) {
+        if(UpType.STATE_GRID.getType() == upflag) {
             InetSocketAddress address = new InetSocketAddress(Constant.upSystemIp(), Constant.upSystemPort());
             log.info("access tcp is running, address is : " + address.getAddress());
             NettyClient nettyClient = new NettyClient(StateGridADecoder.class, new StateGridAHandlerImpl());
             nettyClient.start(address);
+        } else if (UpType.TEK.getType() == upflag) {
+            urlPathHandler.authToken();
         }
         //上级系统算法连接
         if(Constant.ONE.equals(Constant.managerSystemFlag())) {
