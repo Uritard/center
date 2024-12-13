@@ -683,12 +683,14 @@ public class TStdDevicemeteService{
                         log.info("重置预置位相机抓图结果：{}", resPicMap);
                         String urlPath = String.valueOf(resPicMap.get("urlPath"));
                         String remotePath = tCameraPresetService.saveImgToFtpsToCoverOriImg(urlPath, cameraPreset.getPresetImg());
+                        cameraPreset.setPresetPtz(resData);
+                        // 更新PTZ信息
+                        tCameraPresetService.update(cameraPreset);
                         cameraPreset.setPresetImg(remotePath);
+                        // 向边缘节点同步预置位图片和ptz信息
+                        tCameraPresetService.SycPresetToEdge(cameraPreset);
+                        result.setData(1);
                     }
-                    cameraPreset.setPresetPtz(resData);
-                    tCameraPresetService.update(cameraPreset); // 更新PTZ信息
-                    tCameraPresetService.SycPresetToEdge(cameraPreset); // 向边缘节点同步预置位图片和ptz信息
-                    result.setData(1);
                 } else {
                     result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
                     result.setData(0);
