@@ -41,6 +41,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
@@ -382,9 +383,12 @@ public class HttpClientUtils {
     private String execute(HttpUriRequest request, HttpContext context, int retry) throws IOException {
         // 使用 context 做同步处理，避免两个相同的服务请求同时做鉴权处理，会引起其中一个鉴权报错
         CloseableHttpResponse response;
+
+        boolean haveToken = setToken(request, context);
+
         // context 不为空，且 context 中认证信息不为 SUCCESS 则需要加锁，避免锁异常
-        boolean needSync = context != null && (((HttpClientContext)context).getTargetAuthState() == null
-            || ((HttpClientContext)context).getTargetAuthState().getState() != AuthProtocolState.SUCCESS) && ((HttpClientContext)context).getUserToken()==null;
+        boolean needSync = !haveToken && context != null && (((HttpClientContext)context).getTargetAuthState() == null
+            || ((HttpClientContext)context).getTargetAuthState().getState() != AuthProtocolState.SUCCESS);
         if (needSync) {
             synchronized (getLock(request, context)) {
                 response = client.execute(request, context);
@@ -412,6 +416,19 @@ public class HttpClientUtils {
             IoUtil.close(response);
         }
         return execute(request, context, ++retry);
+    }
+
+    public boolean setToken(HttpUriRequest request, HttpContext context) {
+        if (context == null) {
+            return false;
+        }
+        String token = Optional.ofNullable(((HttpClientContext)context).getUserToken()).map(Object::toString).orElse("");
+        if (StringUtils.isNotEmpty(token)) {
+            request.addHeader("token", token);
+            request.addHeader("access_token", token);
+            return true;
+        }
+        return false;
     }
 
     /**

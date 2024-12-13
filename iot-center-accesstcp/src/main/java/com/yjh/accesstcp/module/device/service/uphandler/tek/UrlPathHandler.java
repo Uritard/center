@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,6 +65,7 @@ public class UrlPathHandler {
 
         try {
             String ret = HttpClientUtils.getInstance().tokenAuth(url, params, heardAttrs, this::authToken);
+            log.info("鉴权登录：{}", ret);
             JSONObject json = JSON.parseObject(ret);
             String token = json.getString("access_token");
             long expires = json.getLongValue("expires_in");
@@ -76,7 +78,7 @@ public class UrlPathHandler {
             HttpClientUtils.getInstance().updateContext(url, context);
 
             // 设置定时器，超期之前刷新
-            taskScheduler.scheduleWithFixedDelay(this::authToken, Duration.ofSeconds(expires));
+            taskScheduler.schedule(this::authToken, Instant.now().plusSeconds(expires));
             return token;
         } catch (IOException e) {
             log.error("登录鉴权失败", e);
