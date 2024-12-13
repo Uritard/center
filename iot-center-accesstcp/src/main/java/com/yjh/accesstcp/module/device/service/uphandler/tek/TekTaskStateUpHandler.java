@@ -61,7 +61,7 @@ public class TekTaskStateUpHandler extends AbstractTekHandler {
             TaskStatusEntity entity = new TaskStatusEntity();
             Map<String, Object> item = xmlBaseModel.getItems().get(0);
             entity.setPlanNo(MapUtils.getString(item, "task_code"));
-            entity.setTaskNo(MapUtils.getString(item, "task_patrolled_id"));
+            entity.setTaskNo(MapUtils.getString(item, "task_code"));
             entity.setPatrolDeviceType(isRobotOrCameraTask(entity.getPlanNo(), entity.getTaskNo()));
             String taskStatus = MapUtils.getString(item, "task_state");
             entity.setTaskStatus(aInterfaceApiToUP(taskStatus));
@@ -122,12 +122,12 @@ public class TekTaskStateUpHandler extends AbstractTekHandler {
      */
     private String isRobotOrCameraTask(String taskCode, String taskPatrolledId) {
         // 增加时间判断，避免预先初始化导致数据传入下一个任务
-        String timeStr = StringUtils.substringAfterLast(taskPatrolledId, "_");
+        /*String timeStr = StringUtils.substringAfterLast(taskPatrolledId, "_");
         Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
         //根据taskCode找到taskId
-        UPatrolTask uPatrolTask = patrolTaskDao.selectTaskIdByTaskCode(taskCode, date);
+        UPatrolTask uPatrolTask = patrolTaskDao.selectTaskIdByTaskCode(taskCode, date);*/
         //查询任务下面的点位巡视类型
-        List<Integer> cruiseTypeList = patrolTaskDao.selectCruiseType(uPatrolTask.getTaskId());
+        List<Integer> cruiseTypeList = patrolTaskDao.selectCruiseType(taskCode);
         String type = "0";
         //包含相机就是相机任务 其他的视为机器人任务
         if (cruiseTypeList.contains(230) || cruiseTypeList.contains(229)) {
