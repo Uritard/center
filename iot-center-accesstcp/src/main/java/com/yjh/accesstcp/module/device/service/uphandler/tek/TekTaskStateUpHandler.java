@@ -74,7 +74,7 @@ public class TekTaskStateUpHandler extends AbstractTekHandler {
             }
             List<TaskStatusEntity> list = new ArrayList<>();
             list.add(entity);
-            String result = HttpClientUtils.getInstance().postUrl(urlPathHandler.getTekUrl(TASK_STATUS_URL), JSON.toJSONString(list));
+            String result = HttpClientUtils.getInstance().doPost(urlPathHandler.getTekUrl(TASK_STATUS_URL), JSON.toJSONString(list));
             log.info("发送任务状态返回： {}", result);
             TekResult tekResult = JSON.parseObject(result,TekResult.class);
             if (tekResult == null || !(0 == tekResult.getCode())) {

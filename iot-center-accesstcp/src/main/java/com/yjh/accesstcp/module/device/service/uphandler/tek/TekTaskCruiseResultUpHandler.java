@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -64,16 +65,20 @@ public class TekTaskCruiseResultUpHandler extends AbstractTekHandler {
 
     private void uploadPic(XMLBaseModel xmlBaseModel, String url) {
         for(Map<String, Object> item : xmlBaseModel.getItems()){
-            Map params = new HashMap(8);
+            Map<String, Object> params = new HashMap<>(8);
             String filePaths = String.valueOf(item.get("file_path"));
             String[] split = filePaths.split(",");
             for (String filePath : split) {
-                params.put("file", new File(filePath) );
-                params.put("planNo", String.valueOf(item.get("task_code")));
-                params.put("taskNo", String.valueOf(item.get("task_patrolled_id")));
-                params.put("infoCode", String.valueOf(item.get("patroldevice_code")));
-                params.put("source", 1);
-                HttpClientUtils.getInstance().doPost(url, params);
+                try {
+                    params.put("file", new File(filePath) );
+                    params.put("planNo", String.valueOf(item.get("task_code")));
+                    params.put("taskNo", String.valueOf(item.get("task_patrolled_id")));
+                    params.put("infoCode", String.valueOf(item.get("patroldevice_code")));
+                    params.put("source", 1);
+                    HttpClientUtils.getInstance().doPost(url, params);
+                } catch (IOException e) {
+                    log.error("上传文件失败", e);
+                }
             }
         }
     }
