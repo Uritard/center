@@ -7,10 +7,10 @@ import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
-import com.yjh.accessrobot.commons.utils.file.FileUtil;
 import com.yjh.accessrobot.module.command.dao.TStdDeviceMapper;
 import com.yjh.accessrobot.module.command.dao.TWarnInfoMapper;
-import com.yjh.accessrobot.module.command.entity.*;
+import com.yjh.accessrobot.module.command.entity.TWarnInfo;
+import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
@@ -24,8 +24,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.util.Map;
 
 /**
  * <功能描述> 上级系统接收巡视主机消息
@@ -77,14 +76,22 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
             log.error("tStdDevice is null,edgeCode:{}, deviceId:{} ",sendCode, patrolDeviceCode);
             return;
         }
+        int alarmSource = Integer.parseInt(String.valueOf(map.getOrDefault("source", "689")));
         // 图片在ftps上的全路径
-        String targetPath = redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content") + "/"+filePath;
+        String targetPath;
+        String resultRealImg;
+        if (alarmSource == 689) {
+            targetPath = redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content") + "/" + filePath;
+            resultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")),
+                Constant.DEFECT_RESULT_REAL_IMG);
+        } else {
+            targetPath = redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content") + "/" + filePath;
+            resultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content")),
+                Constant.RESULT_IMG_REAL_PATH);
+        }
         robotService.downloadFile(targetPath, filePath);
 
-        String defectResultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")),
-                Constant.DEFECT_RESULT_REAL_IMG);
         //689->静默  998->声纹
-        int alarmSource = Integer.parseInt(String.valueOf(map.getOrDefault("source", "689")));
         TWarnInfo tWarnInfo = new TWarnInfo()
                 .setWarnLevel(Integer.valueOf(AlarmLevelEnum.getAlarmLevelByProtocolCode(alarmLevel).getCode()))
                 .setWarnType(alarmSource == 998 ? 501 : null)
@@ -102,7 +109,7 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
                 .setAlarmSource(alarmSource)
                 .setOriginId(originId)
                 .setEdgeCode(sendCode)
-                .setImagePath(defectResultRealImg);
+                .setImagePath(resultRealImg);
         tWarnInfoMapper.insert(tWarnInfo);
         sendUpSystem(xmlBaseModel);
 
