@@ -798,4 +798,29 @@
     <select id="selectRobotOrDroneByName" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
         select * from t_robot_info where 1=1 <if test="name != null and name != ''"> and robot_name like concat('%',#{name},'%')</if>
     </select>
+    <select id="selectStatusByEdgeCode" resultType="java.lang.String">
+        select
+            a.edge_status
+        FROM
+            t_std_region a
+        WHERE
+            a.region_code = #{edgeCode, jdbcType=VARCHAR}
+          and a.state = 1
+    </select>
+    <select id="selectStatusByRobotCode" resultType="java.lang.String">
+        SELECT a.robot_status FROM t_robot_info a
+        WHERE 1 = 1
+        and a.robot_id = #{robotId, jdbcType=VARCHAR}
+    </select>
+    <select id="selectRobotCodeByInspectionIds" resultType="java.lang.Long">
+        SELECT
+            DISTINCT a.robot_id
+        FROM
+            t_robot_inspection a
+        WHERE a.inspection_id  in (
+        <foreach collection="list" item="inspectionId" separator=",">
+            #{inspectionId}
+        </foreach>
+        )
+    </select>
 </mapper>
