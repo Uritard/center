@@ -423,5 +423,9 @@ public class Constant {
      * 预置位图片存储绝对路径
      */
     public static final String PRESET_REAL_IMG_PATH = "/imgs/specimens";
+    /**
+     * 相机抓图存储相对路径
+     */
+    public static final String RESULT_IMG_REAL_PATH = "/imgs/resultImg/";
 
 }

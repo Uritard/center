@@ -49,7 +49,7 @@ public class VoiceHttpWarnService {
             log.info("未查到 {} 声纹设备的测点信息！", voiceAlarm.getHcCode());
             return 0;
         }
-        String parentPath = FileUtil.concatPath(SysParamConfig.getSysContent("resultImgPath"), "resultImg/silentTask/");
+        String parentPath = FileUtil.concatPath(SysParamConfig.getSysContent("resultImgPath"), "/voiceAlarm/");
         String filePath = FileUtil.getFilePath(parentPath, voiceAlarm.getHcCode(), "wav");
         try {
             File file = new File(filePath);
