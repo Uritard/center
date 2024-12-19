@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.checkerframework.checker.formatter.qual.Format;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
@@ -77,6 +78,7 @@ public class DeviceMaintenanceInfo implements Serializable {
     /**
      * 维护信息描述
      */
+    @Length(max = 512, message = "维护说明长度必须小于等于512")
     private String faultDesc;
 
     /**
