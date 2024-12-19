@@ -106,6 +106,7 @@ public class UPatrolTaskService {
     public static final String TASK_ALL = "--ALL";
     public static final String SUBSET = "--subset";
     public static final String REISSUE_PREFIX = "reissue_result";
+    private static final String OFF_LINE = "离线";
     public static final Map<String, Object> MAP_LOCK = new ConcurrentHashMap<>();
     /**
      / 限流 10s一次
@@ -382,6 +383,11 @@ public class UPatrolTaskService {
         List<UPatrolTaskAttr> uPatrolTaskAttrs = new ArrayList<>();
         if (Objects.nonNull(tCruiseTaskAdd.getPlanId())) {
             List<UPatrolPlanAttr> uPatrolPlanAttrList = uPatrolPlanAttrDao.selectByPlanId(tCruiseTaskAdd.getPlanId());
+            instanceList = uPatrolPlanAttrList.stream().map(UPatrolPlanAttr::getInstanceId).collect(Collectors.toList());
+            List<TCruisePointInstance> tCruisePointInstanceList = uPatrolTaskAttrDao.batchSelect(instanceList);
+            if (!checkLowerDeviceOnline(tCruisePointInstanceList)) {
+                throw new BusinessException("下级设备离线，无法下发任务！");
+            }
             for (UPatrolPlanAttr uPatrolPlanAttr : uPatrolPlanAttrList) {
                 UPatrolTaskAttr uPatrolTaskAttr = new UPatrolTaskAttr();
                 uPatrolTaskAttr.setTaskId(uPatrolTask.getTaskId());
@@ -446,6 +452,9 @@ public class UPatrolTaskService {
                 }
             }
             List<TCruisePointInstance> tCruisePointInstanceList = uPatrolTaskAttrDao.batchSelect(instanceList);
+            if (!checkLowerDeviceOnline(tCruisePointInstanceList)) {
+                throw new BusinessException("下级设备离线，无法下发任务！");
+            }
             if (Constant.logUpLv3()) {
                 log.info("tCruisePointInstanceList {}", tCruisePointInstanceList);
             }
@@ -483,6 +492,67 @@ public class UPatrolTaskService {
         return instanceList;
     }
 
+    /**
+     * 判断任务中的设备或者下级是否在线
+     *
+     * @param tCruisePointInstanceList  任务点位信息
+     * @return true 在线  false 离线
+     */
+    public boolean checkLowerDeviceOnline(List<TCruisePointInstance> tCruisePointInstanceList) {
+        List<TCruisePointInstance> edgeDetailList = tCruisePointInstanceList.stream()
+            .filter(t -> StringUtils.isNotEmpty(t.getEdgeCode()) && StringUtils.isNotEmpty(t.getOriginId())).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(edgeDetailList)) {
+            List<String> edgeList = edgeDetailList.stream().map(TCruisePointInstance::getEdgeCode).collect(Collectors.toList());
+            for (String edgeCode : edgeList) {
+                if (!checkEdgeOnline(edgeCode)) {
+                    return false;
+                }
+            }
+        }
+        List<Long> inspectionIds = tCruisePointInstanceList.stream()
+            .filter(t -> TypeEnum.ROBOT.getCode() == t.getCruiseType() || TypeEnum.UAV.getCode() == t.getCruiseType())
+            .map(TCruisePointInstance::getCruiseid).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(inspectionIds)) {
+            List<Long> robotIdList = tRobotInfoDao.selectRobotCodeByInspectionIds(inspectionIds);
+            if (CollectionUtils.isNotEmpty(robotIdList)) {
+                for (Long robotId : robotIdList) {
+                    if (!checkRobotStatus(robotId)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 判断边缘节点是否在线是否正在运作
+     *
+     * @param edgeCode
+     * @return boolean
+     */
+    public boolean checkEdgeOnline(String edgeCode) {
+        String edgeOnlineStatus = tRobotInfoDao.selectStatusByEdgeCode(edgeCode);
+        if (StringUtils.equals(OFF_LINE, edgeOnlineStatus)) {
+            log.info("=========={}该边缘节点处于离线状态==========", edgeCode);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     *  判断机器人/无人机是否在线是否正在运作
+     * @param robotId
+     * @return
+     */
+    private boolean checkRobotStatus(Long robotId) {
+        String robotOnlineStatus = tRobotInfoDao.selectStatusByRobotCode(robotId);
+        if (StringUtils.equals(OFF_LINE, robotOnlineStatus)) {
+            log.info("=========={}该机器人处于离线状态==========", robotId);
+            return false;
+        }
+        return true;
+    }
 
     public List<TCruisePointInstanceNameDetail> initializeTaskInfo(List<Long> instanceList, UPatrolTask task, boolean notInit)  {
 
@@ -2875,7 +2945,7 @@ public class UPatrolTaskService {
                 } else {
                     timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBeforeTime, dayAfterTime);
                 }
-                log.info("dayBefore={}，dayAfter={}", dayBeforeTime, dayAfterTime);
+//                log.info("dayBefore={}，dayAfter={}", dayBeforeTime, dayAfterTime);
                 for (Date aTimeList : timeList) {
                     Map<String, Object> taskCountMap = new HashMap<>();
                     Map<String, Object> taskCountMapDel = new HashMap<>();

@@ -142,4 +142,10 @@ public interface TRobotInfoDao {
     TRobotInfo selectByRobotCode(@Param(value = "robotCode") String robotCode);
 
     List<TRobotInfo> selectRobotOrDroneByName(@Param(value = "name") String name);
+
+    String selectStatusByEdgeCode(@Param(value = "edgeCode") String edgeCode);
+
+    String selectStatusByRobotCode(@Param(value = "robotId") Long robotId);
+
+    List<Long> selectRobotCodeByInspectionIds(@Param(value = "list") List<Long> inspectionId);
 }
