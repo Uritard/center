@@ -94,7 +94,7 @@ public class TCruiseTaskAdd implements Serializable {
     @ApiModelProperty(value = "是否OCR识别 (0:是 1:否)")
     private String isOcr;
 
-    private Long createUserId;
+    private String creator;
 
     @ApiModelProperty(value = "预案编码")
     private String planCode;

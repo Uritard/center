@@ -91,4 +91,19 @@ public class FileUtil {
         }
         return fileName;
     }
+
+
+    /**
+     * 拼接文件路径，如果有重复 //，则去除一个/
+     * concatPath("/imgs", "name.jpg")          = /imgs/name.jpg
+     * concatPath("/imgs", "/name.jpg")          = /imgs/name.jpg
+     * concatPath("/imgs/", "/name.jpg")          = /imgs/name.jpg
+     * @return 拼接后路径
+     */
+    public static String concatPath(String basePath, String pathToAdd) {
+        String filePathTem = org.apache.commons.lang3.StringUtils.stripStart(pathToAdd, "/\\");
+        String baseTem = org.apache.commons.lang3.StringUtils.endsWithAny(basePath, "/", "\\") ? basePath : basePath + "/";
+        return baseTem + filePathTem;
+    }
+
 }

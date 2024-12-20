@@ -138,6 +138,14 @@
         delete from a_interface_task_info where task_code = #{taskCode}
     </delete>
 
+    <select id="selectAInterfaceTask" parameterType="java.lang.String" resultType="com.yjh.accesstcp.module.device.entity.AInterfaceTaskInfo">
+        SELECT `type`,task_code,task_name,priority,device_level,device_list,fixed_start_time,cycle_month,cycle_week,
+        cycle_execute_time,cycle_start_time,cycle_end_time,interval_number,interval_type,interval_execute_time,
+        interval_start_time,interval_end_time,invalid_start_time,invalid_end_time,isenable,creator,create_time
+        from a_interface_task_info
+        where task_code = #{taskCode, jdbcType=VARCHAR} limit 1
+    </select>
+
     <select id="selectTaskIdByTaskCode" parameterType="java.lang.String" resultType="com.yjh.accesstcp.module.device.entity.UPatrolTask">
         SELECT
         a.task_id,

@@ -32,6 +32,7 @@ public interface PatrolTaskDao {
     int batchAddAInterfaceTask(List<AInterfaceTaskInfo> list);
     int updateAInterfaceTask(AInterfaceTaskInfo aInterfaceTaskInfo);
     int deleteAInterfaceTask(@Param(value = "taskCode") String taskCode);
+    AInterfaceTaskInfo selectAInterfaceTask(@Param(value = "taskCode") String taskCode);
 
     UPatrolTask selectTaskIdByTaskCode(@Param(value = "robotTaskId") String robotTaskId,
         @Param(value = "executeTime") Date executeTime);

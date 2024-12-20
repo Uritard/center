@@ -33,7 +33,6 @@ public class UrlPathHandler {
     private final static String KEY = "systemConfigKey:upSystem";
     private final static String OAUTH_URL = "/auth/oauth/token";
 
-    private final RedisTemplate redisTemplate;
     private final TaskScheduler taskScheduler;
 
     @Value("${up.tek.prefix:}")

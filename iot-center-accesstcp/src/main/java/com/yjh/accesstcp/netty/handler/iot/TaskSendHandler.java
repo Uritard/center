@@ -62,7 +62,7 @@ public class TaskSendHandler implements MessageHandlerStrategy<XMLBaseModel>, In
                     Map<String, List<TCruiseTaskAdd>> map = new HashMap<>();
                     map.put("list", taskList);
                     Result re;
-                    log.info("是否删除任务 isenable:{}", "0".equals(tCruiseTaskAdd.getIsenable()));
+                    log.info("是否下发任务 isenable:{}", "0".equals(tCruiseTaskAdd.getIsenable()));
                     if ("0".equals(tCruiseTaskAdd.getIsenable())) {
                         re = Constant.otherServer(map, Constant.TASK_ISSUE_URL);
                     } else {
