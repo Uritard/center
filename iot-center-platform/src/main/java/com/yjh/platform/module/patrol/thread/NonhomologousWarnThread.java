@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_NORMAL;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
@@ -322,14 +323,14 @@ public class NonhomologousWarnThread implements Runnable{
                         nowResult.put("resultValue", StringUtils.substringBefore(robotInsResult, ","));
                         nowResult.put("warnId", warnId);
                         if ("4".equals(timeType)) {
-                            //上次对比处理
+                            //上次对比处理，上次结果有值并且巡视结果状态为正常再进行判断
                             Map<String, Object> lastResult = nonhomologousWarnDao.selectLastResultNum(robotInstanceId);
-                            if (lastResult != null) {
+                            if (Objects.nonNull(lastResult) && CommonUtils.equals(lastResult.get("cruiseResult"), CRUISE_RESULT_NORMAL)) {
                                 log.info("lastValue===={}  thisValue==={} lastTaskId==={}", lastResult.get("resultValue"), robotInsResult,
                                     lastResult.get("taskId"));
                                 if (Objects.nonNull(lastResult.get("resultValue"))) {
-                                    float difference = NumberUtils.toFloat(robotInsResult) - NumberUtils.toFloat(
-                                        String.valueOf(lastResult.get("resultValue")));
+                                    float difference = Math.abs(NumberUtils.toFloat(robotInsResult) - NumberUtils.toFloat(
+                                        String.valueOf(lastResult.get("resultValue"))));
                                     String dvalStr = CommonUtils.percentFormat(difference, "#.##");
                                     if (difference - threshold > 1e-5) {
                                         //告警
