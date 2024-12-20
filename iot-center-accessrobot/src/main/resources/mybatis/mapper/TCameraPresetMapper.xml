@@ -37,7 +37,7 @@
         select
         <include refid="Base_Column_List" />
         from t_camera_preset
-        where  preset_id = #{presetId,jdbcType=BIGINT} 
+        where  preset_id = #{presetId,jdbcType=BIGINT}
     </select>
     <select id="selectByEdgeCode" resultType="com.yjh.accessrobot.module.command.entity.TCameraPreset">
         select
@@ -48,7 +48,7 @@
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from t_camera_preset
-        where  preset_id = #{presetId,jdbcType=BIGINT} 
+        where  preset_id = #{presetId,jdbcType=BIGINT}
     </delete>
     <delete id="deleteByEdgeCodeAndOriginId">
         delete from t_camera_preset  where edge_code=#{edgeCode}
@@ -111,7 +111,7 @@
         </trim>
     </insert>
     <insert id="batchInsert" keyColumn="preset_id" keyProperty="presetId" parameterType="java.util.List" useGeneratedKeys="true">
-        replace into t_camera_preset
+        insert into t_camera_preset
         (camera_id,preset_num
         ,preset_name,preset_type
         ,creator_user,creator_time,is_use
@@ -136,11 +136,11 @@
                     preset_img = #{presetImg,jdbcType=VARCHAR},
                 </if>
         </set>
-        where   preset_id = #{presetId,jdbcType=BIGINT} 
+        where   preset_id = #{presetId,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TCameraPreset">
         update t_camera_preset
-        set 
+        set
             camera_id =  #{cameraId,jdbcType=BIGINT},
             preset_num =  #{presetNum,jdbcType=INTEGER},
             preset_name =  #{presetName,jdbcType=VARCHAR},

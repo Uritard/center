@@ -105,11 +105,11 @@
         select
         a.task_id as taskId,
         a.instance_id as inspectionId,
-        a.result_num as resultValue
+        a.result_num as resultValue,
+        a.cruise_result as cruiseResult
         from u_patrol_data_result a
         where a.instance_id = #{instanceId}
         and a.createtime is not null
-        and a.cruise_result = 246
         order by a.createtime desc
         limit 1
     </select>

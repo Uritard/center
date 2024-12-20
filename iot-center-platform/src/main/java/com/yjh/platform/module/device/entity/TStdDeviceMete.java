@@ -40,7 +40,7 @@ public class TStdDeviceMete implements Serializable {
     @ApiModelProperty(value = "设备ID")
     private Long deviceId;
 
-    @Length(max = 10, message = "设备点位ID长度必须小于等于10")
+    @Length(max = 64, message = "设备点位ID长度必须小于等于64")
     @ApiModelProperty(value = "设备点位ID")
     private String devicePointId;
 
