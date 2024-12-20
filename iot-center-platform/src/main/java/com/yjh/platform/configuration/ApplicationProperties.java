@@ -103,7 +103,7 @@ public class ApplicationProperties {
         private boolean resolveLocal;
 
         public boolean isEnable() {
-            return "1".equals(flag);
+            return !"0".equals(flag);
         }
     }
 

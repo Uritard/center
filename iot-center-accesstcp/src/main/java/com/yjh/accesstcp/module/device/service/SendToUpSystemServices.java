@@ -1603,6 +1603,7 @@ public class SendToUpSystemServices {
         tCruiseTaskAdd.setIsenable(item.getOrDefault("isenable", "").toString());
         tCruiseTaskAdd.setInvalidStartTime(item.getOrDefault("invalid_start_time", "").toString());
         tCruiseTaskAdd.setInvalidEndTime(item.getOrDefault("invalid_end_time", "").toString());
+        tCruiseTaskAdd.setCreator(MapUtils.getString(item, "creator"));
 
         String priority = item.getOrDefault("priority", "").toString();
 
@@ -2059,32 +2060,30 @@ public class SendToUpSystemServices {
             String port = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemPort");
             if (Objects.nonNull(flag) && Objects.nonNull(ip) && Objects.nonNull(port)) {
                 SocketAddress socketAddress = new InetSocketAddress(ip, Integer.parseInt(port));
-                int upflag = NumberUtils.toInt(Constant.upSystemFlag());
+                SocketAddress oldSocketAddr = new InetSocketAddress(Constant.upSystemIp(), Constant.upSystemPort());
+                int upflag = NumberUtils.toInt(flag);
                 if (!Constant.upSystemFlag().equals(flag)) {
+                    Constant.upSystemFlag = flag;
                     //flag 改动 由0 -> 1 启动 由1 -> 0 关闭
                     if (UpType.STATE_GRID.getType() == upflag) {
                         this.start(socketAddress, "upSystem");
                     } else if (UpType.TEK.getType() == upflag) {
+                        this.stop(oldSocketAddr);
                         urlPathHandler.authToken();
-                        this.stop(socketAddress);
                     }
-                    Constant.upSystemFlag = flag;
                 }
                 boolean isChange = !Constant.ZERO.equals(flag) && (!Constant.upSystemIp().equals(ip) || !String.valueOf(Constant.upSystemPort()).equals(port));
                 if (isChange) {
+                    Constant.upSystemIp = ip;
+                    Constant.upSystemPort = Integer.valueOf(port);
                     if (UpType.STATE_GRID.getType() == upflag) {
                         //ip 端口修改 变更连接
-                        if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.get(socketAddress))) {
-                            this.stop(socketAddress);
-                            this.start(socketAddress, "upSystem");
-                        } else {
-                            this.start(socketAddress, "upSystem");
-                        }
+                        // 关闭连接时已进行判断是否存在，不在此处判断
+                        this.stop(oldSocketAddr);
+                        this.start(socketAddress, "upSystem");
                     } else {
                         urlPathHandler.authToken();
                     }
-                    Constant.upSystemIp = ip;
-                    Constant.upSystemPort = Integer.valueOf(port);
                 }
             }
             //算法管理平台
@@ -2206,6 +2205,10 @@ public class SendToUpSystemServices {
             log.info("存储A接口任务出错：{}",items);
         }
 
+    }
+
+    public AInterfaceTaskInfo selectAInterfaceTask(String taskCode) {
+        return patrolTaskDao.selectAInterfaceTask(taskCode);
     }
 
     public List<String> selectInstanceIdsByRegionOrDevice(Map<String, String> idMap) {

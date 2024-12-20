@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.service;
 
+import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSON;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
@@ -16,9 +17,7 @@ import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.user.dao.TSequentialConfDao;
 import com.yjh.platform.module.user.entity.TSequentialConf;
-import com.yjh.platform.module.file.FileUtil;
 import com.yjh.platform.module.video.service.CameraConService;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -544,7 +543,7 @@ public class TSequentialConfService {
                     value = "分析失败";
                     break;
             }
-            FileUtil.createDirectory(path);
+            FileUtil.mkdir(path);
             log.info("applicationProperties:{}", applicationProperties);
             String devicePath = path + applicationProperties.getSequentialConfig().getSequentialVideocfmResult().replace("{{date}}", simpleDateFormat2.format(new Date()));
 
@@ -626,7 +625,7 @@ public class TSequentialConfService {
                 cfgDeviceId = StringUtils.substringAfter(cfgDeviceId, stationId);
             }
             String path = ftpsFilePath + "/" + stationId + "/linkage/";
-            FileUtil.createDirectory(path);
+            FileUtil.mkdir(path);
             String devicePath = path + applicationProperties.getSequentialConfig().getSequentialReturnLinkage().replace("{{date}}", simpleDateFormat2.format(new Date()));
             log.info("unionTask devicePath {}", devicePath);
             File txt = new File(devicePath);

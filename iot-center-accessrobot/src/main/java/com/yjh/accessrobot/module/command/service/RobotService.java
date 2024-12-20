@@ -64,6 +64,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -664,7 +665,7 @@ public class RobotService {
                         case "device_file_path":
                             desc = "点位模型";
                             if (isEdge) {
-                                syncModelUpdate("1", v.toString(), nodeCode);
+                                syncModelUpdate("1", v, nodeCode);
                             } else {
                                 //包含操作点
                                 if (map.containsKey("operation_device_file_path")) {
@@ -3255,9 +3256,20 @@ public class RobotService {
     }
 
     public XMLBaseModel getXmlMessage(String filePathAndName) throws DocumentException {
-        SAXReader reader = new SAXReader();
-        Document document = reader.read(new File(filePathAndName));
-        return PlatformXMLUtil.readStringXmlOut(document);
+        File file = new File(filePathAndName);
+        try {
+            log.info("file size: {}, path: {}", FileUtils.sizeOf(file), filePathAndName);
+            SAXReader reader = new SAXReader();
+            Document document = reader.read(file);
+            return PlatformXMLUtil.readStringXmlOut(document);
+        } catch (DocumentException e) {
+            try {
+                log.error("filecontent: {}", FileUtils.readFileToString(file));
+            } catch (IOException ex) {
+                log.error(e.getMessage(), e);
+            }
+            throw e;
+        }
     }
 
     public Boolean selectByRegionCodeAndState(String sendCode, Integer state){

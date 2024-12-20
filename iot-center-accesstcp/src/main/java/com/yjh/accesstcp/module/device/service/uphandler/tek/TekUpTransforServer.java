@@ -5,9 +5,14 @@
 package com.yjh.accesstcp.module.device.service.uphandler.tek;
 
 import cn.hutool.core.date.DateUtil;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.commons.result.BusinessException;
+import com.yjh.accesstcp.module.device.entity.AInterfaceTaskInfo;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
+import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
+import com.yjh.accesstcp.module.device.service.uphandler.DefaultEmptyHandlerImpl;
 import com.yjh.accesstcp.module.device.service.uphandler.tek.entity.TaskPlan;
 import com.yjh.accesstcp.netty.entiy.MessageHeader;
 import com.yjh.accesstcp.netty.handler.MessageHandlerStrategy;
@@ -16,9 +21,12 @@ import com.yjh.accesstcp.netty.handler.ProtocolEnum;
 import com.yjh.accesstcp.netty.handler.iot.IotHandlerEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 对上级系统下发命令进行处理转换，转为国网规范消息
@@ -30,6 +38,10 @@ import java.util.*;
 @Slf4j
 @RequiredArgsConstructor
 public class TekUpTransforServer {
+    private final DefaultEmptyHandlerImpl defaultEmptyHandler;
+    private final SendToUpSystemServices sendToUpSystemServices;
+
+    private static final Cache<String, String> TASK_IPLAN_CACHE = CacheBuilder.newBuilder().expireAfterWrite(7, TimeUnit.DAYS).build();
 
     /**
      * 将科大下发协议转换成电网协议
@@ -51,7 +63,7 @@ public class TekUpTransforServer {
         MessageHandlerStrategy<XMLBaseModel> messageHandlerStrategy =
             (MessageHandlerStrategy<XMLBaseModel>)MessageHandlerStrategyFactory.getStrategyType(ProtocolEnum.IOT, type);
         if (Optional.ofNullable(messageHandlerStrategy).isPresent()) {
-            messageHandlerStrategy.handler(null, xmlBaseModel, header);
+            messageHandlerStrategy.handler(defaultEmptyHandler, xmlBaseModel, header);
         } else {
             throw new BusinessException("协议处理错误");
         }
@@ -82,8 +94,9 @@ public class TekUpTransforServer {
             map.put("priority", "2");
             // 设备层级   3 设备点位
             map.put("device_level", "3");
-            // 定期和立即任务参数
-            map.put("fixed_start_time", taskPlan.getTaskTime());
+            // 定期和立即任务参数 1-定时下发 2-立即下发
+            String taskTime = taskPlan.getTaskType() == 2 ? DateUtil.now() : taskPlan.getTaskTime();
+            map.put("fixed_start_time", taskTime);
             // 周期任务参数
             map.put("cycle_month", "");
             map.put("cycle_week", "");
@@ -99,14 +112,33 @@ public class TekUpTransforServer {
 
             map.put("invalid_start_time", "");
             map.put("invalid_end_time", "");
-            map.put("isenable", "1");
-            map.put("creator", Constant.server());
+            map.put("isenable", "0");
+            map.put("creator", taskPlan.getPlanNo());
             map.put("create_time", DateUtil.now());
             mapList.add(map);
+
+            TASK_IPLAN_CACHE.put(taskPlan.getTaskNo(), taskPlan.getPlanNo());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
         return mapList;
+    }
+
+    public String getTaskPlanCode(String taskCode) {
+        try {
+            return TASK_IPLAN_CACHE.get(taskCode, () -> {
+                try {
+                    AInterfaceTaskInfo aInterfaceTaskInfo = sendToUpSystemServices.selectAInterfaceTask(taskCode);
+                    return aInterfaceTaskInfo.getCreator();
+                } catch (Exception e) {
+                    log.error("根据task_code查询A接口任务出错：", e);
+                    return "";
+                }
+            });
+        } catch (ExecutionException e) {
+            log.error("获取 planCode 失败", e);
+        }
+        return StringUtils.EMPTY;
     }
 
 }
