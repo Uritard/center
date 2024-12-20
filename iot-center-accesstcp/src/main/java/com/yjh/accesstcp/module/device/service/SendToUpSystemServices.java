@@ -2070,6 +2070,8 @@ public class SendToUpSystemServices {
                     } else if (UpType.TEK.getType() == upflag) {
                         this.stop(oldSocketAddr);
                         urlPathHandler.authToken();
+                    } else {
+                        this.stop(oldSocketAddr);
                     }
                 }
                 boolean isChange = !Constant.ZERO.equals(flag) && (!Constant.upSystemIp().equals(ip) || !String.valueOf(Constant.upSystemPort()).equals(port));
