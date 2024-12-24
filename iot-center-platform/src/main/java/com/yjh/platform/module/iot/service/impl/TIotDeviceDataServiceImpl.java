@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.configuration.SysParamConfig;
@@ -616,6 +617,7 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
             }
         } catch (Exception e) {
             log.error("电表报表生成失败", e);
+            throw new BusinessException("电表报表生成失败!");
         }
     }
 
