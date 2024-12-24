@@ -793,7 +793,7 @@
     </select>
 
     <select id="selectByRobotCode" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
-        select * from t_robot_info where robot_code = #{robotCode}
+        select * from t_robot_info where robot_code = #{robotCode} limit 1
     </select>
     <select id="selectRobotOrDroneByName" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
         select * from t_robot_info where 1=1 <if test="name != null and name != ''"> and robot_name like concat('%',#{name},'%')</if>

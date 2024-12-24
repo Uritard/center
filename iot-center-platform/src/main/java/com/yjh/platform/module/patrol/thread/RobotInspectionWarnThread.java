@@ -16,6 +16,7 @@ import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
+import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.service.TAlgorithmInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -47,7 +48,19 @@ public class RobotInspectionWarnThread implements Runnable{
 
     private Map<String, String> tCruiseTaskResultMap = Collections.EMPTY_MAP;
 
+    private final static Map<String, String> ALARM_TYPE_MAP = new HashMap<>(16);
+
     private final Object waiter = new Object();
+
+    static {
+        ALARM_TYPE_MAP.put("2022_1", "130");
+        ALARM_TYPE_MAP.put("2022_2", "131");
+        ALARM_TYPE_MAP.put("2022_3", "132");
+        ALARM_TYPE_MAP.put("2022_4", "133");
+        ALARM_TYPE_MAP.put("2024_1", "131");
+        ALARM_TYPE_MAP.put("2024_2", "132");
+        ALARM_TYPE_MAP.put("2024_3", "133");
+    }
 
     public RobotInspectionWarnThread(RobotPatrolTaskAlarm taskAlarm, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService, String taskCode){
         this.taskAlarm = taskAlarm;
@@ -302,23 +315,10 @@ public class RobotInspectionWarnThread implements Runnable{
                 map.put("imagePath", tCruiseTaskResultMap.get("picpath"));
             }
 
-            String alarmLevel = taskAlarm.getAlarmLevel();
-            switch (alarmLevel) {
-                case "1":
-                    map.put("level", "130");
-                    break;
-                case "2":
-                    map.put("level", "131");
-                    break;
-                case "3":
-                    map.put("level", "132");
-                    break;
-                case "4":
-                    map.put("level", "133");
-                    break;
-                default:
-                    break;
-            }
+            TRobotInfo robotInfo = uPatrolTaskService.selectRobotInfoByCode(taskAlarm.getRobotCode());
+            int robotApiType = Optional.ofNullable(robotInfo).map(TRobotInfo::getApiType).orElse(2024);
+            String alarmLevel = robotApiType + "_" + taskAlarm.getAlarmLevel();
+            map.put("level", ALARM_TYPE_MAP.getOrDefault(alarmLevel, "131"));
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }

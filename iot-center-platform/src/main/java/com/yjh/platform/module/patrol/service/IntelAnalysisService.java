@@ -807,12 +807,12 @@ public class IntelAnalysisService {
                     try {
                         String defectResultRealImg = resImageUrl.replaceAll(SysParamConfig.getSysContent("judgeResultImg"),
                             Constant.JUDGE_RESULT_REAL_IMG + "/");
-                        Map<String, Object> jasonMaps = new HashMap<>(16);
+                        Map<String, String> jasonMaps = new HashMap<>(16);
                         jasonMaps.put("type", "algorithmTest");
                         jasonMaps.put("path", defectResultRealImg);
                         String json = JSON.toJSONString(jasonMaps);
                         log.info("发送给前端的消息：{}", json);
-                        postUrl(Constant.WEBSOCKET_URL, json);
+                        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
                     } catch (Exception e) {
                         log.error("算法测试发送websocket异常：", e);
                     }
@@ -851,12 +851,12 @@ public class IntelAnalysisService {
                     try {
                         String defectResultRealImg = resImageUrl.replaceAll(SysParamConfig.getSysContent("defectResultImg") + "/",
                                 Constant.DEFECT_RESULT_REAL_IMG);
-                        Map<String, Object> jasonMaps = new HashMap<>(16);
+                        Map<String, String> jasonMaps = new HashMap<>(16);
                         jasonMaps.put("type", "algorithmTest");
                         jasonMaps.put("path", defectResultRealImg);
                         String json = JSON.toJSONString(jasonMaps);
                         log.info("发送给前端的消息：{}", json);
-                        postUrl(Constant.WEBSOCKET_URL, json);
+                        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
                     } catch (Exception e) {
                         log.info("算法测试发送websocket异常：", e);
                     }
@@ -882,14 +882,14 @@ public class IntelAnalysisService {
                     ftpsService.uploadFile("结果图", resImageUrl, remotefilepath);
                 } else {
                     String value = item.getValue();
-                    Map<String, Object> jasonMaps = new HashMap<>(16);
+                    Map<String, String> jasonMaps = new HashMap<>(16);
                     jasonMaps.put("type", "algorithmTest");
                     jasonMaps.put("value", value);
                     String json = JSON.toJSONString(jasonMaps);
                     log.info("发送给前端的消息：{}", json);
 
                     try {
-                        postUrl(Constant.WEBSOCKET_URL, json);
+                        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
                     }
@@ -1202,16 +1202,16 @@ public class IntelAnalysisService {
                 if (!alarmShieldService.isShield(tWarnInfo.getStdMeteId())){
                     //webSocket通知前端调用查询告警弹框的接口
                     Long warnId = analyseDataOperateDao.selectCurrentWarn();
-                    Map<String, Object> jasonMaps = new HashMap<>(16);
+                    Map<String, String> jasonMaps = new HashMap<>(16);
                     jasonMaps.put("type", "alarmPopUp");
-                    jasonMaps.put("warnId", warnId);
-                    jasonMaps.put("defectModel", 450);
-                    jasonMaps.put("warnLevel", tWarnInfo.getWarnLevel());
+                    jasonMaps.put("warnId", String.valueOf(warnId));
+                    jasonMaps.put("defectModel", "450");
+                    jasonMaps.put("warnLevel", String.valueOf(tWarnInfo.getWarnLevel()));
                     jasonMaps.put("warnType", "1");
                     String json = JSON.toJSONString(jasonMaps);
                     log.info("发送给前端的消息：{}", json);
                     if (!Constant.isUpSystem()){
-                        postUrl(Constant.WEBSOCKET_URL, json);
+                        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
                     }
                 } else {
                 log.info("此告警被屏蔽了，不弹窗！");
@@ -1456,25 +1456,6 @@ public class IntelAnalysisService {
     }
 
     /**
-     * 请求webSocket发送数据
-     *
-     * @param url 请求地址
-     * @param json 发送内容
-     * @return String
-     */
-    public String postUrl(String url, String json) throws IOException, URISyntaxException {
-        CloseableHttpClient client = HttpClients.createDefault();
-        URI uri = new URIBuilder(url).setParameter("json", json).build();
-        HttpPost httpPost = new HttpPost(uri);
-        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
-        httpPost.setHeader("Accept", "application/json");
-        httpPost.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
-        CloseableHttpResponse response = client.execute(httpPost);
-        HttpEntity entity = response.getEntity();
-        return EntityUtils.toString(entity, "UTF-8");
-    }
-
-    /**
      * 将文件上传至巡视主机ftp服务器
      *
      * @param sourcePath 源文件地址
@@ -1511,13 +1492,13 @@ public class IntelAnalysisService {
     }
 
     public void algorithmUpdateResult(UpdateResponse response) throws Exception{
-        Map<String, Object> jasonMaps = new HashMap<>(16);
+        Map<String, String> jasonMaps = new HashMap<>(16);
         jasonMaps.put("type", "algorithmUpdateTest");
         jasonMaps.put("result", StringUtils.equals("1", response.getResult()) ? "成功" : "失败");
         String json = JSON.toJSONString(jasonMaps);
         log.info("发送给前端的消息：{}", json);
 
-        postUrl(Constant.WEBSOCKET_URL, json);
+        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
     }
 
     /**
