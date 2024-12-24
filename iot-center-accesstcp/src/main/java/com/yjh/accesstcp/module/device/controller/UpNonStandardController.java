@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/")
-@Api(value = "/", tags = "非标准的上级系统接口处理")
+@RequestMapping("/task")
+@Api(value = "/task", tags = "非标准的上级系统接口处理")
 public class UpNonStandardController {
     private final TekUpTransforServer tekUpTransforServer;
 
