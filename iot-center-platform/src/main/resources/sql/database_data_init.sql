@@ -1712,7 +1712,7 @@ INSERT INTO `system_config`(`config_type`, `config_name`, `config_key`, `config_
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (1, NULL, '任务管理', '/scout/task', 'images/renwuguanli.png', 1);
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (2, NULL, '巡视结果', '/scout/resultConfirm', 'images/xunshijieguo.png', 2);
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (3, NULL, '巡视报表', '/scout/resultConfirm?activeName=巡视报表', 'images/xunshibaobiao.png', 3);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (4, NULL, '非同源告警', '/scout/resultConfirm?activeName=非同源告警', 'images/feitongyuangaojing.png', 4);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (4, NULL, '非同源告警', '/scout/warningManagePage?activeName=非同源告警', 'images/feitongyuangaojing.png', 4);
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (5, NULL, '异常点位', '/scout/resultConfirm?activeName=识别异常点位', 'images/yichangdianwei.png', 5);
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (6, NULL, '测点查看', '/monitoring/autoPatrol', 'images/cedainchakan.png', 6);
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (7, NULL, '机器人监控', '/monitoring/robotMonitor', 'images/jiqirenjiankong.png', 7);
