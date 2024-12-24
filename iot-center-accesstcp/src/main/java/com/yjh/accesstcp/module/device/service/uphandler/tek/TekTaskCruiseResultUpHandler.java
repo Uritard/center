@@ -104,8 +104,12 @@ public class TekTaskCruiseResultUpHandler extends AbstractTekHandler {
                 param.put("dataValue", "");
                 param.put("textValue", value);
             }
-            param.put("dataStatus", AbnormalResDescEnum.contains(value) ? "3" : "2");
-            param.put("pointStatus", MapUtils.getString(item,"valid","0"));
+            if (Constant.ONE.equals(MapUtils.getString(item, "valid"))) {
+                param.put("dataStatus", Constant.ONE);
+            } else {
+                param.put("dataStatus", Constant.ZERO);
+            }
+            param.put("pointStatus", "2");
             param.put("infoCode", MapUtils.getString(item,"device_id"));
             param.put("inspectionType", "1".equals(MapUtils.getString(item,"data_type")) ? "1" : "0");
             String[] edges = StringUtils.split(Constant.edgeCode(), "-", 2);
