@@ -61,7 +61,7 @@ public class TekTaskStateUpHandler extends AbstractTekHandler {
             TaskStatusEntity entity = new TaskStatusEntity();
             Map<String, Object> item = xmlBaseModel.getItems().get(0);
             entity.setPlanNo(MapUtils.getString(item, "task_code"));
-            entity.setTaskNo(MapUtils.getString(item, "task_code"));
+            entity.setTaskNo(MapUtils.getString(item, "task_patrolled_id"));
             entity.setPatrolDeviceType(isRobotOrCameraTask(entity.getPlanNo(), entity.getTaskNo()));
             String taskStatus = MapUtils.getString(item, "task_state");
             entity.setTaskStatus(aInterfaceApiToUP(taskStatus));
