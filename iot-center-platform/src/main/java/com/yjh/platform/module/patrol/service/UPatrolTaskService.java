@@ -2893,9 +2893,8 @@ public class UPatrolTaskService {
      * @param robotCode 机器人实物id
      * @return TRobotInfo 机器人信息
      */
-    @Transactional(rollbackFor = Exception.class)
     public TRobotInfo selectRobotInfoByCode(String robotCode){
-        return uPatrolTaskDao.selectRobotInfoByCode(robotCode);
+        return tRobotInfoDao.selectByRobotCode(robotCode);
     }
 
     @Transactional(rollbackFor = Exception.class)

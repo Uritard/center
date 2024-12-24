@@ -643,7 +643,7 @@ public class ProcessResultToUpSystem {
         try {
             for (Map<String, String> redisInfoMap : resultList){
                 // 判别告警等级暂定为一般
-                String alarmLevel = "2";
+                String alarmLevel = "1";
                 TWarnInfo tWarnInfo = new TWarnInfo();
                 tWarnInfo.setImagePath(cruiseResultMap.get("picpath"));
 

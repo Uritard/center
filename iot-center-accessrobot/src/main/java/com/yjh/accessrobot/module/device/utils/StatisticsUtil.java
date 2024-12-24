@@ -183,6 +183,7 @@ public class StatisticsUtil {
     String json = JSON.toJSONString(jasonMaps);
     log.info("发送给前端的消息：{}", json);
     try {
+      // String result = Constant.postUrl(Constant.WEBSOCKET_URL, json);
       String result = serviceRestTemplate.postForObject(Constant.WEBSOCKET_URL, json, String.class);
       log.info("param:{} result:{}", json, result);
     } catch (Exception e) {

@@ -5,31 +5,19 @@ import com.google.common.base.CaseFormat;
 import com.yjh.manager.common.result.Result;
 import com.yjh.manager.common.result.ResultCodeEnum;
 import com.yjh.manager.common.utils.NumToStringUtil;
+import com.yjh.manager.common.websocket.WebSocketServer;
 import com.yjh.manager.module.log.dao.SysLogDao;
 import com.yjh.manager.module.log.entity.LongAnalyseDetail;
 import com.yjh.manager.module.log.entity.SysLog;
 import com.yjh.manager.module.log.entity.SysLogDetail;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -49,10 +37,6 @@ public class SysLogService {
 
     @Resource
     private RedisTemplate redisTemplate;
-
-
-    @Value("${spring.websocket.send.url}")
-    private String WEBSOCKET_SEND_URL;
 
     @Transactional(rollbackFor = Exception.class)
     public Result insert(String logType, String ip,String title,Integer state,String content,Long userId,String userName,String requestOrigin,String requestPath,String requestMethod) {
@@ -149,7 +133,7 @@ public class SysLogService {
                 String json = JSON.toJSONString(errMessage);
                 new Thread(() -> {
                     try {
-                        postUrl(json);
+                        WebSocketServer.sendMsg(json);
                         // Result result1 = restTemplate.getForObject(Constant.WEB_SCOKET, Result.class, json);
                     } catch (Exception e) {
                         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -167,20 +151,6 @@ public class SysLogService {
         }
 
         return result;
-    }
-
-
-    //请求webSocket发送方法
-    public String postUrl(String json) throws IOException, URISyntaxException {
-        CloseableHttpClient client = HttpClients.createDefault();
-        URI uri = new URIBuilder(WEBSOCKET_SEND_URL).setParameter("json", json).build();
-        HttpPost httpPost = new HttpPost(uri);
-        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
-        httpPost.setHeader("Accept", "application/json");
-        httpPost.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
-        CloseableHttpResponse response = client.execute(httpPost);
-        HttpEntity entity = response.getEntity();
-        return EntityUtils.toString(entity, "UTF-8");
     }
 
     @Transactional(rollbackFor = Exception.class)
