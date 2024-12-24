@@ -28,7 +28,7 @@ public class TekResult extends Result {
     }
 
     public void success() {
-        super.setCode(1, "sucess");
+        super.setCode(0, "success");
         this.msg = "sucess";
         this.flag = true;
     }
