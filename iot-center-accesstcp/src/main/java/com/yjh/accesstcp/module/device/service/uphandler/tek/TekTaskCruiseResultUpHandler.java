@@ -69,12 +69,13 @@ public class TekTaskCruiseResultUpHandler extends AbstractTekHandler {
             Map<String, Object> params = new HashMap<>(8);
             String filePaths = String.valueOf(item.get("file_path"));
             String[] split = filePaths.split(",");
+            String taskCode = MapUtils.getString(item,"task_code");
             for (String filePath : split) {
                 try {
                     params.put("file", new File(FileUtil.concatPath(ftpsBase, filePath)));
-                    params.put("planNo", String.valueOf(item.get("task_code")));
-                    params.put("taskNo", String.valueOf(item.get("task_patrolled_id")));
-                    params.put("infoCode", String.valueOf(item.get("patroldevice_code")));
+                    params.put("planNo", tekUpTransforServer.getTaskPlanCode(taskCode));
+                    params.put("taskNo", taskCode);
+                    params.put("infoCode", MapUtils.getString(item,"device_id"));
                     params.put("source", 1);
                     String result = HttpClientUtils.getInstance().doPost(url, params);
                     log.info("上报图片返回： {}", result);
@@ -96,14 +97,14 @@ public class TekTaskCruiseResultUpHandler extends AbstractTekHandler {
             param.put("dataTime", localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
             param.put("dataUnit", MapUtils.getString(item,"unit"));
             String value = MapUtils.getString(item,"value");
-            if (NumberUtil.isNumber(value)) {
+            if (NumberUtil.isNumber(StringUtils.substringBefore(value, ","))) {
                 param.put("dataValue", value);
                 param.put("textValue", "");
             } else {
                 param.put("dataValue", "");
                 param.put("textValue", value);
             }
-            param.put("dataStatus", "1");
+            param.put("dataStatus", AbnormalResDescEnum.contains(value) ? "3" : "2");
             param.put("pointStatus", MapUtils.getString(item,"valid","0"));
             param.put("infoCode", MapUtils.getString(item,"device_id"));
             param.put("inspectionType", "1".equals(MapUtils.getString(item,"data_type")) ? "1" : "0");
@@ -121,4 +122,89 @@ public class TekTaskCruiseResultUpHandler extends AbstractTekHandler {
         }
     }
 
+    enum AbnormalResDescEnum{
+        /**
+         * 机器人离线,未执行
+         */
+        ROBOT_OFFLINE("机器人离线,未执行"),
+        /**
+         * 无人机离线,未执行
+         */
+        DRONE_OFFLINE("无人机离线,未执行"),
+        /**
+         * 机器人处于检修状态,未执行
+         */
+        ROBOT_OVERHAUL("机器人处于检修状态,未执行"),
+        /**
+         * 无人机处于检修状态,未执行
+         */
+        DRONE_OVERHAUL("无人机处于检修状态,未执行"),
+        /**
+         * 设备操作任务中
+         */
+        EQUIPMENT_OPERATE("机器人操作任务中,未执行"),
+        /**
+         * 设备检修中
+         */
+        EQUIPMENT_MAINTENANCE("设备检修中"),
+        /**
+         * 任务超期
+         */
+        TASK_TIMEOUT("任务超期"),
+        /**
+         * 任务终止
+         */
+        TERMINATION_OF_TASK("任务终止"),
+        /**
+         * 机器人任务异常
+         */
+        ROBOT_ANOMALY_TASK("机器人任务异常"),
+        /**
+         * 无人机任务异常
+         */
+        DRONE_ANOMALY_TASK("无人机任务异常"),
+        /**
+         * 可见光相机任务异常
+         */
+        VIDEO_ANOMALY_TASK("可见光相机任务异常"),
+        /**
+         * 红外相机任务异常
+         */
+        INFRARED_ANOMALY_TASK("红外相机任务异常"),
+        /**
+         * 声纹任务异常
+         */
+        VOICE_ANOMALY_TASK("声纹任务异常"),
+        /**
+         * 任务异常
+         */
+        ANOMALY_TASK("任务异常");
+
+        public String getDesc() {
+            return desc;
+        }
+
+        @Override
+        public String toString(){
+            return desc;
+        }
+
+        final String desc;
+
+        AbnormalResDescEnum(String desc){
+            this.desc = desc;
+        }
+
+        private static final Map<String, AbnormalResDescEnum> ABNORMAL_ENUM_MAP = new HashMap<>();
+
+        static {
+            for (AbnormalResDescEnum value : AbnormalResDescEnum.values()) {
+                ABNORMAL_ENUM_MAP.put(value.getDesc(), value);
+            }
+        }
+
+        public static boolean contains(String desc) {
+            return ABNORMAL_ENUM_MAP.containsKey(desc);
+        }
+    }
 }
