@@ -43,7 +43,7 @@ public class UpNonStandardController {
             result.error(e.getMessage());
             log.error("下发任务错误: {}", e.getMessage(), e);
         } catch (Exception e) {
-            result.error("任务下发失败，系统错误");
+            result.error("任务下发失败");
             log.error("失败查询描述：", e);
         }
         return result;

@@ -1,9 +1,8 @@
 package com.yjh.accesstcp.netty.handler.iot;
 
 import com.yjh.accesstcp.common.Constant;
+import com.yjh.accesstcp.commons.result.BusinessException;
 import com.yjh.accesstcp.commons.result.Result;
-import com.yjh.accesstcp.commons.utils.DateTimeUtil;
-import com.yjh.accesstcp.module.device.entity.DeviceModel;
 import com.yjh.accesstcp.module.device.entity.TCruiseTaskAdd;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
@@ -14,16 +13,15 @@ import com.yjh.accesstcp.netty.handler.MessageHandlerStrategyFactory;
 import com.yjh.accesstcp.netty.handler.ProtocolEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <功能描述>
@@ -44,7 +42,7 @@ public class TaskSendHandler implements MessageHandlerStrategy<XMLBaseModel>, In
         List<Map<String, Object>> itemList = xmlBaseModel.getItems();
         if (CollectionUtils.isEmpty(itemList)) {
             log.error("下发任务不正确，无法执行");
-            clientHandler.normalResponse("400", header.getSessionId());
+            clientHandler.normalResponse("400", header.getSessionId(), "下发任务不正确，无法执行");
             return;
         }
         try {
@@ -74,16 +72,20 @@ public class TaskSendHandler implements MessageHandlerStrategy<XMLBaseModel>, In
                         param.put("source", "");
                         re = Constant.otherServerPost(param, Constant.TASK_DELETE_URL);
                     }
-                    clientHandler.normalResponse("200", header.getSessionId());
+                    String code = re.isSuccess() ? "200" : "500";
+                    clientHandler.normalResponse(code, header.getSessionId(), re.getMessage());
                     log.info("--响应任务下发--" + re);
                 });
                 //存储A接口任务信息
                 sendToUpSystemServices.saveAInterfaceTaskInfo(list);
 
             }
+        } catch (BusinessException e) {
+            log.error("任务执行失败", e);
+            clientHandler.normalResponse("400", header.getSessionId(), e.getMessage());
         } catch (Exception e) {
             log.error("任务执行失败", e);
-            clientHandler.normalResponse("400", header.getSessionId());
+            clientHandler.normalResponse("400", header.getSessionId(), "系统错误");
         }
     }
 
