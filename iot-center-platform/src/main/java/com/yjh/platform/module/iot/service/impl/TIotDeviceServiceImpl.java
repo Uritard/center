@@ -9,6 +9,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.common.utils.TreesUtil;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
@@ -81,6 +82,9 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
             devicePoints.forEach(d -> {
                 d.setIotDeviceId(iotExtend.getId());
                 d.setIotDeviceName(iotExtend.getDeviceName());
+                if ((DictConvertUtil.DICT.getDictCode("iotDeviceType", "电量表")).equals(Integer.toString(iotDevice.getIotDeviceType()))) {
+                    d.setPointName(DictConvertUtil.DICT.covertToDict("meterNumType", d.getPointName()));
+                }
             });
             if(Constant.logUpLv2()) {
                 log.info("IotDevice pointsAdd: {}", JSON.toJSONString(devicePoints));
@@ -118,6 +122,9 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
             devicePoints.forEach(d -> {
                 d.setIotDeviceId(iotExtend.getId());
                 d.setIotDeviceName(iotExtend.getDeviceName());
+                if ((DictConvertUtil.DICT.getDictCode("iotDeviceType", "电量表")).equals(Integer.toString(iotDevice.getIotDeviceType()))) {
+                    d.setPointName(DictConvertUtil.DICT.covertToDict("meterNumType", d.getPointName()));
+                }
                 if (d.getId() == null) {
                     TIotDevicePoint pold = pointMap.get(d.getChannelNum());
                     if (pold != null) {
