@@ -826,7 +826,7 @@
                        SELECT @ai := @ai + 1 as ac
                        from (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 6) ac1,
                             (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) ac2,
-                            (SELECT @ai := 0) xc0
+                            (SELECT @ai := -1) xc0
               ) c where ac &lt;= #{nearDays,jdbcType=INTEGER}
         ) a
         LEFT JOIN ( SELECT DATE(warn_time) date, warn_time, count(1) AS count
@@ -849,7 +849,7 @@
                        SELECT @ai := @ai + 1 as ac
                        from (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) ac1,
                             (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) ac2,
-                            (SELECT @ai := 0) xc0
+                            (SELECT @ai := -1) xc0
               ) c  where ac &lt;= #{nearDays,jdbcType=INTEGER}
         ) a
         LEFT JOIN (
