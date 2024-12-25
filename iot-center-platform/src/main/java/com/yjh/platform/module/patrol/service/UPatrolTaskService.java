@@ -2455,7 +2455,7 @@ public class UPatrolTaskService {
             InspectionResultEvent event = new InspectionResultEvent();
             event.setTaskId(MapUtils.getString(cruiseResultMap,"taskId"));
             event.setInstanceId(MapUtils.getString(cruiseResultMap,"devicePointId"));
-            event.setResult(MapUtils.getString(cruiseResultMap,"resultNum"));
+            event.setResult(MapUtils.getString(cruiseResultMap,"resultDesc"));
             if (Constant.logUpLv3()) {
                 log.info("电表的数据推送: {}", event);
             }
