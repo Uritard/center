@@ -9,6 +9,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.commons.result.BusinessException;
+import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.module.device.entity.AInterfaceTaskInfo;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
@@ -38,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @RequiredArgsConstructor
 public class TekUpTransforServer {
-    private final DefaultEmptyHandlerImpl defaultEmptyHandler;
     private final SendToUpSystemServices sendToUpSystemServices;
 
     private static final Cache<String, String> TASK_IPLAN_CACHE = CacheBuilder.newBuilder().expireAfterWrite(7, TimeUnit.DAYS).build();
@@ -63,7 +63,11 @@ public class TekUpTransforServer {
         MessageHandlerStrategy<XMLBaseModel> messageHandlerStrategy =
             (MessageHandlerStrategy<XMLBaseModel>)MessageHandlerStrategyFactory.getStrategyType(ProtocolEnum.IOT, type);
         if (Optional.ofNullable(messageHandlerStrategy).isPresent()) {
+            DefaultEmptyHandlerImpl defaultEmptyHandler = new DefaultEmptyHandlerImpl();
             messageHandlerStrategy.handler(defaultEmptyHandler, xmlBaseModel, header);
+            if (!defaultEmptyHandler.isSuccess()) {
+                throw new BusinessException(defaultEmptyHandler.getCode(), StringUtils.defaultIfEmpty(defaultEmptyHandler.getMessage(), "系统错误"));
+            }
         } else {
             throw new BusinessException("协议处理错误");
         }

@@ -469,7 +469,7 @@ public class UPatrolTaskController {
         return result;
     }
 
-    @ApiOperation(value = "站端任务下发")
+    @ApiOperation(value = "上级系统任务下发")
     @RequestMapping(value = "/upSystemIssuedTask", method = RequestMethod.POST)
     public Result upSystemIssuedTask(@RequestBody Map<String,List<TCruiseTaskAdd>> map) {
         Result result = new Result();
@@ -486,10 +486,10 @@ public class UPatrolTaskController {
             }
         } catch (BusinessException e) {
             result.setMessage(e.getCode(), e.getMessage());
-            log.error("站端任务下发异常: {}", e.getMessage());
+            log.error("上级系统任务下发异常: {}", e.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("站端任务下发错误:", e);
+            log.error("上级系统任务下发错误:", e);
         }
         return result;
     }

@@ -257,7 +257,8 @@ public class UPatrolTaskService {
         if (Objects.isNull(uPatrolTask.getTaskCode())) {
             uPatrolTask.setTaskCode(uPatrolTask.getTaskId());
         }
-
+        // 时间校验
+        checkTime(uPatrolTask);
         List<Long> instanceList = insertTaskAttr(uPatrolTask, tCruiseTaskAdd);
 
         List<TCruisePointInstanceNameDetail> detailList = initializeNextTaskInfo(uPatrolTask, instanceList);
@@ -269,6 +270,29 @@ public class UPatrolTaskService {
         }
 
         return uPatrolTask;
+    }
+
+    /**
+     * 校验时间
+     */
+    public boolean checkTime(UPatrolTask uPatrolTask) {
+        // 周期任务校验开始时间和结束时间
+        if (uPatrolTask.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
+            // 开始时间和结束时间都不可为空
+            boolean notNull = uPatrolTask.getEndTime() != null && uPatrolTask.getStartTime() != null;
+            // 结束时间不可早于开始时间且结束时间不可早于当前时间
+            boolean timeCycle = notNull && uPatrolTask.getEndTime().after(uPatrolTask.getStartTime()) && DateTime.now().before(uPatrolTask.getEndTime());
+            if (!timeCycle) {
+                throw new BusinessException("时间范围不正确，结束时间在当前时间之前");
+            }
+        } else if (uPatrolTask.getExecuteType() == TaskTypeEnum.TIME.getType()) {
+            // 定时任务时间校验，开始时间不可早于当前时间
+            boolean notAfterNow = DateUtil.dateSecond().isAfter(uPatrolTask.getStartTime());
+            if (notAfterNow) {
+                throw new BusinessException("开始时间在当前时间之前");
+            }
+        }
+        return true;
     }
 
     private UPatrolTask dealTaskInfo(TCruiseTaskAdd tCruiseTaskAdd){
@@ -452,6 +476,9 @@ public class UPatrolTaskService {
                 }
             }
             List<TCruisePointInstance> tCruisePointInstanceList = uPatrolTaskAttrDao.batchSelect(instanceList);
+            if (CollectionUtils.isEmpty(tCruisePointInstanceList)) {
+                throw new BusinessException("点位ID错误");
+            }
             if (!checkLowerDeviceOnline(tCruisePointInstanceList)) {
                 throw new BusinessException("下级设备离线，无法下发任务！");
             }
@@ -478,7 +505,7 @@ public class UPatrolTaskService {
             }
         }
 
-        if (uPatrolTaskAttrs.size() > 0) {
+        if (!uPatrolTaskAttrs.isEmpty()) {
             uPatrolTaskAttrDao.batchAdd(uPatrolTaskAttrs);
         }
         uPatrolTask.setCreateTime(new Date());

@@ -1,6 +1,7 @@
 
 package com.yjh.accesstcp.commons.result;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
@@ -76,4 +77,8 @@ public class Result {
         this.data = data;
     }
 
+    @JsonIgnore
+    public boolean isSuccess() {
+        return SUCCESS == this.code;
+    }
 }

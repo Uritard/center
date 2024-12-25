@@ -134,6 +134,10 @@ public interface TCPClientHandler {
      * @param code             状态码
      * @param receiveSessionId 返回序列号
      */
+    default void normalResponse(String code, long receiveSessionId, String message) {
+        normalResponse(code, receiveSessionId);
+    }
+
     default void normalResponse(String code, long receiveSessionId) {
         XMLBaseModel xmlBaseModel =
                 new XMLBaseModel().setType("251").setCommand("3").setCode(code).setSendCode(getCruise()).setReceiveCode(getServer());

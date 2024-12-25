@@ -13,6 +13,7 @@ import com.yjh.accesstcp.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accesstcp.common.utils.ZipUtil;
 import com.yjh.accesstcp.commons.result.BusinessException;
 import com.yjh.accesstcp.commons.result.Result;
+import com.yjh.accesstcp.commons.result.ResultCodeEnum;
 import com.yjh.accesstcp.commons.utils.CommonUtils;
 import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.dao.*;
@@ -1509,6 +1510,9 @@ public class SendToUpSystemServices {
         TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, isLingAge, Constant.edgeLevel());
         String deviceList = MapUtils.getString(item, "device_list");
         String instanceIds = convertInstances(NumberUtils.toInt(deviceLevel, 3), deviceList);
+        if (StringUtils.isBlank(instanceIds)) {
+            throw new BusinessException(ResultCodeEnum.INVALIDREQUEST.getCode(), "点位ID错误");
+        }
 
         tCruiseTaskAdd.setDeviceList(instanceIds);
         item.put("device_list", instanceIds);
@@ -1633,11 +1637,11 @@ public class SendToUpSystemServices {
             tCruiseTaskAdd.setStartTime(new Date());
         } else {
             level = String.valueOf(this.getUpperTaskLevel("902"));
-            if (StringUtils.isNotEmpty(org.apache.commons.collections.MapUtils.getString(item, "fixed_start_time"))) {
+            if (StringUtils.isNotEmpty(MapUtils.getString(item, "fixed_start_time"))) {
                 long fixedStartTime = DateTimeUtil.parse(String.valueOf(item.get("fixed_start_time"))).getTime();
                 log.info("fixedStartTime=={},当前时间:{}", fixedStartTime, System.currentTimeMillis());
-                if (Math.abs(System.currentTimeMillis() - fixedStartTime) <= (60 * 1000)) {
-                    // 立即(fixed_start_time和当前时间相差5min)
+                if (Math.abs(System.currentTimeMillis() - fixedStartTime) <= (3 * 60 * 1000)) {
+                    // 立即(fixed_start_time和当前时间相差3min)
                     tCruiseTaskAdd.setIfRun(173);
                 } else {
                     // 定期

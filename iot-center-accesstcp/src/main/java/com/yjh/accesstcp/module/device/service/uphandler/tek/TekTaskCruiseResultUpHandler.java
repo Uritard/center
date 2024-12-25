@@ -64,15 +64,24 @@ public class TekTaskCruiseResultUpHandler extends AbstractTekHandler {
     }
 
     private void uploadPic(XMLBaseModel xmlBaseModel, String url) {
-        String ftpsBase = (String)redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content");
+        String ftpsBase = (String) redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content");
         for(Map<String, Object> item : xmlBaseModel.getItems()){
             Map<String, Object> params = new HashMap<>(8);
             String filePaths = String.valueOf(item.get("file_path"));
+            if (StringUtils.isEmpty(filePaths)) {
+                log.warn("当前测点没有文件需要传输");
+                continue;
+            }
             String[] split = filePaths.split(",");
             String taskCode = MapUtils.getString(item,"task_code");
             for (String filePath : split) {
                 try {
-                    params.put("file", new File(FileUtil.concatPath(ftpsBase, filePath)));
+                    File file = new File(FileUtil.concatPath(ftpsBase, filePath));
+                    if (!file.isFile() || !file.exists()) {
+                        log.error("文件不存在: {}", file.getAbsolutePath());
+                        continue;
+                    }
+                    params.put("file", file);
                     params.put("planNo", tekUpTransforServer.getTaskPlanCode(taskCode));
                     params.put("taskNo", taskCode);
                     params.put("infoCode", MapUtils.getString(item,"device_id"));
@@ -109,7 +118,7 @@ public class TekTaskCruiseResultUpHandler extends AbstractTekHandler {
             } else {
                 param.put("dataStatus", Constant.ZERO);
             }
-            param.put("pointStatus", "2");
+            param.put("pointStatus", AbnormalResDescEnum.contains(value) ? "3" : "2");
             param.put("infoCode", MapUtils.getString(item,"device_id"));
             param.put("inspectionType", "1".equals(MapUtils.getString(item,"data_type")) ? "1" : "0");
             String[] edges = StringUtils.split(Constant.edgeCode(), "-", 2);
