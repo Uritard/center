@@ -43,6 +43,8 @@ public class TekTaskStateUpHandler extends AbstractTekHandler {
     private PatrolTaskDao patrolTaskDao;
     @Resource
     private UrlPathHandler urlPathHandler;
+    @Resource
+    private TekUpTransforServer tekUpTransforServer;
 
     private final static String TASK_STATUS_URL = "/distribute/data/service/taskStatus/receive";
 
@@ -60,8 +62,9 @@ public class TekTaskStateUpHandler extends AbstractTekHandler {
         try {
             TaskStatusEntity entity = new TaskStatusEntity();
             Map<String, Object> item = xmlBaseModel.getItems().get(0);
-            entity.setPlanNo(MapUtils.getString(item, "task_code"));
-            entity.setTaskNo(MapUtils.getString(item, "task_patrolled_id"));
+            String taskCode = MapUtils.getString(item,"task_code");
+            entity.setPlanNo(tekUpTransforServer.getTaskPlanCode(taskCode));
+            entity.setTaskNo(taskCode);
             entity.setPatrolDeviceType(isRobotOrCameraTask(entity.getPlanNo(), entity.getTaskNo()));
             String taskStatus = MapUtils.getString(item, "task_state");
             entity.setTaskStatus(aInterfaceApiToUP(taskStatus));
