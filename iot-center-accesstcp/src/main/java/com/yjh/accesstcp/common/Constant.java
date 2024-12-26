@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.deser.impl.PropertyBasedCreator;
 import com.yjh.accesstcp.common.utils.StaticContextAccessor;
 import com.yjh.accesstcp.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accesstcp.commons.result.Result;
+import com.yjh.accesstcp.commons.result.ResultCodeEnum;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
@@ -141,6 +142,7 @@ public class Constant {
             re = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(url, Result.class ,map);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            re.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         }
         return re;
     }
