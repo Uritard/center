@@ -8,10 +8,8 @@ import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.IUpSystemService;
 import com.yjh.accesstcp.module.device.service.uphandler.IUpHandler;
 import com.yjh.accesstcp.module.device.service.uphandler.UpHandlerFactory;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;

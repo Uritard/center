@@ -4,12 +4,12 @@
 
 package com.yjh.accesstcp.module.device.service.uphandler.tek;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.commons.result.BusinessException;
-import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.module.device.entity.AInterfaceTaskInfo;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
@@ -22,6 +22,7 @@ import com.yjh.accesstcp.netty.handler.ProtocolEnum;
 import com.yjh.accesstcp.netty.handler.iot.IotHandlerEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -128,15 +129,40 @@ public class TekUpTransforServer {
         return mapList;
     }
 
+    /**
+     * 判断是否上级下发任务
+     * @param xmlBaseModel 消息体
+     */
+    public boolean notUpTask(XMLBaseModel xmlBaseModel) {
+        Map<String, Object> item = CollectionUtil.getFirst(xmlBaseModel.getItems());
+        String taskCode = MapUtils.getString(item,"task_code");
+        return notUpTask(taskCode);
+    }
+
+    /**
+     * 根据 taskCode 判断是否上级下发任务
+     * @param taskCode 任务编码
+     */
+    public boolean notUpTask(String taskCode) {
+        String planNo = getTaskPlanCode(taskCode);
+        return StringUtils.isEmpty(planNo);
+    }
+
+    /**
+     * 从数据库中获取planNo，使用缓存提升速度
+     */
     public String getTaskPlanCode(String taskCode) {
+        if (StringUtils.isEmpty(taskCode)) {
+            return StringUtils.EMPTY;
+        }
         try {
             return TASK_IPLAN_CACHE.get(taskCode, () -> {
                 try {
                     AInterfaceTaskInfo aInterfaceTaskInfo = sendToUpSystemServices.selectAInterfaceTask(taskCode);
-                    return aInterfaceTaskInfo.getCreator();
+                    return Optional.ofNullable(aInterfaceTaskInfo).map(AInterfaceTaskInfo::getCreator).orElse(StringUtils.EMPTY);
                 } catch (Exception e) {
                     log.error("根据task_code查询A接口任务出错：", e);
-                    return "";
+                    return StringUtils.EMPTY;
                 }
             });
         } catch (ExecutionException e) {
