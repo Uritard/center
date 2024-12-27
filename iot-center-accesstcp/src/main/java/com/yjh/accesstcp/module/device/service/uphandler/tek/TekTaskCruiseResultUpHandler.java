@@ -8,7 +8,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.common.utils.HttpClientUtils;
 import com.yjh.accesstcp.commons.result.Result;
@@ -28,8 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <功能描述>
@@ -56,6 +55,11 @@ public class TekTaskCruiseResultUpHandler extends AbstractTekHandler {
 
     @Override
     public int sendUpHandler(XMLBaseModel xmlBaseModel) {
+        if (tekUpTransforServer.notUpTask(xmlBaseModel)) {
+            log.warn("planNo 为空，非上级下发任务，xmlBaseModel: {}", xmlBaseModel);
+            return 0;
+        }
+
         // 图片上传
         this.uploadPic(xmlBaseModel, urlPathHandler.getTekUrl(PIC_UPLOAD_URL));
         // 结果上报
@@ -96,8 +100,9 @@ public class TekTaskCruiseResultUpHandler extends AbstractTekHandler {
     }
 
     private void uploadResult(XMLBaseModel xmlBaseModel) {
+        List<Map<String, Object>> resultList = new ArrayList<>();
         for(Map<String, Object> item : xmlBaseModel.getItems()){
-            JSONObject param = new JSONObject();
+            Map<String, Object> param = new LinkedHashMap<>();
             LocalDateTime localDateTime = DateUtil.parseLocalDateTime((String) item.get("time"));
             String taskCode = MapUtils.getString(item,"task_code");
             param.put("dataId", StrUtil.uuid());
@@ -128,11 +133,14 @@ public class TekTaskCruiseResultUpHandler extends AbstractTekHandler {
             param.put("year", localDateTime.getYear());
             param.put("month", localDateTime.getMonthValue());
             param.put("day", localDateTime.getDayOfMonth());
-
-            String result = param.toJSONString();
-            rabbitTemplate.convertAndSend(RabbitMqConfig.EXCHANGE_NAME, RabbitMqConfig.ROUTING_KEY, result);
-            log.info("上报任务结果进入mq： {}", result);
+            resultList.add(param);
         }
+        String result = JSON.toJSONString(resultList);
+        rabbitTemplate.convertAndSend(RabbitMqConfig.EXCHANGE_NAME, RabbitMqConfig.ROUTING_KEY, result, m -> {
+            m.getMessageProperties().setMessageId(StrUtil.uuid());
+            return m;
+        });
+        log.info("上报任务结果进入mq： {}", result);
     }
 
     enum AbnormalResDescEnum{
