@@ -42,6 +42,7 @@ public class ResultConvertUtil {
 //        System.out.println(convertResult(c));
 //       System.out.println(convertQXResult(b));
         System.out.println(convertResult("合位"));
+        System.out.println(convertResult("正向有功总:1140"));
 //        System.out.println(convertBJResult("32.6ABCDEFGHIJKL,MOPQRSTUVWXYZa我-1"));
     }
 
@@ -69,6 +70,8 @@ public class ResultConvertUtil {
             return "0";
         } else if (StringUtils.containsAny(result, "异常", "超时", "错误", "失败", "未识别")) {
             return "-1";
+        } else if (StringUtils.containsAny(result, ":")) {
+            return StringUtils.substringAfterLast(result, ":");
         } else if (CommonUtils.containsChinese(result)) {
             return String.valueOf(StringUtils.split(result).length);
         } else {
