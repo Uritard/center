@@ -101,7 +101,7 @@ public interface TCruisePointInstanceDao {
 
     List<AreaInfoDeviceId> selectDeviceByDeviceMeteId(@Param(value = "deviceMeteId") Long deviceMeteId);
 
-    TIotDevicePoint getBindIotDevicePoint(@Param(value = "devicePointId") Long devicePointId);
+    TIotDevicePoint getBindIotDevicePoint(@Param(value = "devicePointId") String devicePointId);
 
     TStdDeviceMete selectMeteByInsId(@Param(value = "instanceId") Long instanceId);
 }
