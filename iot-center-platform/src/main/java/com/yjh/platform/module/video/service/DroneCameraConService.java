@@ -105,12 +105,12 @@ public class DroneCameraConService {
             // http://127.0.0.1/index/api/webrtc?app=live&stream=test&type=play
             String scheam = "1".equals(videoHttps) ? "https://" : "http://";
             String wsSchema = "1".equals(videoHttps) ? "wss://" : "ws://";
-            webRtcUrl = scheam + hostIp + "/ZLM/index/api/webrtc?app=live&stream=" + id + "&type=play";
-            flvUrl =  scheam + hostIp + "/ZLM/rtp/" + id + ".live.flv";
-            wsFlvUrl = wsSchema + hostIp + "/ZLM/rtp/" + id + ".live.flv";
+            webRtcUrl = "/ZLM/index/api/webrtc?app=live&stream=" + id + "&type=play";
+            flvUrl =  "/ZLM/rtp/" + id + ".live.flv";
+            wsFlvUrl = "/ZLM/rtp/" + id + ".live.flv";
         } else {
             // webrtc://172.24.39.10/live/40001
-            webRtcUrl = "webrtc://" + hostIp + "/live/" + id;
+            webRtcUrl = "/live/" + id;
         }
         returnMap.put("webRtcUrl", webRtcUrl);
         returnMap.put("flvUrl", flvUrl);

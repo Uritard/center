@@ -1321,31 +1321,30 @@ public class CameraConService {
     /**
      * 组装webRtc播放路径，SRS和ZLMediaKit播放路径不同
      */
-    private void webRtcUrl(Long id, Map<String, Object> returnMap) {
-        webRtcUrl(String.valueOf(id), returnMap, false);
-    }
+//    private void webRtcUrl(Long id, Map<String, Object> returnMap) {
+//        webRtcUrl(String.valueOf(id), returnMap, false);
+//    }
 
     private void webRtcUrl(Map<String, String> resultMap, Map<String, Object> returnMap) {
         Map<String, String> hostIpMap = redisTemplate.opsForHash().entries("t_sys_param:hostIp");
-        String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "videoHttpsEnable"));
-        String hostIp = hostIpMap.get("content");
 
         String rtcUrl = resultMap.get("rtc");
         int subIndex = rtcUrl.indexOf("/", Math.max(8, rtcUrl.lastIndexOf(":")));
         String subUrl = rtcUrl.substring(subIndex);
-        String schema = "1".equals(videoHttps) ? "https://" : "http://";
-        String newUrl = schema + hostIp + "/ZLM" + subUrl;
+        String newUrl = "/ZLM" + subUrl;
         returnMap.put("webRtcUrl", newUrl);
 
         String flvUrl = resultMap.get("flv");
         String flvSubUrl = flvUrl.substring(subIndex);
-        String httpSchema = "1".equals(videoHttps) ? "https://" : "http://";
-        String newFlvUrl = httpSchema + hostIp + "/ZLM" + flvSubUrl;
-        returnMap.put("flvUrl", newFlvUrl);
-
-        String wsSchema = "1".equals(videoHttps) ? "wss://" : "ws://";
-        String newWsUrl = wsSchema + hostIp + "/ZLM" + flvSubUrl;
+        String newWsUrl = "/ZLM" + flvSubUrl;
         returnMap.put("wsFlvUrl", newWsUrl);
+        returnMap.put("flvUrl", newWsUrl);
+
+        String fmp4Url = resultMap.get("fmp4");
+        String fmp4SubUrl = fmp4Url.substring(subIndex);
+        String newFmp4Url = "/ZLM" + fmp4SubUrl;
+        returnMap.put("fmp4Url", newFmp4Url);
+
         returnMap.put("streamId", resultMap.get("stream"));
     }
 
@@ -1363,43 +1362,38 @@ public class CameraConService {
         webRtcUrl(resultMap, returnMap);
     }
 
-    private void webRtcUrl(String id, Map<String, Object> returnMap) {
-        webRtcUrl(id, returnMap, false);
-    }
+//    private void webRtcUrl(String id, Map<String, Object> returnMap) {
+//        webRtcUrl(id, returnMap, false);
+//    }
+//
+//    private void webRtcUrl(Long id, Map<String, Object> returnMap, boolean isHistory) {
+//        webRtcUrl(String.valueOf(id), returnMap, isHistory);
+//    }
 
-    private void webRtcUrl(Long id, Map<String, Object> returnMap, boolean isHistory) {
-        webRtcUrl(String.valueOf(id), returnMap, isHistory);
-    }
-
-    private void webRtcUrl(String id, Map<String, Object> returnMap, boolean isHistory) {
-        String mediaServer = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "mediaServer"));
-        String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "videoHttpsEnable"));
-        Map<String, String> hostIpMap = redisTemplate.opsForHash().entries("t_sys_param:hostIp");
-        String hostIp = hostIpMap.get("content");
-        String webRtcUrl;
-        String file;
-
-        String scheam = "1".equals(videoHttps) ? "https://" : "http://";
-        String wsScheam = "1".equals(videoHttps) ? "wss://" : "ws://";
-        String app = isHistory ? "history" : "live";
-        if (MEDIA_ZLK.equalsIgnoreCase(mediaServer)) {
-            // http://127.0.0.1/index/api/webrtc?app=live&stream=test&type=play
-            webRtcUrl = scheam + hostIp + "/ZLM/index/api/webrtc?app=" + app + "&stream=" + id + "&type=play";
-            file = String.format("/ZLM/%s/%s.live.flv", app, id);
-        } else {
-            // webrtc://172.24.39.10/live/40001
-            webRtcUrl = "webrtc://" + hostIp + "/" + app + "/" + id;
-            file = String.format("/%s/%s.flv", app, id);
-        }
-
-        String flvUrl = scheam + hostIp + file;
-        String wsFlvUrl = wsScheam + hostIp + file;
-
-        returnMap.put("webRtcUrl", webRtcUrl);
-        returnMap.put("flvUrl", flvUrl);
-        returnMap.put("wsFlvUrl", wsFlvUrl);
-        returnMap.put("streamId", id);
-    }
+//    private void webRtcUrl(String id, Map<String, Object> returnMap, boolean isHistory) {
+//        String mediaServer = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "mediaServer"));
+//        String webRtcUrl;
+//        String file;
+//
+//        String app = isHistory ? "history" : "live";
+//        if (MEDIA_ZLK.equalsIgnoreCase(mediaServer)) {
+//            // http://127.0.0.1/index/api/webrtc?app=live&stream=test&type=play
+//            webRtcUrl = "/ZLM/index/api/webrtc?app=" + app + "&stream=" + id + "&type=play";
+//            file = String.format("/ZLM/%s/%s.live.flv", app, id);
+//        } else {
+//            // webrtc://172.24.39.10/live/40001
+//            webRtcUrl = "/" + app + "/" + id;
+//            file = String.format("/%s/%s.flv", app, id);
+//        }
+//
+//        String flvUrl = file;
+//        String wsFlvUrl = file;
+//
+//        returnMap.put("webRtcUrl", webRtcUrl);
+//        returnMap.put("flvUrl", flvUrl);
+//        returnMap.put("wsFlvUrl", wsFlvUrl);
+//        returnMap.put("streamId", id);
+//    }
 
     private CameraVendor cameraVendor(int vendorId) {
         return cameraVendor(String.valueOf(vendorId));

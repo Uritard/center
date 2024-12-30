@@ -273,6 +273,7 @@ public class TSysParamService{
         result.put("theme", SysParamConfig.getSysContent("theme"));
         result.put("homeType", SysParamConfig.getSysContent("homeType"));
         result.put("videoPlayer", SysParamConfig.getSysContent("videoPlayer"));
+        result.put("videoType", SysParamConfig.getSysContent("videoType"));
 
         return result;
     }
