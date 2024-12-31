@@ -2,7 +2,7 @@ package com.yjh.accesstcp;
 
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.module.device.service.impl.UpType;
-import com.yjh.accesstcp.module.device.service.uphandler.tek.UrlPathHandler;
+import com.yjh.accesstcp.module.device.service.uphandler.tek.TekRobotStatusUpHandler;
 import com.yjh.accesstcp.netty.NettyClient;
 import com.yjh.accesstcp.netty.algorithm.StateGridAlgorithmHandlerImpl;
 import com.yjh.accesstcp.netty.iot.StateGridADecoder;
@@ -19,6 +19,7 @@ import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import javax.annotation.Resource;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
@@ -41,7 +42,7 @@ public class AccessTcpApplication implements CommandLineRunner {
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
-    private UrlPathHandler urlPathHandler;
+    private TekRobotStatusUpHandler tekRobotStatusUpHandler;
 
     public static void main(String[] args) {
         SpringApplication.run(AccessTcpApplication.class, args);
@@ -60,7 +61,7 @@ public class AccessTcpApplication implements CommandLineRunner {
             NettyClient nettyClient = new NettyClient(StateGridADecoder.class, new StateGridAHandlerImpl());
             nettyClient.start(address);
         } else if (UpType.TEK.getType() == upflag) {
-            urlPathHandler.authToken();
+            tekRobotStatusUpHandler.uploadRobotStatus(redisTemplate);
         }
         //上级系统算法连接
         if(Constant.ONE.equals(Constant.managerSystemFlag())) {
