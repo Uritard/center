@@ -45,5 +45,5 @@ public interface TAlgorithmInfoDao {
 
     String selectRecognizeTypeByPresetId(@Param(value = "presetId") Long presetId);
 
-    int selectPresetCountByPresetId(@Param(value = "presetId") Long parseLong);
+    int selectPresetCountByPresetId(@Param(value = "presetId") String presetId);
 }

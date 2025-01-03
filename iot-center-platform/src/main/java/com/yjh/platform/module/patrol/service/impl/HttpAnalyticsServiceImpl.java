@@ -228,7 +228,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
             } else {
                 String presetId = StringUtils.substringAfterLast(analysis.getPicModelPath(), "/");
                 //急速模式 非相机任务的表计算法
-                int cameraCount = tAlgorithmInfoDao.selectPresetCountByPresetId(Long.parseLong(presetId));
+                int cameraCount = tAlgorithmInfoDao.selectPresetCountByPresetId(presetId);
                 boolean isMeter = !StringUtils.equals("11", analysis.getAnalyseType()) || !StringUtils.equals("398", analysis.getAnalyseType());
                 if (Constant.fastTurbo() && cameraCount == 0 && isMeter) {
                     log.info("急速模式 非相机上报的表计识别");
