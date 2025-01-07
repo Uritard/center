@@ -450,7 +450,7 @@ public class CameraConService {
     public String stopStream(String cameraId) {
         PlayEntity playEntity = PlayEntity.builder().deviceId(String.valueOf(cameraId)).build();
         IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
-        iPlayService.videoStopByWvpFFM(playEntity);
+        iPlayService.videoStopByZlmFFM(playEntity);
         return "stop " + cameraId + " preview success!";
     }
 
@@ -1329,7 +1329,10 @@ public class CameraConService {
         Map<String, String> hostIpMap = redisTemplate.opsForHash().entries("t_sys_param:hostIp");
 
         String rtcUrl = resultMap.get("rtc");
-        int subIndex = rtcUrl.indexOf("/", Math.max(8, rtcUrl.lastIndexOf(":")));
+        int subIndex = 0;
+        if (rtcUrl.contains(":")) {
+            subIndex = rtcUrl.indexOf("/", Math.max(8, rtcUrl.lastIndexOf(":")));
+        }
         String subUrl = rtcUrl.substring(subIndex);
         String newUrl = "/ZLM" + subUrl;
         returnMap.put("webRtcUrl", newUrl);
@@ -1356,8 +1359,9 @@ public class CameraConService {
      */
     private void ffmRtcUrl(String srcUrl, String streamId, Map<String, Object> returnMap) {
         IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
-        PlayEntity playEntity = PlayEntity.builder().srcUrl(srcUrl).command(Constant.ffmpegCmd()).deviceId(streamId).build();
-        Result result = iPlayService.videoPlayByWvpFFM(playEntity);
+        String mediaSignKey = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "mediaSignKey"));
+        PlayEntity playEntity = PlayEntity.builder().signKey(mediaSignKey).srcUrl(srcUrl).command(Constant.ffmpegCmd()).deviceId(streamId).build();
+        Result result = iPlayService.videoPlayByZlmFFM(playEntity);
         Map<String, String> resultMap = (Map<String, String>) result.getData();
         webRtcUrl(resultMap, returnMap);
     }
