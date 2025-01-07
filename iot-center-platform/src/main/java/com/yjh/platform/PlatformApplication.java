@@ -71,6 +71,8 @@ public class PlatformApplication  implements CommandLineRunner {
     private String url;
     @Value("${wvp.host}")
     private String wvpHost;
+    @Value("${zlm.host}")
+    private String zlmHost;
     @Autowired
     private TCameraPresetService tCameraPresetService;
 
@@ -85,6 +87,7 @@ public class PlatformApplication  implements CommandLineRunner {
             redisTemplate.delete("AllRobotCode");
             DictConvertUtil.DICT.loadDict(dictBusinessService);
             VideoConfig.custom(wvpHost);
+            VideoConfig.setZlmHost(zlmHost);
             sysKeyService.loadKeysToRedis();
             tSysParamService.insertIntoRedis(true);
             tCameraInfoService.intoRedis();
