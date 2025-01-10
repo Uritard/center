@@ -1950,90 +1950,32 @@ public class CameraConService {
      *
      * @param picPath Dlt图像路径
      */
-    public List<String> getLineTemperature(String points,String picPath){
-        Integer column = null;
-        Integer row = null;
-        Integer xPlus = null;
-        Integer yPlus = null;
-        String[] pointList = points.split(",");
-        column = ValueUtil.toInteger(pointList[0],0);
-        row = ValueUtil.toInteger(pointList[1],0);
-        if (pointList.length == 4){
-            xPlus = ValueUtil.toInteger(pointList[2],1);
-            yPlus = ValueUtil.toInteger(pointList[3],1);
+    public List<String> getLineTemperature(List<String> points,String picPath){
+
+        ThermoEntity.Builder entity = ThermoEntity.builder()
+            .path(picPath.replaceAll(Constant.RESULT_IMG_REAL_PATH,SysParamConfig.getSysContent("resultImgPath")));
+
+        for (String point : points) {
+            Integer x1;
+            Integer y1;
+            Integer x2 = null;
+            Integer y2 = null;
+            String[] pointList = point.split(",");
+            x1 = ValueUtil.toInteger(pointList[0],0);
+            y1 = ValueUtil.toInteger(pointList[1],0);
+            if (pointList.length == 4){
+                x2 = ValueUtil.toInteger(pointList[2],1);
+                y2 = ValueUtil.toInteger(pointList[3],1);
+            }
+            entity.thermoPoint(new ThermoPoint(x1, y1, x2, y2));
         }
-        /**
-         * https://172.24.39.17/imgs/resultImg/376595ad00d14ff0b0759f0c850c7656/20231103093152014.jpg -- picPath
-         * /home/yjh_iot_center/iot-picture/infrared/f0d5b4f048054ec3bc863b2ab33f6849/20231108095522121.csv
-         */
 
-        String csvRedisPath  = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content"));
-        String picRedisPath  = Constant.RESULT_IMG_REAL_PATH;
-
-        String csvPath = picPath.replace(picRedisPath,csvRedisPath).replace("jpg","csv");
-
-//        csvPath = "D://testCdoe/11.csv";
-        String temperature = "0.00";
-
-        try (BufferedReader reade = new BufferedReader(new InputStreamReader(new FileInputStream(csvPath), "GBK"))){
-
-            List<String[]> dataTmp = new ArrayList<>();
-            String line;
-            while ((line = reade.readLine()) != null) {
-                //CSV格式文件为逗号分隔符文件，这里根据逗号切分
-                String[] item = line.split(",");
-                dataTmp.add(item);
-            }
-
-            int width = dataTmp.get(0).length;
-            int height = dataTmp.size();
-
-            String[][] tmpData = new String[width][height];
-            for (int i = 0; i < height; i++) {
-                String[] itemRow = dataTmp.get(i);
-                for (int j = 0; j < width; j++) {
-                    tmpData[j][i] = itemRow[j];
-                }
-            }
-
-            double xRatio = (double)width /640;
-            double yRatio = (double)height /512;
-
-            log.info("温度点阵文件数据大小: {}x{}, 系数: {}x{}", width, height, xRatio, yRatio);
-            if (xPlus != null) {
-                int x1 = (int)(column * xRatio);
-                int y1 = (int)(row * yRatio);
-                int x2 = (int)(xPlus * xRatio);
-                int y2 = (int)(yPlus * yRatio);
-
-                List<Float> tempList = new ArrayList<>();
-
-                for (int x = x1; x <= x2; x++) {
-                    for (int y = y1; y <= y2; y++) {
-                        tempList.add(NumberUtils.toFloat(tmpData[Math.min(x, width - 1)][Math.min(y, height - 1)]));
-                    }
-                }
-                Float max = NumberUtil.max(tempList.toArray(new Float[0]));
-
-                log.info("arr: {}", tempList);
-                //转换保留后两位小数
-                temperature = NumberUtil.roundStr(max, 2);
-                log.info("框测temperature转换保留后两位小数 {}", temperature);
-
-                return Collections.singletonList(temperature);
-            } else {
-                int x = (int)(column * xRatio);
-                int y = (int)(row * yRatio);
-
-                //转换保留后两位小数
-                temperature = NumberUtil.roundStr(tmpData[Math.min(x, width - 1)][Math.min(y, height - 1)], 2);
-                log.info("点测temperature转换保留后两位小数 {}", temperature);
-            }
-        } catch (Exception e) {
-            log.error("解析对应csv文件出错！", e);
-            throw new BusinessException("文件读取错误！");
+        IInfraredService iInfraredService = VideoServiceFactory.loadSnapService(CameraVendor.HIK, IInfraredService.class);
+        Result<List<String>> result = iInfraredService.getFileTemperature(entity.build());
+        if (result.getCode() != 200) {
+            throw new BusinessException("非标准D/LT 664红外图片,获取点阵温度失败！");
         }
-        return Collections.singletonList(temperature);
+        return result.getData();
     }
 
     /**

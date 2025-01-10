@@ -967,7 +967,8 @@ public class HelloController {
     @GetMapping(value = "/getLineTemperature")
     @ApiOperation(value = "getLineTemperature")
     public Result getLineTemperature(
-            @RequestParam(value = "points", required = false) String points,
+            @RequestParam(value = "points", required = false) List<String> points,
+            @RequestParam(value = "cameraId", required = false) Long cameraId,
             @RequestParam(value = "path", required = false) String path
     ) throws Exception{
         Result result = new Result();
