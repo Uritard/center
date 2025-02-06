@@ -495,7 +495,17 @@ public class TStdDeviceModelService {
         if (CollectionUtils.isNotEmpty(insertIdSet)) {
             insertList = newList.stream().filter(t -> insertIdSet.contains(t.getOriginId())).collect(Collectors.toList());
             List<List<TCameraPreset>> partitionList = Lists.partition(insertList, 1000);
-            partitionList.forEach(list -> tCameraPresetMapper.batchInsert(list));
+            partitionList.forEach(list -> {
+                list = list.stream()
+                    .collect(Collectors.toMap(
+                        preset -> preset.getCameraId() + "-" + preset.getPresetNum(), // 键映射函数
+                        Function.identity(), // 值映射函数（即对象本身）
+                        (existing, replacement) -> existing // 合并函数，这里保留已存在的对象（可以根据需要选择保留哪个）
+                    ))
+                    .values().stream() // 获取Map的值（即去重后的对象集合）
+                    .collect(Collectors.toList()); // 收集成List
+                tCameraPresetMapper.batchInsert(list);
+            });
             //处理预置位图片
             if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel)) {
                 insertList.forEach(tCameraPreset -> {
