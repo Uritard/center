@@ -150,4 +150,20 @@ public class ReportManageController {
         }
         return result;
     }
+
+    @ApiOperation(value = "下载站所运行报告报告")
+    @GetMapping(value = "/downLoadStationRunReport")
+    @Logs(title = "下载站所运行报告报告",content = "下载站所运行报告报告",logType = 9,authority = "1235")
+    public Result downLoadStationRunReport() {
+        Result result = new Result();
+        try {
+            result.setData(reportManageService.downLoadStationRunReport());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("下载巡视报告发生错误:", e);
+        }
+        return result;
+    }
 }

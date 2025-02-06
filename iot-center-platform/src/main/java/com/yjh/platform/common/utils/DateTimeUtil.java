@@ -41,6 +41,7 @@ public class DateTimeUtil {
     private static final String TIMEFORMAT2 = "yyyyMMddHHmmss";
     private static final String DATEOFFORMAT = "yyyyMMdd_HHmmss";
     private static final String DATEFORMATFILE = "yyyyMMddHHmmssSSS";
+    private static final String DATEFORMAT_CHINESE = "yyyy年MM月dd日";
 
 
     private static ResourceBundle resource = null;
@@ -84,6 +85,14 @@ public class DateTimeUtil {
      */
     public static String getDatePattern() {
         return DATEFORMATTPL;
+    }
+    /**
+     * 日期格式。
+     *
+     * @return 日期格式
+     */
+    public static String getDateChinesePattern() {
+        return DATEFORMAT_CHINESE;
     }
 
     /**
@@ -275,6 +284,20 @@ public class DateTimeUtil {
             return "";
         }
         FastDateFormat sdf = FastDateFormat.getInstance(getDatePattern());
+        return sdf.format(date);
+    }
+
+    /**
+     * 日期转为字符串.
+     *
+     * @param date 要格式化的日期
+     * @return 日期字符串 yyyy-mm-dd
+     */
+    public static String formatYMDChinese(Date date) {
+        if (date == null) {
+            return "";
+        }
+        FastDateFormat sdf = FastDateFormat.getInstance(getDateChinesePattern());
         return sdf.format(date);
     }
 

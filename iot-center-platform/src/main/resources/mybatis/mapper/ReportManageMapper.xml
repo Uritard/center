@@ -334,6 +334,18 @@
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
+    <select id="selectResultDataToday" resultType="com.yjh.platform.module.patrol.entity.UPatrolDataResult">
+        SELECT
+            device_point_id,
+            result_num,
+            cruise_time
+        FROM
+            `u_patrol_data_result`
+        WHERE
+            cruise_time BETWEEN CONCAT(CURDATE(), ' 00:00:00')
+                AND CURDATE() + INTERVAL 1 DAY - INTERVAL 1 SECOND
+          AND COALESCE (device_point_id, '')
+    </select>
 
 
 </mapper>

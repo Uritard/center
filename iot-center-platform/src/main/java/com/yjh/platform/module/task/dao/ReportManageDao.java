@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.dao;
 
+import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
 import com.yjh.platform.module.task.entity.CheckPointType;
 import com.yjh.platform.module.task.entity.TCruiseDataResultDetail;
 import com.yjh.platform.module.task.entity.TReportInfo;
@@ -38,4 +39,7 @@ public interface ReportManageDao {
     List<TReportInfo> reportSelect(HashMap<String,Object> map);
     int reportDelete(@Param(value = "reportId") String reportId);
     String selectReviewTaskFlag(@Param(value = "taskId")String taskId);
+
+    List<UPatrolDataResult> selectResultDataToday();
+
 }

@@ -75,7 +75,7 @@
         <if test="iotDeviceType == 840">
             and device.iot_device_type = 840
         </if>
-        <if test="list.size > 0"> and device.up_region_id in
+        <if test="list != null and list.size > 0"> and device.up_region_id in
             <foreach collection="list" item="regionId" separator="," open="(" close=")">
                 #{regionId}
             </foreach></if>

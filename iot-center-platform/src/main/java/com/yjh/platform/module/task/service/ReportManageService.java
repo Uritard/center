@@ -4,6 +4,7 @@ import cn.hutool.cache.Cache;
 import cn.hutool.cache.CacheUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.net.URLEncodeUtil;
+import com.google.common.collect.Maps;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
@@ -14,10 +15,13 @@ import com.yjh.platform.common.utils.smUtil.report.ReportDataRepo;
 import com.yjh.platform.common.utils.smUtil.report.ReportHelper;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.service.TStdRegionService;
+import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
+import com.yjh.platform.module.iot.service.TIotDeviceDataService;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.LineKeyValue;
 import com.yjh.platform.module.patrol.entity.NonhomologousInfo;
+import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
@@ -28,6 +32,8 @@ import org.apache.commons.collections4.KeyValue;
 import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +41,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author YC
@@ -62,6 +66,8 @@ public class ReportManageService {
     private TStdRegionService stdRegionService;
     @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
+    @Autowired
+    private TIotDeviceDataService iotDeviceDataService;
 
     public static final Cache<String, Integer> REPORT_CACHE = CacheUtil.newFIFOCache(1000);
 
@@ -561,6 +567,68 @@ public class ReportManageService {
             String zipFilePath = CommonUtils.concatPath(tempReflect, fileName + ".zip");
             String zipFileTagPath = edgeId + "/Report/" + fileName + ".zip";
             analyseDataOperateService.uploadFileToUpFtps(zipFilePath, zipFileTagPath);
+        }
+    }
+
+    public String downLoadStationRunReport() {
+        String templatePath = "/home/yjh_iot_center/iotCenter-web/dist/static/files/template_station_run.xlsx";
+        String stationName = SysParamConfig.getSysContent("stationName");
+        String fileName = stationName + "智能运维运行日志" + "_" +  DateTimeUtil.formatYMD(new Date()) + ".xlsx";
+        // 输出文件路径
+        String outputPath = SysParamConfig.getSysContent("tempReflect") + "/" + fileName;
+        Map<String, Object> dataMap = Maps.newHashMap();
+        //巡检点位数据
+        List<UPatrolDataResult> resultList = reportManageDao.selectResultDataToday();
+        Map<String, List<UPatrolDataResult>> resultDataMap = resultList.stream().collect(Collectors.groupingBy(UPatrolDataResult::getDevicePointId));
+        resultDataMap.forEach((k, v) -> {
+            for (UPatrolDataResult result : v) {
+                dataMap.put(result.getDevicePointId() + "-" + (v.indexOf(result) + 1), result.getResultNum());
+            }
+        });
+        resultList.forEach(uPatrolDataResult -> dataMap.put(uPatrolDataResult.getDevicePointId(), uPatrolDataResult.getResultNum()));
+        //电量表数据
+        List<IotDeviceDataEx> tIotDeviceList = iotDeviceDataService.selectIotDataEx(null, true);
+        Map<Long, List<IotDeviceDataEx>> resultIotMap =
+            tIotDeviceList.stream().collect(Collectors.groupingBy(IotDeviceDataEx::getIotDeviceId));
+        resultIotMap.forEach((k, v) -> v.forEach(iotDeviceDataEx -> {
+            String valueKey = iotDeviceDataEx.getAddress() + iotDeviceDataEx.getChannelNum();
+            dataMap.put(valueKey, iotDeviceDataEx.getValue());
+            dataMap.put(valueKey + "P", iotDeviceDataEx.getPowerValue());
+        }));
+        dataMap.put("date", DateTimeUtil.formatYMDChinese(new Date()));
+        generateReport(templatePath, outputPath, dataMap);
+        outputPath = SysParamConfig.getSysContent("meteModelPath") + "/" + fileName;
+        return outputPath;
+    }
+
+    /**
+     * 匹配方式填充数据
+     *
+     * @param templatePath 模板路径
+     * @param outputPath   输出路径
+     * @param dataMap      数据
+     */
+    public void generateReport(String templatePath, String outputPath, Map<String, Object> dataMap) {
+        try (FileInputStream fis = new FileInputStream(templatePath); Workbook workbook = new XSSFWorkbook(fis)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            //遍历模板 填充内容
+            for (Row row : sheet) {
+                for (Cell cell : row) {
+                    if (cell.getCellTypeEnum() == CellType.STRING) {
+                        String cellValue = cell.getStringCellValue();
+                        for (String key : dataMap.keySet()) {
+                            if (cellValue.contains("${" + key + "}")) {
+                                cell.setCellValue(cellValue.replace("${" + key + "}", dataMap.get(key).toString()));
+                            }
+                        }
+                    }
+                }
+            }
+            try (FileOutputStream fos = new FileOutputStream(outputPath)) {
+                workbook.write(fos);
+            }
+        } catch (IOException e) {
+            log.error("站所运行日志下载失败", e);
         }
     }
 }
