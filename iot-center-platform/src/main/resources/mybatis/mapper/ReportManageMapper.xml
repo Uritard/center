@@ -338,7 +338,8 @@
         SELECT
             device_point_id,
             result_num,
-            cruise_time
+            createtime,
+            cruise_result
         FROM
             `u_patrol_data_result`
         WHERE
