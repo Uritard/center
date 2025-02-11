@@ -582,10 +582,11 @@ public class ReportManageService {
         Map<String, List<UPatrolDataResult>> resultDataMap = resultList.stream().collect(Collectors.groupingBy(UPatrolDataResult::getDevicePointId));
         resultDataMap.forEach((k, v) -> {
             for (UPatrolDataResult result : v) {
-                dataMap.put(result.getDevicePointId() + "-" + (v.indexOf(result) + 1), result.getResultNum());
+                if (result.getCruiseResult() == CruiseConstant.CRUISE_RESULT_NORMAL) {
+                    dataMap.put(result.getDevicePointId() + "-" + (v.indexOf(result) + 1), result.getResultNum());
+                }
             }
         });
-        resultList.forEach(uPatrolDataResult -> dataMap.put(uPatrolDataResult.getDevicePointId(), uPatrolDataResult.getResultNum()));
         //电量表数据
         List<IotDeviceDataEx> tIotDeviceList = iotDeviceDataService.selectIotDataEx(null, true);
         Map<Long, List<IotDeviceDataEx>> resultIotMap =
@@ -619,6 +620,9 @@ public class ReportManageService {
                         for (String key : dataMap.keySet()) {
                             if (cellValue.contains("${" + key + "}")) {
                                 cell.setCellValue(cellValue.replace("${" + key + "}", dataMap.get(key).toString()));
+                                break;
+                            }else if (cellValue.startsWith("${") && cellValue.endsWith("}")){
+                                cell.setCellValue("");
                             }
                         }
                     }

@@ -19,7 +19,7 @@ public class Object2Map {
      * @throws
      */
     //默认null值字段不显示
-    public static Map objectToMap(Object obj) {
+    public static Map<String, String> objectToMap(Object obj) {
 
         Map<String, String> map  = objectToMap(obj, false);
         return map;

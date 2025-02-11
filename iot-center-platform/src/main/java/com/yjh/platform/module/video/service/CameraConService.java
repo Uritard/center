@@ -14,10 +14,7 @@ import com.google.common.io.Files;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
-import com.yjh.platform.common.utils.CommonUtils;
-import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.JSONUtil;
-import com.yjh.platform.common.utils.ThreadPoolUtil;
+import com.yjh.platform.common.utils.*;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.user.service.TCameraInfoService;
@@ -1361,8 +1358,8 @@ public class CameraConService {
         IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
         String mediaSignKey = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "mediaSignKey"));
         PlayEntity playEntity = PlayEntity.builder().signKey(mediaSignKey).srcUrl(srcUrl).command(Constant.ffmpegCmd()).deviceId(streamId).build();
-        Result result = iPlayService.videoPlayByZlmFFM(playEntity);
-        Map<String, String> resultMap = (Map<String, String>) result.getData();
+        Result<StreamInfo> result = iPlayService.videoPlayByZlmFFM(playEntity);
+        Map<String, String> resultMap = Object2Map.objectToMap(result.getData());
         webRtcUrl(resultMap, returnMap);
     }
 
