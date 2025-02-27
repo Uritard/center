@@ -82,9 +82,6 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
             devicePoints.forEach(d -> {
                 d.setIotDeviceId(iotExtend.getId());
                 d.setIotDeviceName(iotExtend.getDeviceName());
-                if ((DictConvertUtil.DICT.getDictCode("iotDeviceType", "电量表")).equals(Integer.toString(iotDevice.getIotDeviceType()))) {
-                    d.setPointName(DictConvertUtil.DICT.covertToDict("meterNumType", d.getPointName()));
-                }
             });
             if(Constant.logUpLv2()) {
                 log.info("IotDevice pointsAdd: {}", JSON.toJSONString(devicePoints));
