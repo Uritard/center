@@ -87,7 +87,8 @@ public class TCameraRecorderService {
     public int update(TCameraRecorder tCameraRecorder) {
         List<Long> cameraList = tCameraInfoService.selectCameraByRecord(tCameraRecorder.getRecordId());
         if (CollectionUtils.isNotEmpty(cameraList)) {
-            cameraList.forEach(cameraId -> tCameraInfoService.stopStream(cameraId));
+            // 这里删除不会成功，注掉吧 2025-02-27
+            // cameraList.forEach(cameraId -> tCameraInfoService.stopStream(cameraId));
         }
         ModelDecodeUtil.decodeField(tCameraRecorder, "identityCode");
         return this.tCameraRecorderDao.update(tCameraRecorder);
