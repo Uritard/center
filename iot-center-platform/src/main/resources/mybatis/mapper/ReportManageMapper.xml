@@ -343,9 +343,8 @@
         FROM
             `u_patrol_data_result`
         WHERE
-            cruise_time BETWEEN CONCAT(CURDATE(), ' 00:00:00')
-                AND CURDATE() + INTERVAL 1 DAY - INTERVAL 1 SECOND
-          AND COALESCE (device_point_id, '')
+            cruise_time BETWEEN CONCAT(CURDATE(), ' 00:00:00') AND CONCAT(CURDATE(),' 23:59:59')
+          AND device_point_id != '' and device_point_id is not null
     </select>
 
 
