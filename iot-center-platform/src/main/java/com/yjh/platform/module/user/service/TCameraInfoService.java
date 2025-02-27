@@ -588,7 +588,7 @@ public class TCameraInfoService {
 //            Result result=Constant.otherServerGet(String.valueOf(cameraId), Constant.CAMERA_STREAM_STOP);
             log.info(result);
         } catch (Exception e) {
-            log.info("cameraId: {} stopStream failed", cameraId);
+            log.info("cameraId: {} stopStream failed", cameraId, e);
         }
     }
 

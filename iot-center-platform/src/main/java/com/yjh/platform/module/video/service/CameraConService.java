@@ -189,7 +189,6 @@ public class CameraConService {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> startRealPlay(Long cameraId) {
         Map<String, Object> returnMap = new HashMap<>();
         try {
@@ -212,7 +211,6 @@ public class CameraConService {
         return returnMap;
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public String stopRealPlay(Long cameraId, String rtmpUrl) {
         //todo 目前先不关闭ffmpeg进程,在多用户同时播放统一个相机视频，一个用户关闭进程后，另外一个用户则无法观看
         //回放视频流可停止
@@ -227,7 +225,6 @@ public class CameraConService {
         return "stop " + cameraId + " preview success!";
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> batchStartRealPlay(String cameraIds) {
 
         List<Map<String, Object>> returnMapList = new ArrayList<>();
@@ -281,7 +278,6 @@ public class CameraConService {
         return returnMapList;
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> robotStartRealPlay(Long robotId) {
         List<Map<String, Object>> returnMapList = new ArrayList<>();
 
@@ -437,15 +433,13 @@ public class CameraConService {
         return returnMapList;
     }
 
-
-    @Transactional(rollbackFor = Exception.class)
     public String robotStopRealPlay(Long robotId) {
         return "stop " + robotId + " preview success!";
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public String stopStream(String cameraId) {
-        PlayEntity playEntity = PlayEntity.builder().deviceId(String.valueOf(cameraId)).build();
+        String mediaSignKey = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "mediaSignKey"));
+        PlayEntity playEntity = PlayEntity.builder().deviceId(cameraId).signKey(mediaSignKey).build();
         IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
         iPlayService.videoStopByZlmFFM(playEntity);
         return "stop " + cameraId + " preview success!";
@@ -660,7 +654,6 @@ public class CameraConService {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public Object pTZControl(int dwPTZCommand, Long cameraId, int dStop, int speed) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
         String command;
@@ -1782,8 +1775,6 @@ public class CameraConService {
         return true;
     }
 
-    //@Logs(title = "获取相机状态", code = "getCameraStatus", content = "获取相机状态信息")
-    @Transactional(rollbackFor = Exception.class)
     public Map<String, String> getCameraStatus(Long recordId) {
         Map<String, String> channleStatusMap = new HashMap<>();
         if (Objects.isNull(recordId)) {
@@ -1846,8 +1837,6 @@ public class CameraConService {
         return channleStatusMap;
     }
 
-    //@Logs(title = "获取相机树状态", code = "getCameraStatusTree", content = "获取NVR下挂相机树状态")
-    @Transactional(rollbackFor = Exception.class)
     public List<CameraAreaInfo> getCameraStatusTree(String cameraName, Integer flag) {
         //if (Objects.nonNull(cameraName)) {}
         List<CameraAreaInfo> tree = new ArrayList<>();
