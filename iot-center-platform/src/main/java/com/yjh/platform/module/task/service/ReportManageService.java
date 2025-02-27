@@ -583,7 +583,7 @@ public class ReportManageService {
         resultDataMap.forEach((k, v) -> {
             for (UPatrolDataResult result : v) {
                 if (result.getCruiseResult() == CruiseConstant.CRUISE_RESULT_NORMAL) {
-                    dataMap.put(result.getDevicePointId() + "-" + (v.indexOf(result) + 1), result.getResultNum());
+                    dataMap.put(result.getDevicePointId() + "-" + (v.indexOf(result) + 1), result.getResultDesc());
                 }
             }
         });

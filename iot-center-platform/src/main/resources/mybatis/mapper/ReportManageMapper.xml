@@ -337,7 +337,7 @@
     <select id="selectResultDataToday" resultType="com.yjh.platform.module.patrol.entity.UPatrolDataResult">
         SELECT
             device_point_id,
-            result_num,
+            result_desc,
             createtime,
             cruise_result
         FROM
