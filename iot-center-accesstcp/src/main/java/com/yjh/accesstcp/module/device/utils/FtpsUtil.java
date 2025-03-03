@@ -69,6 +69,12 @@ public class FtpsUtil {
                 ftpClient.setRemoteVerificationEnabled(false);
                 ftpClient.setPassiveNatWorkaroundStrategy(new LocalServerResolverImpl(ftpClient));
             }
+            // 连接超时时间
+            ftpClient.setConnectTimeout(15000);
+            // 默认超时时间
+            ftpClient.setDefaultTimeout(15000);
+            // 数据传输超时时间
+            ftpClient.setDataTimeout(180000);
             ftpClient.connect(ip, port);
             // Connect to host
             int reply = ftpClient.getReplyCode();
@@ -155,6 +161,12 @@ public class FtpsUtil {
                     ftpClient.setRemoteVerificationEnabled(false);
                     ftpClient.setPassiveNatWorkaroundStrategy(new LocalServerResolverImpl(ftpClient));
                 }
+                // 连接超时时间
+                ftpClient.setConnectTimeout(15000);
+                // 默认超时时间
+                ftpClient.setDefaultTimeout(15000);
+                // 数据传输超时时间
+                ftpClient.setDataTimeout(180000);
                 ftpClient.connect(ip, port);
                 // Connect to host
                 int reply = ftpClient.getReplyCode();
