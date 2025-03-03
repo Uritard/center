@@ -581,9 +581,11 @@ public class ReportManageService {
         List<UPatrolDataResult> resultList = reportManageDao.selectResultDataToday();
         Map<String, List<UPatrolDataResult>> resultDataMap = resultList.stream().collect(Collectors.groupingBy(UPatrolDataResult::getDevicePointId));
         resultDataMap.forEach((k, v) -> {
+            int count = 1;
             for (UPatrolDataResult result : v) {
                 if (result.getCruiseResult() == CruiseConstant.CRUISE_RESULT_NORMAL) {
-                    dataMap.put(result.getDevicePointId() + "-" + (v.indexOf(result) + 1), result.getResultDesc());
+                    dataMap.put(result.getDevicePointId() + "-" + count, result.getResultDesc());
+                    count++;
                 }
             }
         });
