@@ -602,7 +602,7 @@ public class CameraConController {
     public Result droneStartRealPlay(@RequestParam(value = "robotId") Long robotId) {
         Result result = new Result();
         try {
-            result.setData(droneCameraConService.droneStartRealPlayNew(robotId));
+            result.setData(cameraConService.droneStartRealPlay(robotId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

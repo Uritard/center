@@ -278,6 +278,49 @@ public class CameraConService {
         return returnMapList;
     }
 
+    /**
+     * 无人机视频流
+     * @param robotId 无人机id
+     * @return 视频流信息
+     */
+    public List<Map<String, Object>> droneStartRealPlay(Long robotId) {
+        //无人机可配三路视频 对应前端的三个位置  light-camera->0  infrared-camera->1  robotVideo->3
+        String[] cameraType = new String[] {"0", "1", "3"};
+        RobotConInfo robotConInfo = cameraConDao.selectDroneConInfo(robotId);
+        List<Map<String, Object>> returnMapList = new ArrayList<>();
+        for (String type : cameraType) {
+            String transUrl = String.valueOf(redisTemplate.opsForHash()
+                .get("systemConfigKey:videoServerConfig", "droneVideo-" + robotConInfo.getRobotFactory() + "-" + type));
+            if (CommonUtils.isEmptyOrNullstr(transUrl)) {
+                continue;
+            }
+            Map<String, Object> nestInnerMap = getDroneVideMap(robotConInfo, type, transUrl);
+            returnMapList.add(nestInnerMap);
+        }
+        return returnMapList;
+    }
+
+    private Map<String, Object> getDroneVideMap(RobotConInfo robotConInfo, String type, String transUrl) {
+        Map<String, Object> returnMap = Maps.newHashMap();
+        try {
+            String streamId = robotConInfo.getNestCode() + type;
+            Map<String, Object> params = Maps.newHashMap();
+            params.put("nestCode", robotConInfo.getNestCode());
+            params.put("username", robotConInfo.getIdentityManager());
+            params.put("password", robotConInfo.getIdentityCode());
+            params.put("ip", robotConInfo.getRobotIp());
+            params.put("port", robotConInfo.getRobotPort());
+            String channelId = StringUtils.defaultIfBlank(robotConInfo.getNumLight(), "1");
+            params.put("channelId", channelId);
+            transUrl = PathVariableUtil.variableParse(transUrl, params);
+            ffmRtcUrl(transUrl, streamId, returnMap);
+            returnMap.put("cameraType", type);
+        } catch (Exception e) {
+            log.error("获取无人机视频流失败 getDroneVideo err: ", e);
+        }
+        return returnMap;
+    }
+
     public List<Map<String, Object>> robotStartRealPlay(Long robotId) {
         List<Map<String, Object>> returnMapList = new ArrayList<>();
 

@@ -979,6 +979,8 @@ INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, 
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('7', 'meter_num_type', '无功III总', '0', '电表数值类型', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('8', 'meter_num_type', '无功IV总', '0', '电表数值类型', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('9', 'meter_num_type', '正向有功总需量', '0', '电表数值类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('890', 'robot_factory', '普宙', '0', '生产厂家', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('891', 'robot_factory', '惊鸣', '0', '生产厂家', '1');
 
 -- ----------------------------
 -- Records of t_period_model
@@ -1684,7 +1686,11 @@ INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'ffmpeg-818', 'rtsp://${ip}:${port}/camera0', '巨哥拉流命令', '无', NULL);
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'ffmpeg-819', 'rtsp://${ip}:${port}/video', '高德拉流命令', '无', NULL);
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'mediaStreamPush', 'rtmp://${ip}:${port}/${app}/${stream}', '机器人流媒体拉流', '从机器人的流媒体服务器取流', NULL);
-INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'droneVideo', 'rtsp://%s:%s/live/%s', '无人机拉流命令', '从无人机的流媒体服务器取流', NULL);
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'droneVideo-890-0', 'rtsp://${ip}:${port}/live/${nestCode}/0', '普宙无人机机巢内拉流命令', '无', NULL);
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'droneVideo-890-1', 'rtsp://${ip}:${port}/live/${nestCode}/1', '普宙无人机机巢外拉流命令', '无', NULL);
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'droneVideo-890-3', 'rtsp://${ip}:${port}/live/${nestCode}/3', '普宙无人机拉流命令', '无', NULL);
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'droneVideo-891-0', 'rtsp://${ip}:${port}/video', '惊鸣无人机可见光拉流命令', '无', NULL);
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'droneVideo-891-1', 'rtsp://${ip}:${port}/temp', '惊鸣无人机红外拉流命令', '无', NULL);
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'mediaServer', 'ZLMediaKit', '流媒体服务器', '视频播放的流媒体服务器，ZLMediaKit或SRS，默认ZLMediaKit', '{\"rule\":\"^[_a-zA-Z0-9\\\\-]+$\",\"msg\":\"输入字母数字或_-符号\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'mediaSignKey', 'srKJOET13nbwRELGA6bVxIJsnXW5sCcB', '媒体鉴权秘钥', '推流时流媒体服务的鉴权秘钥，ZLMediaKit需要', '{\"rule\":\"^[_a-zA-Z0-9\\\\-]+$\",\"msg\":\"输入字母数字或_-符号\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'emergencyAccessNum', '10', '紧急调阅视频并发路数', '紧急调阅视频并发路数，超出会自动关闭最早的视频流','{\"rule\":\"^(\\\\d|[1-9]\\\\d)$\",\"msg\":\"请输入0-99的整数\"}');
