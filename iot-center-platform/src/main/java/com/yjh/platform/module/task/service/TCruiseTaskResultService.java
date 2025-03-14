@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.service;
 import cn.hutool.cache.Cache;
 import cn.hutool.cache.CacheUtil;
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Maps;
 import com.yjh.commons.CollectionUtil;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
@@ -32,6 +33,7 @@ import com.yjh.platform.module.video.service.DroneCameraConService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -212,150 +214,44 @@ public class TCruiseTaskResultService {
         } else {
             inspectResult.setImagePath("");
         }
-        Map<String, String> videoInfo = new HashMap<>();
-        if ("230".equals(resultMap.containsKey("cruiseType") ?
-            String.valueOf(resultMap.get("cruiseType")) : "")) {
-            videoInfo.put("videoCameraType", "2");
-        } else if ("524".equals(resultMap.containsKey("cruiseType") ?
-            String.valueOf(resultMap.get("cruiseType")) : "")) {
-            // 无人机视频流红外和可见光为一路流，需要额外处理
-            videoInfo.put("videoCameraType", "3");
-        } else {
-            videoInfo.put("videoCameraType", "1");
-        }
-        if (!Constant.fastTurbo()) {
-            String videoPrefixKey = "videoInfo:";
-            if (!CommonUtils.isEmptyOrNullstr(resultMap.get("robotId"))) {
-                videoInfo.put("robotId", resultMap.get("robotId"));
-                String robotId = resultMap.get("robotId");
-                String cacheKey = videoPrefixKey + "robot:" + robotId;
-                boolean getInRedis = getVideoFromRedis(cacheKey, videoInfo, inspectResult);
-                if (getInRedis) {
-                    return;
-                }
-                //判断当前机器人巡视点的采集设备为 红外或可见光
-                String runningCameraFlag = inspectResult.getSaveTypeList();
-                if (Objects.nonNull(runningCameraFlag) && runningCameraFlag.equals("fir")) {
+        Map<String, String> videoInfo = Maps.newHashMap();
+        switch (MapUtils.getString(resultMap, "cruiseType", "")) {
+            //视频-红外
+            case "230":
+                videoInfo.put("videoCameraType", "2");
+                videoInfo.put("cameraId", MapUtils.getString(resultMap, "cameraId", ""));
+                break;
+            //视频-可见光
+            case "229":
+                videoInfo.put("videoCameraType", "1");
+                videoInfo.put("cameraId", MapUtils.getString(resultMap, "cameraId", ""));
+                break;
+            //机器人
+            case "228":
+                videoInfo.put("robotId", MapUtils.getString(resultMap, "robotId", ""));
+                //机器人红外
+                if ("2".equals(MapUtils.getString(resultMap, "fileType"))) {
                     videoInfo.put("videoCameraType", "2");
-                }
-                HashMap<String, Long> robot = new HashMap<>();
-                robot.put("robotId", Long.valueOf(resultMap.get("robotId")));
-
-                log.info("switch (videoInfo.get(\"videoCameraType\")), 参数：{}", JSONUtil.toJSONString(videoInfo));
-                switch (videoInfo.get("videoCameraType")) {
-                    case "1":
-                        List<Map<String, Object>> data = cameraConService.robotStartRealPlay(Long.valueOf(resultMap.get("robotId")));
-                        Result result = new Result();
-                        result.setData(data);
-                        List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>)result.getData();
-                        if (CollectionUtils.isNotEmpty(robotVideoInfo)) {
-                            videoInfo.putAll(robotVideoInfo.get(0));
-                        } else {
-                            videoInfo.put("flvUrl", "null");
-                            videoInfo.put("rtmpUrl", "null");
-                            videoInfo.put("webRtcUrl", "null");
-                        }
-                        videoInfo.put("cameraId", robot.get("robotId").toString());
-                        inspectResult.setVideoInfo(videoInfo);
-                        break;
-                    case "2":
-                        List<Map<String, Object>> data2 = cameraConService.robotStartRealPlay(Long.valueOf(resultMap.get("robotId")));
-                        Result result2 = new Result();
-                        result2.setData(data2);
-                        List<Map<String, String>> robotInfraredVideoInfo = (List<Map<String, String>>)result2.getData();
-                        if (CollectionUtils.isNotEmpty(robotInfraredVideoInfo)) {
-                            videoInfo.putAll(robotInfraredVideoInfo.get(1));
-                        } else {
-                            videoInfo.put("flvUrl", "null");
-                            videoInfo.put("rtmpUrl", "null");
-                            videoInfo.put("webRtcUrl", "null");
-                        }
-                        videoInfo.put("cameraId", robot.get("robotId").toString());
-                        inspectResult.setVideoInfo(videoInfo);
-                        break;
-                    case "3":
-                        // 获取无人机视频流
-                        Map<String, String> map = getDroneVideoInfo(robotId);
-                        if (map != null && map.size() == 3) {
-                            videoInfo.put("flvUrl", map.get("flvUrl"));
-                            videoInfo.put("rtmpUrl", map.get("rtmpUrlInferad"));
-                            videoInfo.put("webRtcUrl", map.get("webRtcUrl"));
-                        } else {
-                            videoInfo.put("flvUrl", "null");
-                            videoInfo.put("rtmpUrl", "null");
-                            videoInfo.put("webRtcUrl", "null");
-                        }
-
-                        videoInfo.put("cameraId", robot.get("robotId").toString());
-                        inspectResult.setVideoInfo(videoInfo);
-                        break;
-                    default:
-                        break;
-                }
-
-                log.info("视频流信息存入redis， cacheKey: {}, videoInfo: {}", cacheKey, JSONUtil.toJSONString(videoInfo));
-
-                try {
-                    redisTemplate.opsForHash().putAll(cacheKey, videoInfo);
-                    redisTemplate.expire(cacheKey, 60, TimeUnit.SECONDS);
-                } catch (Exception e) {
-                    log.error("redisTemplate.opsForHash().putAll(cacheKey, videoInfo) err", e);
-                }
-            }
-
-            //拉机器人的红外和可见光的视频流
-            if (!CommonUtils.isEmptyOrNullstr(resultMap.get("cameraId"))) {
-                videoInfo.put("cameraId", resultMap.get("cameraId"));
-                String camera = resultMap.get("cameraId");
-                String cacheKey = videoPrefixKey + "camera:" + camera;
-                boolean getInRedis = getVideoFromRedis(cacheKey, videoInfo, inspectResult);
-                if (getInRedis) {
-                    return;
-                }
-                HashMap<String, Long> cameraId = new HashMap<>();
-                cameraId.put("cameraId", Long.valueOf(camera));
-//                Result result = sendGetRequest(Constant.START_CAMERA_URL, cameraId);
-                Result result = new Result();
-                Map<String, Object> data = cameraConService.startRealPlay(Long.valueOf(camera));
-                result.setData(data);
-                Map<String, String> cameraVideoInfo = (Map<String, String>)result.getData();
-                if (MapUtils.isNotEmpty(cameraVideoInfo)) {
-                    videoInfo.putAll(cameraVideoInfo);
                 } else {
-                    videoInfo.put("flvUrl", "");
-                    videoInfo.put("rtmpUrl", "");
-                    videoInfo.put("webRtcUrl", "");
+                    //机器人可见光
+                    videoInfo.put("videoCameraType", "1");
                 }
-                inspectResult.setVideoInfo(videoInfo);
-
-                redisTemplate.opsForHash().putAll(cacheKey, videoInfo);
-                redisTemplate.expire(cacheKey, 60, TimeUnit.SECONDS);
-            }
+                break;
+            //无人机
+            case "524":
+                videoInfo.put("droneId", MapUtils.getString(resultMap, "robotId", ""));
+                //无人机红外
+                if ("2".equals(MapUtils.getString(resultMap, "fileType"))) {
+                    videoInfo.put("videoCameraType", "2");
+                } else {
+                    //无人机可见光
+                    videoInfo.put("videoCameraType", "1");
+                }
+                break;
+            default:
+                break;
         }
-    }
-
-    private Map<String, String> getDroneVideoInfo(String robotId) {
-        try {
-            // List<Map<String, Object>> maps = droneCameraConService.droneStartRealPlayNew(Long.valueOf(robotId));
-            Map<String, String> data = new HashMap<>();
-            // for (Map.Entry<String, Object> entry : maps.get(0).entrySet()) {
-            //     data.put(entry.getKey(), entry.getValue().toString());
-            // }
-            return data;
-        } catch (Exception e) {
-            log.error("getDroneVideoInfo err, ", e);
-            return null;
-        }
-    }
-
-    private synchronized boolean getVideoFromRedis(String key, Map<String, String> videoInfo, CruiseInspectResult inspectResult){
-        Map<String, String> videoRedis = redisTemplate.opsForHash().entries(key);
-        // if(MapUtils.isEmpty(videoRedis)) {
-        //     return false;
-        // }
-        videoInfo.putAll(videoRedis);
         inspectResult.setVideoInfo(videoInfo);
-        return true;
     }
 
     @Transactional(rollbackFor = Exception.class)
