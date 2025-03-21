@@ -597,7 +597,7 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                 }
                 int num = 1;
                 for (Map.Entry<String, List<TIotDeviceData>> entry : dailyDataMap.entrySet()) {
-                    int start = 5 + (num - 1) * 5;
+                    int start = 5 + (num - 1) * 7;
                     sheet.getRow(5).getCell(num).setCellValue(entry.getKey());
                     Map<String, String> dataMap = entry.getValue().stream()
                         .collect(Collectors.toMap(TIotDeviceData::getPointName, TIotDeviceData::getValue, (e1, e2) -> e1));
@@ -606,6 +606,8 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                     setCellValue(row, start + 1, MapUtils.getDoubleValue(dataMap, "无功II总"));
                     setCellValue(row, start + 2, MapUtils.getDoubleValue(dataMap, "无功III总"));
                     setCellValue(row, start + 3, MapUtils.getDoubleValue(dataMap, "无功IV总"));
+                    setCellValue(row, start + 5, MapUtils.getDoubleValue(dataMap, "反向有功总"));
+                    setCellValue(row, start + 6, MapUtils.getDoubleValue(dataMap, "正向有功总需量"));
                     sheet.getRow(5).getCell(4 * num + num).setCellValue(entry.getKey());
                     num++;
                 }
