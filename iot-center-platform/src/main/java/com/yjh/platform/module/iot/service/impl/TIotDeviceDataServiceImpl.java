@@ -35,10 +35,7 @@ import org.apache.commons.collections4.KeyValue;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -50,6 +47,8 @@ import org.springframework.stereotype.Service;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Function;
@@ -608,7 +607,7 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                     setCellValue(row, start + 3, MapUtils.getDoubleValue(dataMap, "无功IV总"));
                     setCellValue(row, start + 5, MapUtils.getDoubleValue(dataMap, "反向有功总"));
                     setCellValue(row, start + 6, MapUtils.getDoubleValue(dataMap, "正向有功总需量"));
-                    sheet.getRow(5).getCell(4 * num + num).setCellValue(entry.getKey());
+                    sheet.getRow(5).getCell(start).setCellValue(entry.getKey());
                     num++;
                 }
                 // 间隔一行
