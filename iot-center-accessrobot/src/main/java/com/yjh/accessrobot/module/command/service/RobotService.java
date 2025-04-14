@@ -2410,14 +2410,16 @@ public class RobotService {
         item.add(map);
 
         TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
-        XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode(Constant.sendCode())
-                .setReceiveCode(robotCode)
-                .setCode(String.valueOf(tRobotInfo.getRobotNum()))
-                .setTime(DateTimeUtil.format(new Date()))
-                .setType(type)
-                .setCommand(command)
-                .setItems(item);
+        XMLBaseModel xmlBaseModel = new XMLBaseModel();
+        if (tRobotInfo.getDroneType() != null) {
+            // 无人机
+            xmlBaseModel.setSendCode(Constant.sendCode()).setReceiveCode(robotCode).setCode(String.valueOf(tRobotInfo.getRobotNum()))
+                .setTime(DateTimeUtil.format(new Date())).setType("20001").setCommand("5").setItems(item);
+        } else {
+            // 机器人
+            xmlBaseModel.setSendCode(Constant.sendCode()).setReceiveCode(robotCode).setCode(String.valueOf(tRobotInfo.getRobotNum()))
+                .setTime(DateTimeUtil.format(new Date())).setType(type).setCommand(command).setItems(item);
+        }
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
         log.info("生成的机器人控制xml是<start>{}<end>", xmlString);
         RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
