@@ -2942,6 +2942,7 @@ CREATE TABLE `linkage_config` (
  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='存储其他设备的联动规则';
 
+DROP TABLE IF EXISTS `std_model_config`;
 CREATE TABLE `std_model_config`(
     `id`            bigint unsigned NOT NULL COMMENT '模型id',
     `name`          varchar(50)       DEFAULT NULL COMMENT '模型名称',
@@ -2955,5 +2956,3 @@ CREATE TABLE `std_model_config`(
     `updated_time`  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='模型配置表';
-
-
