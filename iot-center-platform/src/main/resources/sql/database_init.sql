@@ -2942,3 +2942,18 @@ CREATE TABLE `linkage_config` (
  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='存储其他设备的联动规则';
 
+CREATE TABLE `std_model_config`(
+    `id`            bigint unsigned NOT NULL COMMENT '模型id',
+    `name`          varchar(50)       DEFAULT NULL COMMENT '模型名称',
+    `status`        int               DEFAULT NULL COMMENT '模型状态;1：使用中  0：未使用',
+    `drone_id`      bigint   NOT NULL COMMENT '无人机id',
+    `config`        json              DEFAULT NULL COMMENT '配置项',
+    `remark`        varchar(255)      DEFAULT NULL COMMENT '备注',
+    `create_person` varchar(32)       DEFAULT NULL COMMENT '创建人',
+    `create_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_by`    varchar(32)       DEFAULT NULL COMMENT '更新人',
+    `updated_time`  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='模型配置表';
+
+
