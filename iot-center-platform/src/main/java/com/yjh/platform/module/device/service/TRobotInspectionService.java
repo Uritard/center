@@ -754,11 +754,11 @@ public class TRobotInspectionService {
         //巡视路径地图路径
         Map<String, Object> mapForCruiseMap = redisTemplate.opsForHash().entries("RobotRoad:" + robotCode);
         if ("2".equals(mapForRobotState.get("value"))) {
-                re.put("cruiseMapPath", MapUtils.getString(mapForCruiseMap, "relativePath", ""));
-        }
-        /*if (mapForCruiseMap.size() != 0 && Optional.ofNullable(mapForCruiseMap.get("coordinatePixel")).isPresent()) {
-            re.put("cruiseMapPath", mapForCruiseMap.get("relativePath"));
-        }*/ else {
+            re.put("cruiseMapPath", MapUtils.getString(mapForCruiseMap, "relativePath", ""));
+            String coordinatePixel = MapUtils.getString(mapForCruiseMap, "coordinatePixel", "");
+            List<String> cruiseRoadList = Arrays.asList(coordinatePixel.split(";"));
+            re.put("cruiseRoadList", cruiseRoadList);
+        } else {
             re.put("cruiseMapPath", "");
         }
 

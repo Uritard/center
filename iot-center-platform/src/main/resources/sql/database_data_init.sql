@@ -724,7 +724,7 @@ INSERT INTO `t_dict_business` VALUES ('300483', '670', 'voice_model', 'HAN04HD2X
 INSERT INTO `t_dict_business` VALUES ('300484', '671', 'voice_factory', '亿嘉和', null, '生产厂家', null);
 INSERT INTO `t_dict_business` VALUES ('300485', '672', 'voice_factory', '快鱼', null, '生产厂家', null);
 INSERT INTO `t_dict_business` VALUES ('300486', '673', 'robot_factory', '大疆', null, '生产厂家', null);
-INSERT INTO `t_dict_business` VALUES ('300487', '674', 'drone_position', '普通无人机', null, '无人机类型', null);
+INSERT INTO `t_dict_business` VALUES ('300487', '674', 'drone_position', '室内无人机', '0', '无人机类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300488', '678', 'defect_model', '导体护套破损', '0', '缺陷类型', '21');
 INSERT INTO `t_dict_business` VALUES ('300489', '677', 'defect_model', '引线断股或松股', '0', '缺陷类型', '30');
 INSERT INTO `t_dict_business` VALUES ('300490', '679', 'defect_model', '未佩戴安全绳', '0', '缺陷类型', '22');
@@ -981,7 +981,7 @@ INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, 
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('9', 'meter_num_type', '正向有功总需量', '0', '电表数值类型', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('890', 'robot_factory', '普宙', '0', '生产厂家', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('891', 'robot_factory', '惊鸣', '0', '生产厂家', '1');
-
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('675', 'drone_position', '室外无人机', '0', '无人机类型', '2')
 -- ----------------------------
 -- Records of t_period_model
 -- ----------------------------
@@ -1725,6 +1725,8 @@ INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `s
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (8, NULL, '无人机监控', '/monitoring/unmannedMonitor', 'images/wurenjijiankong.png', 8);
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (9, NULL, '联动信息', '/linkage/linkageSignal', 'images/liandongxinhao.png', 9);
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (10, NULL, '告警管理', '/scout/warningManagePage', 'images/xunshishebeigaojing.png', 10);
+
+INSERT INTO `std_model_config` (`id`, `name`, `status`, `drone_id`, `config`, `remark`, `create_person`, `create_time`, `updated_by`, `updated_time`) VALUES ('1', '默认模型配置', '1', '8010', '{\"uavOption\": {\"x\": -4.9, \"y\": 0.15, \"z\": 0.4, \"url\": \"/static/model/uav.glb\", \"scaleX\": 0.7, \"scaleY\": 0.7, \"scaleZ\": 0.7, \"rotationX\": 0, \"rotationY\": 0, \"rotationZ\": 0}, \"cameraOption\": {\"cameraX\": -10, \"cameraY\": 0, \"cameraZ\": 10, \"cameraLX\": 0, \"cameraLY\": 0, \"cameraLZ\": 0}, \"chargerOption\": {\"x\": -4.9, \"y\": 0.15, \"z\": 0.4, \"url\": \"/static/model/charger.glb\", \"scaleX\": 1, \"scaleY\": 1, \"scaleZ\": 1, \"rotationX\": 0, \"rotationY\": 0, \"rotationZ\": 0}, \"stationOption\": {\"x\": 0, \"y\": 0, \"z\": 0, \"url\": \"/static/model/scene.glb\", \"scaleX\": 1, \"scaleY\": 1, \"scaleZ\": 1, \"rotationX\": 0, \"rotationY\": 0, \"rotationZ\": 0}, \"toneMappingExposure\": 1.84}', NULL, NULL, '2025-02-26 16:26:35', NULL, '2025-04-01 10:03:09');
 
 INSERT INTO `dict_area` VALUES ('110000', '北京市', '-1');
 INSERT INTO `dict_area` VALUES ('110100', '市辖区', '110000');

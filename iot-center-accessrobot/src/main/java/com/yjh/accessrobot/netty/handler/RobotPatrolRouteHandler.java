@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.netty.handler;
 
+import com.google.common.collect.Maps;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.CommonUtils;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
@@ -13,6 +14,7 @@ import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -38,10 +40,11 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
     private RobotService robotService;
 
     @Override
-    public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
+    public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId,
+        long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++收到下级的巡视路线数据了+++++++++++++++++");
         //Deal with robot operation data
-        String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
+        String stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
         xmlBaseModel.setCode(stationCode);
         String sendCode = xmlBaseModel.getSendCode();
         if (StringUtils.isEmpty(sendCode)) {
@@ -55,7 +58,8 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
 
         // 给下级响应
         String roadXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
-        byte[] roadProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, roadXmlString);
+        byte[] roadProtocol =
+            PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, roadXmlString);
         RobotServerHandler.send(roadProtocol, sendCode);
         log.info("本级系统给下级{}响应了", sendCode);
 
@@ -63,15 +67,15 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
 
         String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
-        List<Map<String, String>> robotRoadList = new ArrayList<>();
-        xmlBaseModel.getItems().forEach(res -> {
-            Map<String, String> robotRoadMap = new HashMap<>(16);
-            // 2022过检 robot_name -> patroldevice_name
+
+        if (CollectionUtils.isNotEmpty(xmlBaseModel.getItems())) {
+            Map<String, String> robotRoadMap = Maps.newHashMap();
+            Map<String, Object> res = xmlBaseModel.getItems().get(0);
             robotRoadMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
             robotRoadMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
-            if (StringUtils.isNotEmpty((String)res.get("file_path"))) {
-                String filePath = String.valueOf(res.get("file_path"));
-//                robotService.uploadFile(filePath, filePath);
+            String filePathKey = "file_path";
+            if (res.containsKey(filePathKey)) {
+                String filePath = String.valueOf(res.get(filePathKey));
                 String[] splitArray = filePath.split("/");
                 String fileName = splitArray[splitArray.length - 1];
                 log.info("巡检路线图片名称==" + fileName);
@@ -99,37 +103,34 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
                 robotRoadMap.put("relativePath", "");
                 robotRoadMap.put("absolutePath", "");
             }
-            String taskPatrolledId = String.valueOf(res.getOrDefault("task_patrolled_id", ""));
-            if (!CommonUtils.isEmptyOrNullstr(taskPatrolledId)){
-                taskPatrolledId = robotService.getRealTaskPatrolledId(taskPatrolledId);
-                log.info("巡视路线 构建本级 taskPatrolledId=={}", taskPatrolledId);
-                res.put("task_patrolled_id", taskPatrolledId);
-            }
             robotRoadMap.put("taskPatrolledId", String.valueOf(res.get("task_patrolled_id")));
             robotRoadMap.put("robotCode", robotCode);
             robotRoadMap.put("time", String.valueOf(res.get("time")));
-            robotRoadMap.put("coordinatePixel", String.valueOf(res.get("coordinate_pixel")));
-            robotRoadMap.put("coordinateGeography", String.valueOf(res.get("coordinate_geography")));
-            robotRoadList.add(robotRoadMap);
-        });
-
-        for (int i = 0; i < robotRoadList.size(); i++) {
-            redisTemplate.opsForHash().putAll("RobotRoad:" + robotCode, robotRoadList.get(i));
+            StringBuilder stringBuilderPixel = new StringBuilder();
+            StringBuilder stringBuilderGeography = new StringBuilder();
+            xmlBaseModel.getItems().forEach(item -> {
+                stringBuilderPixel.append((item.get("coordinate_pixel"))).append(";");
+                stringBuilderGeography.append((item.get("coordinate_geography"))).append(";");
+            });
+            robotRoadMap.put("coordinatePixel", stringBuilderPixel.toString());
+            robotRoadMap.put("coordinateGeography", stringBuilderGeography.toString());
+            redisTemplate.opsForHash().putAll("RobotRoad:" + robotCode, robotRoadMap);
             redisTemplate.expire("RobotRoad:" + robotCode, 7, TimeUnit.DAYS);
-        }
-        String taskPatrolledId = MapUtils.getString(xmlBaseModel.getItems().get(0), "task_patrolled_id");
-        if(StringUtils.isNotEmpty(taskPatrolledId)){
-            String taskCode = taskPatrolledId.split("_")[1];
-            String timeSrt = taskPatrolledId.split("_")[2];
-            Date date = DateTimeUtil.parseFormat(timeSrt, DateTimeUtil.getDateTimePattern3());
-            UPatrolTask task = robotService.selectTaskIdByTaskCode(taskCode,date);
-            if (task != null){
-                taskPatrolledId = (String)redisTemplate.opsForHash().get(RobotService.countForAbnormalKey+task.getTaskId(),"task_patrolled_id");
-                if (StringUtils.isNotEmpty(taskPatrolledId)){
-                    String finalTaskPatrolledId = taskPatrolledId;
-                    xmlBaseModel.getItems().forEach(item ->{
-                        item.put("task_patrolled_id", finalTaskPatrolledId);
-                    });
+            String taskPatrolledId = MapUtils.getString(res, "task_patrolled_id");
+            if (StringUtils.isNotEmpty(taskPatrolledId)) {
+                String taskCode = taskPatrolledId.split("_")[1];
+                String timeSrt = taskPatrolledId.split("_")[2];
+                Date date = DateTimeUtil.parseFormat(timeSrt, DateTimeUtil.getDateTimePattern3());
+                UPatrolTask task = robotService.selectTaskIdByTaskCode(taskCode, date);
+                if (task != null) {
+                    taskPatrolledId =
+                        (String)redisTemplate.opsForHash().get(RobotService.countForAbnormalKey + task.getTaskId(), "task_patrolled_id");
+                    if (StringUtils.isNotEmpty(taskPatrolledId)) {
+                        String finalTaskPatrolledId = taskPatrolledId;
+                        xmlBaseModel.getItems().forEach(item -> {
+                            item.put("task_patrolled_id", finalTaskPatrolledId);
+                        });
+                    }
                 }
             }
         }
@@ -144,7 +145,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
      */
     private void roadToUpSystem(XMLBaseModel xmlBaseModel) {
         try {
-            for (Map<String, Object> item : xmlBaseModel.getItems()){
+            for (Map<String, Object> item : xmlBaseModel.getItems()) {
                 String filePath = String.valueOf(item.get("file_path"));
                 // 这是机器人放在巡视主机ftps服务下的路径
                 String imgPath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + "/" + filePath;
@@ -171,8 +172,8 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
             }
             Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("systemConfigKey:upSystem");
             String upSystemFtpsFlag = upSystemFtps.get("upSystemFlag");
-            if ("0".equals(upSystemFtpsFlag)){
-                log.info("上级系统开关未开! {}",upSystemFtpsFlag);
+            if ("0".equals(upSystemFtpsFlag)) {
+                log.info("上级系统开关未开! {}", upSystemFtpsFlag);
                 return;
             }
             String upSystemFtpsIp = upSystemFtps.get("upSystemFtpsIp");
@@ -180,8 +181,8 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
             String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
             String upSystemFtpsPassword = upSystemFtps.get("upSystemFtpsPassword");
             boolean resolveLocal = Boolean.parseBoolean(upSystemFtps.get("upSystemFtpsResolveLocal"));
-            FtpsUtil.putFile(sourcePath, targetPathName, upSystemFtpsIp, Integer.parseInt(upSystemFtpsPort),
-                    upSystemFtpsUsername, upSystemFtpsPassword, resolveLocal);
+            FtpsUtil.putFile(sourcePath, targetPathName, upSystemFtpsIp, Integer.parseInt(upSystemFtpsPort), upSystemFtpsUsername,
+                upSystemFtpsPassword, resolveLocal);
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误: ", e);
         }

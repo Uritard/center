@@ -476,9 +476,7 @@
         else ''
         end) as video_mode,
         a.address as place,
-        (CASE
-        WHEN a.drone_position = 674 THEN '13'
-        end) as type,
+        '13' as type,
         '' as patroldevice_info,
         '' as mount_patroldevice_code,
         '1' as edge,

@@ -148,6 +148,7 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
                 // 将无人机坐标信息
                 String redisKey = String.format("DroneCoordinate:%s", robotCode);
                 redisTemplate.opsForList().leftPushAll(redisKey, robotCoordinateList);
+                redisTemplate.expire(redisKey, 7, TimeUnit.DAYS);
             }
         } catch (Exception e) {
             log.error("处理无人机坐标信息报错， err: ", e);
