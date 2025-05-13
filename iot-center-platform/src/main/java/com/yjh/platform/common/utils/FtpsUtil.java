@@ -119,7 +119,7 @@ public class FtpsUtil {
         // 默认超时时间
         ftpClient.setDefaultTimeout(15000);
         // 数据传输超时时间
-        ftpClient.setDataTimeout(180000);
+        ftpClient.setDataTimeout(100000);
         ftpClient.connect(host, port);
         // Connect to host
         int reply = ftpClient.getReplyCode();
@@ -174,7 +174,7 @@ public class FtpsUtil {
             // 默认超时时间
             ftpClient.setDefaultTimeout(15000);
             // 数据传输超时时间
-            ftpClient.setDataTimeout(180000);
+            ftpClient.setDataTimeout(100000);
 
             ftpClient.connect(host, port);
             // Connect to host
@@ -251,7 +251,7 @@ public class FtpsUtil {
                 // 默认超时时间
                 ftpClient.setDefaultTimeout(15000);
                 // 数据传输超时时间
-                ftpClient.setDataTimeout(180000);
+                ftpClient.setDataTimeout(100000);
                 ftpClient.connect(host, port);
                 // Connect to host
                 int reply = ftpClient.getReplyCode();
