@@ -77,10 +77,12 @@ public interface TCameraInfoDao {
         @Param(value = "robotFlag") String robotFlag, @Param(value = "userId") Long userId, @Param(value = "upRegionId") Long upRegionId,
         @Param(value = "cameraType") Integer cameraType);
     List<TCameraInfo> selectCameraByName(@Param(value = "cameraName") String cameraName,
-                                  @Param(value = "robotFlag") String robotFlag,
                                   @Param(value = "userId")Long userId,
                                  @Param(value = "cameraType") Integer cameraType,
                                  @Param(value = "useType") Integer useType);
+    List<TCameraInfo> selectRobotByName(@Param(value = "cameraName") String cameraName,
+                                        @Param(value = "deviceType") Integer deviceType,
+                                        @Param(value = "userId")Long userId);
 
     List<TCameraInfo> selectCameraList(@Param(value = "userId") Long userId, @Param(value = "cameraType") Integer cameraType,
                                        @Param(value = "useType") Integer useType);

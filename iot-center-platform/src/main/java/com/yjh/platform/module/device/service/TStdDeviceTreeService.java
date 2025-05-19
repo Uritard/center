@@ -539,7 +539,7 @@ public class TStdDeviceTreeService {
         if (StringUtils.equals("light", type) || StringUtils.equals("infrared", type)) {
             cameraTypeTemp = StringUtils.equals("light", type) ? 205 : 206;
         }
-        List<TCameraInfo> cameraList = tCameraInfoDao.selectCameraByName(name, "", updateUserId, cameraTypeTemp, null);
+        List<TCameraInfo> cameraList = tCameraInfoDao.selectCameraByName(name, updateUserId, cameraTypeTemp, null);
         if (!CollectionUtils.isEmpty(cameraList)){
             List<Long> regionList = cameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
             Integer flag = condition.getFlag();
