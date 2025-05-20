@@ -431,6 +431,21 @@ public class Constant {
         return managerSystemPort;
     }
 
+    /**
+     * 是否是南瑞上级
+     */
+    public static boolean nariUpSystem() {
+        boolean nariUpSystem;
+        try {
+            nariUpSystem = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:nariUpSystem", "content"));
+            log.debug("nariUpSystem is {}", nariUpSystem);
+        } catch (Exception e) {
+            nariUpSystem = false;
+        }
+        return nariUpSystem;
+    }
+
+
     public static final String T_SYS_PARAM = "t_sys_param:";
     //主站任务下发到机器人
     public static final String ROBOT_TASK_ISSUE_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
