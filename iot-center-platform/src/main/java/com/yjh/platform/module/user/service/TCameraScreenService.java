@@ -10,17 +10,19 @@ import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.*;
+import com.yjh.platform.module.user.entity.enums.CameraDeviceTypeEnum;
 import com.yjh.platform.module.user.entity.enums.UserStateEnum;
 import com.yjh.platform.module.video.controller.CameraConController;
 import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -341,7 +343,30 @@ public class TCameraScreenService{
 
         return cameraStatusMap;
     }
-
+    /**
+     * 获取机器人状态
+     *
+     * @return 机器人状态 map key: 机器人id value: 机器人状态 1：在线 0：离线 -1：异常
+     */
+    private Map<String, String> getRobotStatusMap() {
+        Map<String, String> robotStatusMap = new HashMap<>(16);
+        //获取相机的状态
+        List<TRobotInfo> robotConInfos = tRobotInfoDao.selectAllRobotCode();
+        String online = "在线";
+        String offline = "离线";
+        robotConInfos.forEach(robot -> {
+            String state;
+            if (online.equals(robot.getRobotStatus())) {
+                state = "1";
+            } else if (offline.equals(robot.getRobotStatus())) {
+                state = "0";
+            } else {
+                state = "-1";
+            }
+            robotStatusMap.put(String.valueOf(robot.getRobotId()), state);
+        });
+        return robotStatusMap;
+    }
     /**
      * 处理巡视点是否在线
      *
@@ -644,12 +669,9 @@ public class TCameraScreenService{
         });
         return assembleTrees(areaInfoDetails);
     }
-    public List<AreaInfoDetail> selectCameraTreeWithRobotByName(String cameraName, Integer flag, String robotFlag,
-                                                                Long userId, Integer cameraType, Integer useType){
-//        if (StringUtils.isEmpty(cameraName)){
-//            List<AreaInfoDetail> areaTree = tCameraInfoDao.selectCameraTreeRegion();
-//            return assembleTrees(areaTree);
-//        }
+
+    public List<AreaInfoDetail> selectCameraTreeWithRobotByName(String cameraName, Integer flag, Integer deviceType,
+        Long userId, Integer cameraType, Integer useType) {
 
         SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
         if (Objects.nonNull(sysUser) && UserStateEnum.INVALID.getCode() == sysUser.getState()) {
@@ -666,36 +688,47 @@ public class TCameraScreenService{
         }
 
         List<AreaInfoDetail> areaInfoDetails = new ArrayList<>();
-        //获取相机的状态:  map包含在离线的  不包含未知状态的
-        Map<String,String> map = new HashMap<>(8);
-        List<Long> recordIdList = tCameraScreenDao.selectRecordId();
-        for(Long recordId:recordIdList){
-            Map<String, String> recordIdMap = cameraConService.getCameraStatus(recordId);
-            if(recordIdMap == null){
-                continue;
+        List<TCameraInfo> deviceList = new ArrayList<>();
+        Map<String, String> map = new HashMap<>(16);
+        //查询所有  机器人 (无人机 简易机器人 传统机器人) 摄像机
+        if (Objects.equals(CameraDeviceTypeEnum.ALL.getType(), deviceType)) {
+            //获取相机状态信息
+            map.putAll(getCameraStatusMap());
+            List<TCameraInfo> cameraList = tCameraInfoDao.selectCameraByName(cameraName, userId, cameraType, useType);
+            if (CollectionUtils.isNotEmpty(cameraList)) {
+                deviceList.addAll(cameraList);
             }
-            map.putAll(recordIdMap);
+            //获取机器人状态信息
+            map.putAll(getRobotStatusMap());
+            List<TCameraInfo> robotList = tCameraInfoDao.selectRobotByName(cameraName, deviceType, userId);
+            if (CollectionUtils.isNotEmpty(robotList)) {
+                deviceList.addAll(robotList);
+            }
         }
-
-        List<TCameraInfo> cameraList = tCameraInfoDao.selectCameraByName(cameraName,robotFlag,userId, cameraType, useType);
-        if (!CollectionUtils.isEmpty(cameraList)){
+        if (Objects.isNull(deviceType) || Objects.equals(CameraDeviceTypeEnum.CAMERA.getType(), deviceType)) {
+            //获取相机状态信息
+            map.putAll(getCameraStatusMap());
+            deviceList = tCameraInfoDao.selectCameraByName(cameraName, userId, cameraType, useType);
+        }
+        if (ArrayUtils.contains(new Integer[] {CameraDeviceTypeEnum.DRONE.getType(), CameraDeviceTypeEnum.SIMPLE_ROBOT.getType(),
+            CameraDeviceTypeEnum.TRADITION_ROBOT.getType()}, deviceType)) {
+            //获取机器人状态信息
+            map.putAll(getRobotStatusMap());
+            deviceList = tCameraInfoDao.selectRobotByName(cameraName, deviceType, userId);
+        }
+        if (!CollectionUtils.isEmpty(deviceList)){
 
             List<TCameraInfo> finalCameraList = new ArrayList<>();
             // flag:1-在线 0-离线 2-全部
             if (flag == 2){
-                finalCameraList = cameraList;
+                finalCameraList = deviceList;
             } else if (flag == 1) {
-                finalCameraList = cameraList.stream().filter(tCameraInfo -> StringUtils.equals(map.get(tCameraInfo.getCameraId().toString()), "1")).collect(Collectors.toList());
+                finalCameraList = deviceList.stream().filter(tCameraInfo -> StringUtils.equals(map.get(tCameraInfo.getCameraId().toString()), "1")).collect(Collectors.toList());
             } else if (flag == 0) {
-                finalCameraList = cameraList.stream().filter(tCameraInfo -> !StringUtils.equals(map.get(tCameraInfo.getCameraId().toString()), "1")).collect(Collectors.toList());
+                finalCameraList = deviceList.stream().filter(tCameraInfo -> !StringUtils.equals(map.get(tCameraInfo.getCameraId().toString()), "1")).collect(Collectors.toList());
             }
 
             List<Long> regionList = finalCameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
-
-            // MySQL 8.0
-//            if (!CollectionUtils.isEmpty(finalCameraList)) {
-//                regionList.addAll(tCameraInfoDao.selectRegionByCameraList(finalCameraList));
-//            }
 
             if (!CollectionUtils.isEmpty(finalCameraList)) {
                 Set<Long> upRegionList = finalCameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toSet());
@@ -711,13 +744,11 @@ public class TCameraScreenService{
                 areaInfoDetails = tCameraInfoDao.selectCameraTreeByName(finalCameraList,regionList);
             }
         }
-        areaInfoDetails.forEach(treeNode ->{
-            if("camera".equals(treeNode.getInfoType())){
-                if(map.get(treeNode.getId().toString()) != null){
-                    treeNode.setState(Integer.valueOf(map.get(treeNode.getId().toString())));
-                }else {
-                    treeNode.setState(0);
-                }
+        areaInfoDetails.forEach(treeNode -> {
+            if (map.get(treeNode.getId().toString()) != null) {
+                treeNode.setState(Integer.valueOf(map.get(treeNode.getId().toString())));
+            } else {
+                treeNode.setState(0);
             }
         });
         return assembleTrees(areaInfoDetails);

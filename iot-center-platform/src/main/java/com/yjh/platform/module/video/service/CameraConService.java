@@ -1818,6 +1818,12 @@ public class CameraConService {
         return true;
     }
 
+    /**
+     * 获取相机状态
+     *
+     * @param recordId
+     * @return Map  key:相机id  value相机状态 1 在线  0 离线  -1未知
+     */
     public Map<String, String> getCameraStatus(Long recordId) {
         Map<String, String> channleStatusMap = new HashMap<>();
         if (Objects.isNull(recordId)) {
