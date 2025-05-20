@@ -1054,12 +1054,15 @@ public class SendToUpSystemServices {
             }
             Map<String,Object> st = resultStatistical.get(0);
 
-            st.put("command",cmd);
-            st.put("type",type);
-            st.put("param_year",year);
-            st.put("param_month",month);
-            st.put("startTime",startTime);
-            st.put("endTime",endTime);
+            // 常州对接南瑞上级不可以有这两个参数
+            if (!Constant.nariUpSystem()) {
+                st.put("command", cmd);
+                st.put("type", type);
+                st.put("param_year", year);
+                st.put("param_month", month);
+                st.put("startTime", startTime);
+                st.put("endTime", endTime);
+            }
         }
         return resultStatistical;
     }

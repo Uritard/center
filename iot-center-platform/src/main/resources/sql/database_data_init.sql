@@ -981,7 +981,7 @@ INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, 
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('9', 'meter_num_type', '正向有功总需量', '0', '电表数值类型', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('890', 'robot_factory', '普宙', '0', '生产厂家', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('891', 'robot_factory', '惊鸣', '0', '生产厂家', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('675', 'drone_position', '室外无人机', '0', '无人机类型', '2')
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('675', 'drone_position', '室外无人机', '0', '无人机类型', '2');
 -- ----------------------------
 -- Records of t_period_model
 -- ----------------------------
@@ -1587,6 +1587,7 @@ INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, 
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'center', '无人机地图中心坐标', '32.30096967,119.2600425', '无人机地图默认展示中心点坐标', '{\"rule\":\"^[0-9,\\\\.]+$\",\"msg\":\"请不要输入特殊字符\"}');
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'needAnalyseResult', '算法分析的结果值', '已拍照,拍照', '下级系统需要进行算法分析的结果值', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\#-,]+$\",\"msg\":\"请不要输入特殊字符\"}');
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'reportStateFlag', '报告自动生成上传', '0', '0:不生成 1:自动生成不上传 2:自动生成且上传', '{\"rule\":\"^-?[0-9]\",\"msg\":\"请输入0~9的整数\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'nariUpSystem', '是否南瑞上级', 'false', '南瑞上级可靠性上报字段特殊处理', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 -- ----------------------------
 -- Records of t_version
 -- ----------------------------
