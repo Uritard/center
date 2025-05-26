@@ -6,9 +6,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.net.URLEncoder;
+import java.util.Objects;
 
 /**
  * 文件路径生成和获取
@@ -149,4 +151,45 @@ public class FileUtil {
         return false;
     }
 
+    /**
+     * 检查文件是否是zip格式
+     *
+     * @param file 页面上传的文件
+     * @return 判断结果
+     */
+    public static boolean isZipFile(MultipartFile file) {
+        if (Objects.isNull(file) || file.isEmpty()) return false;
+        try (InputStream inputStream = file.getInputStream()) {
+            byte[] header = new byte[4];
+            if (inputStream.read(header) != 4) return false;
+            //zip文件头: 0x50 0x4B 0x03 0x04
+            return (header[0] == 0x50 && header[1] == 0x4B && header[2] == 0x03 && header[3] == 0x04);
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    /**
+     * 检查文件是否是tar格式
+     *
+     * @param file 页面上传的文件
+     * @return 判断结果
+     */
+    public static boolean isTarFile(MultipartFile file) {
+        if (Objects.isNull(file) || file.isEmpty()) return false;
+        try (InputStream inputStream = file.getInputStream()) {
+            //tar魔数位于257字节处,共5字节: 0x75 0x73 0x74 0x61 0x72
+            byte[] magicNumber = new byte[5];
+            long skipped = inputStream.skip(257);
+            if (skipped != 257) return false;
+            if (inputStream.read(magicNumber) != 5) return false;
+            return (magicNumber[0] == 0x75 &&
+                    magicNumber[1] == 0x73 &&
+                    magicNumber[2] == 0x74 &&
+                    magicNumber[3] == 0x61 &&
+                    magicNumber[4] == 0x72);
+        } catch (IOException e) {
+            return false;
+        }
+    }
 }

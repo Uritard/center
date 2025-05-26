@@ -70,8 +70,9 @@ public enum HandlerEnum {
     IOT_DEVICE_DATA("iotDeviceData","iotDeviceData"),
     IOT_DEVICE("iotDevice","iotDeviceData"),
     //边缘节点系统自检信息
-    SYSTEM_CHECK("200", "systemCheck")
-
+    SYSTEM_CHECK("200", "systemCheck"),
+    //系统更新通知
+    UPGRADE_NOTIFICATION("42005", "upgradeNotification")
     ;
 
     /**
