@@ -54,6 +54,7 @@
         <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
         <result property="imageSize" column="image_size" jdbcType="VARCHAR"/>
         <result property="envRegionId" column="env_region_id" jdbcType="BIGINT"/>
+        <result property="systemVersion" column="system_version" javaType="VARCHAR"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -73,7 +74,7 @@
         defect_record,repair_record,exit_putInto_record,
         remarks,record_id,channel_num_light,
         channel_num_inferad,last_online_time,duration,
-        off_line_count,edge_code,origin_id,image_size,env_region_id
+        off_line_count,edge_code,origin_id,image_size,env_region_id,system_version
     </sql>
 
 
@@ -94,7 +95,7 @@
         ,defect_record,repair_record,exit_putInto_record
         ,remarks,record_id,channel_num_light
         ,channel_num_inferad,last_online_time,duration
-        ,off_line_count,edge_code,origin_id,image_size
+        ,off_line_count,edge_code,origin_id,image_size,system_version
         )
         values (#{robotCode,jdbcType=VARCHAR},#{robotNum,jdbcType=VARCHAR}
                ,#{robotName,jdbcType=VARCHAR},#{nestName,jdbcType=VARCHAR},#{nestCode,jdbcType=VARCHAR}
@@ -111,7 +112,7 @@
                ,#{defectRecord,jdbcType=VARCHAR},#{repairRecord,jdbcType=VARCHAR},#{exitPutintoRecord,jdbcType=VARCHAR}
                ,#{remarks,jdbcType=VARCHAR},#{recordId,jdbcType=BIGINT},#{channelNumLight,jdbcType=INTEGER}
                ,#{channelNumInferad,jdbcType=INTEGER},#{lastOnlineTime,jdbcType=BIGINT},#{duration,jdbcType=BIGINT}
-               ,#{offLineCount,jdbcType=BIGINT},#{edgeCode,jdbcType=VARCHAR},#{originId,jdbcType=VARCHAR},#{imageSize,jdbcType=VARCHAR}
+               ,#{offLineCount,jdbcType=BIGINT},#{edgeCode,jdbcType=VARCHAR},#{originId,jdbcType=VARCHAR},#{imageSize,jdbcType=VARCHAR},#{systemVersion,jdbcType=VARCHAR}
                )
     </insert>
 
@@ -155,6 +156,7 @@
         <if test="madeDate != null">a.made_date = #{madeDate, jdbcType=TIMESTAMP},</if>
         <if test="buildingUser != null ">a.building_user = #{buildingUser},</if>
         <if test="robotSource != null ">a.robot_source = #{robotSource},</if>
+        <if test="systemVersion != null">a.system_version = #{systemVersion},</if>
     </set>
             where a.robot_id = #{robotId, jdbcType=BIGINT}
     </update>
@@ -255,6 +257,7 @@
         ,channel_num_inferad,last_online_time,duration
         ,off_line_count,edge_code,origin_id,image_size
         ,env_region_id
+        ,system_version
         )values
         <foreach collection="list" item="TRobotInfo" separator=",">
              (#{TRobotInfo.robotCode,jdbcType=VARCHAR},#{TRobotInfo.robotNum,jdbcType=VARCHAR}
@@ -273,7 +276,7 @@
             ,#{TRobotInfo.remarks,jdbcType=VARCHAR},#{TRobotInfo.recordId,jdbcType=BIGINT},#{TRobotInfo.channelNumLight,jdbcType=INTEGER}
             ,#{TRobotInfo.channelNumInferad,jdbcType=INTEGER},#{TRobotInfo.lastOnlineTime,jdbcType=BIGINT},#{TRobotInfo.duration,jdbcType=BIGINT}
             ,#{TRobotInfo.offLineCount,jdbcType=BIGINT},#{TRobotInfo.edgeCode,jdbcType=VARCHAR},#{TRobotInfo.originId,jdbcType=VARCHAR}
-            ,#{TRobotInfo.imageSize,jdbcType=VARCHAR},#{TRobotInfo.envRegionId,jdbcType=BIGINT}
+            ,#{TRobotInfo.imageSize,jdbcType=VARCHAR},#{TRobotInfo.envRegionId,jdbcType=BIGINT},#{systemVersion,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

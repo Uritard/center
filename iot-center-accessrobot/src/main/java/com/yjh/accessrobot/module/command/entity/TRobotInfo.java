@@ -210,4 +210,8 @@ public class TRobotInfo implements Serializable {
      */
     @TableField(value = "image_size",updateStrategy = FieldStrategy.IGNORED)
     private String imageSize;
+
+    @ApiModelProperty(value = "机器人系统版本号")
+    @TableField(value = "system_version",updateStrategy = FieldStrategy.IGNORED)
+    private String systemVersion;
 }

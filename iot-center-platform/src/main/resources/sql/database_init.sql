@@ -1683,6 +1683,7 @@ CREATE TABLE `t_robot_info` (
   `light_vendor` varchar(64) DEFAULT NULL COMMENT '可见光厂家',
   `infrared_vendor` varchar(64) DEFAULT NULL COMMENT '红外厂家',
   `api_type` int(11) DEFAULT '2024' COMMENT 'A接口协议版本，默认2024',
+  `system_version` varchar(64) DEFAULT NULL COMMENT '机器人系统版本号',
   PRIMARY KEY (`robot_id`) USING BTREE,
   KEY `edge_code` (`edge_code`,`origin_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8001 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='机器人表';

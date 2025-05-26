@@ -284,7 +284,7 @@ public class Constant {
 
     public static void sendProcess(String key, String title, Integer status, String desc) {
         if (SYNC_MODE_CACHE.containsKey(key)) {
-            sendProcess(title + "模型同步", status, desc, SYNC_MODE_CACHE.get(key));
+            sendProcess(title, status, desc, SYNC_MODE_CACHE.get(key));
         }
     }
 
@@ -427,5 +427,7 @@ public class Constant {
      * 相机抓图存储相对路径
      */
     public static final String RESULT_IMG_REAL_PATH = "/imgs/resultImg/";
+
+    public static final String UPGRADE_PACKAGE_PATH = "/upgrade";
 
 }
