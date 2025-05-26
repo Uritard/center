@@ -690,8 +690,8 @@ public class IntelAnalysisService {
                 targetPath = copyFileFromFtps(type, resImageUrl);
                 taskResult.setAnalyseResultImg(targetPath);
             }
-
-            taskResult.setResultValue(value);
+            // 值为空，赋默认值 0
+            taskResult.setResultValue(StringUtils.defaultIfEmpty(value, "0"));
             taskResult.setResultDesc(desc);
 
             if (list.isEmpty()) {
@@ -702,25 +702,16 @@ public class IntelAnalysisService {
                     taskResult.setResultDesc("未见异常");
                     taskResult.setAnalyseResultImg(originPicPath);
                 }
-            } else {
+            } else if (!StringUtils.equalsAny(type, "meter", "infrared", "qrcode")) {
                 // 非表计，数显，红外，二维码识别
-                if (!StringUtils.equalsAny(type, "meter", "infrared", "qrcode")) {
-                    // 根据value获取对应的值
-                    if (ArrayUtils.contains(new String[] {"0", "1", "2", "3", "4", "5", "6"}, value)) {
-                        int typeValue = Integer.parseInt(list.get(0).getAnalyseType() + value);
-                        String resultDescTemp =
-                            Optional.ofNullable(RecogniseStatusEnum.getValueByCode(typeValue)).orElse(RecogniseStatusEnum.UNKNOWN)
-                                .getValue();
-                        String descVal = result.getDesc();
-                        if (StringUtils.containsAny(descVal, "储能", "非储能", "红", "蓝", "远方", "就地", "开")) {
-                            resultDescTemp = descVal;
-                        }
-                        taskResult.setResultDesc(resultDescTemp);
-                    } else {
-                        taskResult.setResultDesc("算法返回格式不正确");
-                    }
-                } else {
-                    taskResult.setResultDesc("");
+                // 根据value获取对应的值
+                if (ArrayUtils.contains(new String[] {"0", "1", "2", "3", "4", "5", "6"}, value)) {
+                    int typeValue = Integer.parseInt(list.get(0).getAnalyseType() + value);
+                    RecogniseStatusEnum statusEnum =
+                        Optional.ofNullable(RecogniseStatusEnum.getValueByCode(typeValue)).orElse(RecogniseStatusEnum.UNKNOWN);
+
+                    String resultDescTemp = statusEnum == RecogniseStatusEnum.UNKNOWN ? desc : statusEnum.getValue();
+                    taskResult.setResultDesc(resultDescTemp);
                 }
             }
         } catch (Exception e) {
