@@ -428,6 +428,9 @@ public class Constant {
      */
     public static final String RESULT_IMG_REAL_PATH = "/imgs/resultImg/";
 
+    /**
+     * 机器人版本更新包存储目录
+     */
     public static final String UPGRADE_PACKAGE_PATH = "/upgrade";
 
 }

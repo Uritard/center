@@ -1,6 +1,8 @@
 package com.yjh.accessrobot.netty.handler;
 
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
+import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
 import com.yjh.accessrobot.module.command.entity.TRobotInfo;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
@@ -47,28 +49,34 @@ public class RobotUpgradeNotifyHandler implements MessageHandlerStrategy, Initia
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         String robotCode = xmlBaseModel.getSendCode();
         log.info("巡视主机收到机器人: {} 的版本更新通知", robotCode);
+        boolean flag = false;
         try {
-            if (Constant.robotRegisterFlag.getOrDefault(robotCode, false)) {
-                Optional<UpgradeResult> upgradeResult = checkAndGetUpgradeResult(xmlBaseModel.getItems());
-                upgradeResult.ifPresent(result -> {
-                    log.info(result.toString());
-                    TRobotInfo robotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
-                    if (StringUtils.equals(SUCCESS, result.getUpgradeState())) {
-                        robotInfo.setSystemVersion(result.getProgramVersion());
-                        //todo 暂时先在t_robot_info表中添加system_version字段, 后面可以考虑新建一个表单独维护机器人系统版本信息
-                        tRobotInfoDao.update(robotInfo);
-                        Constant.sendProcess(robotCode, robotInfo.getRobotName() + "远程升级", 1, "远程升级成功");
-                    } else {
-                        Constant.sendProcess(robotCode, robotInfo.getRobotName() + "远程升级", 0, "远程升级失败");
-                    }
-                });
-            } else {
-                log.error("机器人: {}未注册!", robotCode);
+            if (!Constant.robotRegisterFlag.getOrDefault(robotCode, false)) return;
+            TRobotInfo robotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
+            String title = robotInfo.getRobotName() + "远程升级";
+            Optional<UpgradeResult> upgradeResult = checkAndGetUpgradeResult(xmlBaseModel.getItems());
+            if (!upgradeResult.isPresent()) {
+                Constant.sendProcess(robotCode, title, 0, "未获取到升级结果");
+                return;
             }
+            UpgradeResult result = upgradeResult.get();
+            log.info(result.toString());
+            if (StringUtils.equals(SUCCESS, result.getUpgradeState())) {
+                robotInfo.setSystemVersion(result.getProgramVersion());
+                //todo 暂时先在t_robot_info表中添加system_version字段, 后面可以考虑新建一个表单独维护机器人系统版本信息
+                tRobotInfoDao.update(robotInfo);
+                Constant.sendProcess(robotCode, title, 1, "远程升级成功");
+            } else {
+                Constant.sendProcess(robotCode, title, 0, "远程升级失败");
+            }
+            flag = true;
         } catch (Exception e) {
             log.error("处理版本更新通知消息异常", e);
         } finally {
             SYNC_MODE_CACHE.remove(robotCode);
+            String responseXml = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(flag, robotCode));
+            byte[] responseByte = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, responseXml);
+            RobotServerHandler.send(responseByte, robotCode);
         }
     }
 
