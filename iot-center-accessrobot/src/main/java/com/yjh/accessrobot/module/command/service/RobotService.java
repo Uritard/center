@@ -1202,6 +1202,11 @@ public class RobotService {
                         copyFileToDevelop(temporaryPath, developAbsoluteUrl);
                         RobotServerHandler.getRobotResultMap().put("developAbsoluteUrl", developAbsoluteUrl);
                         RobotServerHandler.getRobotResultMap().put("developRelativeUrl", developRelativeUrl);
+                    } else if (map.containsKey("program_update_state")) {
+                        String robotCode = xmlBaseModel.getSendCode();
+                        log.info("收到机器人: {}版本更新下发响应报文", robotCode);
+                        TRobotInfo robotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
+                        Constant.sendProcess(robotCode, robotInfo.getRobotName() + "远程升级", 1, "获取版本更新文件成功");
                     }
                     if (ModelFileEnum.getMapByNameSet(map.keySet()) != null) {
                         String code = ModelFileEnum.getMapByNameSet(map.keySet()).get("code");
@@ -3515,11 +3520,12 @@ public class RobotService {
         //版本升级包只支持zip格式或者tar格式
         if (!FileUtil.isZipFile(file) && !FileUtil.isTarFile(file))
             throw new BusinessException(ResultCodeEnum.UNSUPPORTFILETYPE.getName());
-        String uploadPath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + Constant.UPGRADE_PACKAGE_PATH;
-        Path path = Paths.get(uploadPath);
+        //机器人版本更新包存储路径: ftp根目录/upgrade/站所编码/机器人编码
+        String ftpRootPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
+        Path path = Paths.get(ftpRootPath, Constant.UPGRADE_PACKAGE_PATH, Constant.stationCode(), robotCode);
         if (Files.notExists(path)) Files.createDirectories(path);
-        String packageFullPath = uploadPath + file.getOriginalFilename();
-        file.transferTo(Paths.get(packageFullPath).toFile());
+        Path packageFullPath = path.resolve(Objects.requireNonNull(file.getOriginalFilename()));
+        file.transferTo(packageFullPath.toFile());
         log.info("机器人: {} 系统版本升级包上传成功, 本地路径: {}", robotCode, packageFullPath);
         redisTemplate.opsForValue().set("UpgradePackage:" + robotCode, packageFullPath);
     }
