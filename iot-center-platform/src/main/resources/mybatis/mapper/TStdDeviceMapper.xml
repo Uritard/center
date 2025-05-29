@@ -1011,6 +1011,20 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		where b.up_region_id =#{upRegionId}
 	</select>
 
+	<select id="selectSimpleRobotDeviceByRegionId" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+		SELECT DISTINCT
+			b.device_id AS Id,
+			b.device_name AS label,
+			b.up_region_id AS upId,
+			d.region_name AS upName,
+			"simpleRobot" AS infoType,
+			b.device_type AS deviceTypeId
+		FROM
+			t_std_device b
+				LEFT JOIN t_std_region d ON b.up_region_id = d.region_id
+		where b.up_region_id =#{upRegionId} and b.position_type = 'simple'
+	</select>
+
 	<select id="selectCustomByRegionId" resultType="com.yjh.platform.module.device.entity.AreaInfo">
 		SELECT DISTINCT
 		c.custom_id AS Id,
@@ -1496,6 +1510,62 @@ group by camera_id
 		join cte on e.up_region_id = cte.region_id
 		WHERE e.up_region_id IS NOT NULL
 		)
+	</select>
+
+	<select id="selectSimpleRobotDevTreeRegion" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+		SELECT
+		    a.region_id AS Id,
+		    a.region_name AS label,
+			a.up_region_id AS upId,
+			b.region_name AS upName,
+			"region" AS infoType,
+			r.robot_id AS robotId
+		FROM t_std_region a LEFT JOIN t_std_region b ON a.up_region_id = b.region_id LEFT JOIN t_robot_info r ON a.region_id = r.up_region_id
+		WHERE
+		    a.region_id IN
+		( WITH RECURSIVE cte AS (
+		SELECT
+		region_id,
+		up_region_id
+		FROM
+		t_std_region
+		WHERE
+		region_id IN (
+		SELECT
+		up_region_id
+		FROM
+		t_std_device
+		WHERE up_region_id IS NOT NULL AND position_type = 'simple'
+		)
+		<if test="name != null and name != ''">and region_name like concat('%', #{name}, '%')</if>
+		UNION ALL
+		SELECT
+		d.region_id,
+		d.up_region_id
+		FROM
+		t_std_region d
+		JOIN cte ON d.region_id = cte.up_region_id
+		) SELECT DISTINCT
+		up_region_id
+		FROM
+		cte
+		UNION ALL
+		SELECT
+		e.up_region_id
+		FROM
+		t_std_device e
+		join cte on e.up_region_id = cte.region_id
+		WHERE e.up_region_id IS NOT NULL AND position_type = 'simple'
+		)
+	</select>
+
+	<select id="selectSplitBackground" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+		SELECT DISTINCT
+			inspection_id AS Id,
+			inspection_name AS label
+		FROM
+			t_robot_inspection
+		where main_device_id =#{deviceId}
 	</select>
 
 </mapper>

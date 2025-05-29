@@ -755,7 +755,7 @@ public class TStdDeviceService{
         }
     }
 
-    //设备树查询(level：5-间隔，6-设备，7-部位，8-点位，9巡视点；deviceShow：all-所有，dev-设备，camera-摄像头，robot-机器人
+    //设备树查询(level：5-间隔，6-设备，7-部位，8-点位，9巡视点, 10简易机器人拆分后的底图；deviceShow：all-所有，dev-设备，camera-摄像头，robot-机器人
     //级别为5时，deviceType为设备类型 电表 meter 传感器 sensor
     public List<AreaInfo> selectDevTreeNew(String level, String deviceShow,String deviceType, String analyseType,Long id,String customId){
         switch (level){
@@ -769,6 +769,8 @@ public class TStdDeviceService{
                 return deviceMeteTree(id,deviceType,analyseType);
             case "9":
                 return cruisePoint(id);
+            case "10":
+                return tStdDeviceDao.selectSplitBackground(id);
             case "66":
                 return new ArrayList<>();
             default: throw new BusinessException("设备树展示层级输入有误！");
@@ -806,6 +808,9 @@ public class TStdDeviceService{
                 case "iot":
                     areaTree = tStdDeviceDao.selectIotDevTreeRegion(null);
                     break;
+                case "simpleRobot":
+                    areaTree = tStdDeviceDao.selectSimpleRobotDevTreeRegion(null);
+                    break;
                 default:
                     areaTree = tStdDeviceDao.selectDevTreeRegion();
             }
@@ -842,6 +847,9 @@ public class TStdDeviceService{
                         case "robot":
                             area.getChildren().addAll(tStdDeviceDao.selectRobotByRegionId(area.getId()));
                             break;
+                        case "simpleRobot":
+                            area.getChildren().addAll(tStdDeviceDao.selectSimpleRobotDeviceByRegionId(area.getId()));
+                            break;
                         default:throw new BusinessException("设备树展示内容输入有误！");
                     }
                     areaAddDeviceTree(area.getChildren(),deviceShow);
@@ -868,6 +876,9 @@ public class TStdDeviceService{
                 break;
             case "robot":
                 deviceTree = tStdDeviceDao.selectRobotByRegionId(upRegionId);
+                break;
+            case "simpleRobot":
+                deviceTree = tStdDeviceDao.selectSimpleRobotDeviceByRegionId(upRegionId);
                 break;
             default:throw new BusinessException("设备树展示内容输入有误！");
         }
