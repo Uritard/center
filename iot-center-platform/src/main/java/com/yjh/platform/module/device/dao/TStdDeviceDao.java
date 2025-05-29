@@ -134,6 +134,7 @@ public interface TStdDeviceDao {
     List<AreaInfo> getRegionMonitorDevice(@Param(value = "upRegionId")Long upRegionId);
     List<AreaInfo> selectCameraByRegionId(@Param(value = "upRegionId")Long upRegionId);
     List<AreaInfo> selectRobotByRegionId(@Param(value = "upRegionId")Long upRegionId);
+    List<AreaInfo> selectSimpleRobotDeviceByRegionId(@Param(value = "upRegionId")Long  upRegionId);
     List<AreaInfo> selectCustomByRegionId(@Param(value = "deviceId")Long deviceId);
     List<AreaInfo> selectDeviceMeteByDeviceAndCustom(@Param(value = "deviceId")Long deviceId,
                                                      @Param(value = "deviceType")String deviceType,
@@ -172,4 +173,8 @@ public interface TStdDeviceDao {
     List<AreaInfo> selectSensorDevTreeRegion(@Param(value = "name") String name);
 
     List<AreaInfo> selectIotDevTreeRegion(@Param(value = "name") String name);
+
+    List<AreaInfo> selectSimpleRobotDevTreeRegion(@Param(value = "name") String name);
+
+    List<AreaInfo> selectSplitBackground(@Param(value = "deviceId") Long deviceId);
 }

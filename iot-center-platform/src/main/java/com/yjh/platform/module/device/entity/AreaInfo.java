@@ -54,4 +54,7 @@ public class AreaInfo implements Serializable {
     @ApiModelProperty(value = "绑定类型")
     private String bindType;
 
+    @ApiModelProperty(value = "绑定机器人ID")
+    private String robotId;
+
 }
