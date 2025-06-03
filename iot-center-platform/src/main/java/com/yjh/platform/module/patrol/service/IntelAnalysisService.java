@@ -2,6 +2,7 @@ package com.yjh.platform.module.patrol.service;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.file.PathUtil;
+import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -14,10 +15,12 @@ import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.SysParamConfig;
+import com.yjh.platform.module.device.entity.AnalyseTypeEnum;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
@@ -36,6 +39,7 @@ import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.service.AlarmShieldService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import com.yjh.platform.module.user.service.TSequentialConfService;
+import com.yjh.video.api.result.ResultCodeEnum;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
@@ -74,7 +78,9 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
@@ -430,9 +436,11 @@ public class IntelAnalysisService {
         }
         String flagId = response.getRequestId().split("#")[1];
         // 正常的巡视多了接口会阻塞，所以放在线程池
-        if (ArrayUtils.contains(new String[]{"jm", "yjsk", "666666"}, flagId) || StringUtils.endsWith(flagId, "presetCheck")) {
+        if (ArrayUtils.contains(new String[] {"jm", "yjsk", "666666"}, flagId) || StringUtils.endsWith(flagId, "presetCheck")
+            || StringUtils.equals(AnalyseTypeEnum.OCR_RECOGNITION.getName(), flagId)
+            || StringUtils.equals(AnalyseTypeEnum.TARGET_BOX_RECOGNITION.getName(), flagId)) {
             picResAnalyse(response);
-        }else {
+        } else {
             AlgorithmAnalyseThread analyseThread = new AlgorithmAnalyseThread(response, flagId);
             ThreadPoolUtil.PATROL_POOL.addThread(analyseThread);
         }
@@ -494,6 +502,84 @@ public class IntelAnalysisService {
         if (flagId.endsWith("presetCheck")) {
             presetCheckHandle(response, flagId);
             return;
+        }
+        if (StringUtils.equals(AnalyseTypeEnum.OCR_RECOGNITION.getName(), flagId)) {
+            log.info("flagId判断为==>{}", flagId);
+            ocrHandle(response);
+        }
+        if (StringUtils.equals(AnalyseTypeEnum.TARGET_BOX_RECOGNITION.getName(), flagId)) {
+            log.info("flagId判断为==>{}", flagId);
+            targetBoxHandle(response);
+        }
+    }
+
+    /**
+     * 自动标注识别结果处理
+     * @param response 返回结果
+     */
+    private void targetBoxHandle(PicAnalyseResponse response) {
+        try {
+            if (CollectionUtils.isNotEmpty(response.getResultList())) {
+                // objectId 唯一标识
+                String objectId = response.getResultList().get(0).getObjectId();
+                List<AnalyseResultItem> resultList = response.getResultList().get(0).getResults();
+                if (CollectionUtils.isEmpty(resultList)) {
+                    CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
+                    return;
+                }
+                List<TargetBoxResult> targetBoxResultList = new ArrayList<>();
+                AtomicBoolean atomicBoolean = new AtomicBoolean(true);
+                //对返回框重新构建返回数据
+                for (AnalyseResultItem item : resultList) {
+                    List<Area> pos = item.getPos();
+                    if (CollectionUtils.isEmpty(pos)) {
+                        atomicBoolean.set(false);
+                        break;
+                    }
+                    for (Area area: pos) {
+                        List<Point> points = area.getAreas();
+                        if (CollectionUtils.isEmpty(points) || points.size() != 2) {
+                            atomicBoolean.set(false);
+                            break;
+                        }
+                        TargetBoxResult targetBoxResult = new TargetBoxResult();
+                        targetBoxResult.setX1(points.get(0).getX());
+                        targetBoxResult.setY1(points.get(0).getY());
+                        targetBoxResult.setX2(points.get(1).getX());
+                        targetBoxResult.setY2(points.get(1).getY());
+                        targetBoxResultList.add(targetBoxResult);
+                    }
+                }
+                if (atomicBoolean.get()) {
+                    CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.success(targetBoxResultList));
+                } else {
+                    CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
+                }
+            } else {
+              log.error("targetBoxHandle resultList is empty !");
+            }
+        } catch (Exception e) {
+            log.error("targetBoxHandle error", e);
+        }
+    }
+
+    /**
+     * ocr 识别结果处理
+     * @param response 返回结果
+     */
+    private void ocrHandle(PicAnalyseResponse response) {
+        try {
+            if (CollectionUtils.isNotEmpty(response.getResultList())) {
+                String objectId = response.getResultList().get(0).getObjectId();
+                List<AnalyseResultItem> resultList = response.getResultList().get(0).getResults();
+                if (CollectionUtils.isEmpty(resultList)) {
+                    CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
+                } else {
+                    CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.success(resultList));
+                }
+            }
+        } catch (Exception e) {
+            log.error("ocrHandle error", e);
         }
     }
 
@@ -1587,6 +1673,67 @@ public class IntelAnalysisService {
                     algorithmUpdate(request);
                 });
             }
+        }
+    }
+
+    /**
+     * OCR分析
+     * @param ocrAnalyseRequest ocr识别入参
+     * @return 识别结果
+     */
+    public List<AnalyseResultItem> ocrAnalyse(OcrAnalyseRequest ocrAnalyseRequest) {
+        Analysis analysis = new Analysis();
+        Long id = IdUtil.getSnowflakeNextId();
+        analysis.setTaskId(AnalyseTypeEnum.OCR_RECOGNITION.getName()).setPicPath(ocrAnalyseRequest.getImagePath())
+            .setAnalyseType(AnalyseTypeEnum.OCR_RECOGNITION.getCode()).setInstanceId(id);
+        analysis.setPicModelPath(JSON.toJSONString(ocrAnalyseRequest.getOcrBoxes()));
+        try {
+            CompletableFuture<com.yjh.video.api.result.Result<List<AnalyseResultItem>>> future =
+                CommonFutureUtil.registerFuture(String.valueOf(id));
+            Result result = analyticsService.defect(Collections.singletonList(analysis));
+            if (!result.isSuccess()) {
+                throw new BusinessException("OCR分析接口调用失败！");
+            }
+            //异步调用
+            com.yjh.video.api.result.Result<List<AnalyseResultItem>> res = future.get(20, TimeUnit.SECONDS);
+            if (!res.isSuccess()) {
+                throw new BusinessException("OCR分析失败！");
+            }
+            return res.getData();
+        } catch (Exception e) {
+            throw new BusinessException("OCR分析失败！");
+        } finally {
+            CommonFutureUtil.removeFuture(String.valueOf(id));
+        }
+    }
+
+    /**
+     * 自动标注识别接口
+     *
+     * @param imagePath 图片地址
+     * @param type      类型   "zz_bj","sx_bj","yb","zsd","xn"
+     * @return 识别结果
+     */
+    public List<TargetBoxResult> autoLabelAnalyse(String imagePath, String type) {
+        Analysis analysis = new Analysis();
+        Long id = IdUtil.getSnowflakeNextId();
+        analysis.setTaskId(AnalyseTypeEnum.TARGET_BOX_RECOGNITION.getName()).setPicPath(imagePath).setAnalyseType(type).setInstanceId(id);
+        try {
+            CompletableFuture<com.yjh.video.api.result.Result<List<TargetBoxResult>>> future =
+                CommonFutureUtil.registerFuture(String.valueOf(id));
+            Result result = analyticsService.defect(Collections.singletonList(analysis));
+            if (!result.isSuccess()) {
+                throw new BusinessException("自动标注识别接口调用失败！");
+            }
+            com.yjh.video.api.result.Result<List<TargetBoxResult>> res = future.get(20, TimeUnit.SECONDS);
+            if (!res.isSuccess()) {
+                throw new BusinessException("自动标注识别失败！");
+            }
+            return res.getData();
+        } catch (Exception e) {
+            throw new BusinessException("自动标注识别失败！");
+        } finally {
+            CommonFutureUtil.removeFuture(String.valueOf(id));
         }
     }
 }

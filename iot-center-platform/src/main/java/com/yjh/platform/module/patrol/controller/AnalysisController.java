@@ -14,6 +14,7 @@ import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstance;
+import com.yjh.platform.module.patrol.entity.interlanalysis.OcrAnalyseRequest;
 import com.yjh.platform.module.patrol.entity.interlanalysis.UpdateRequest;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
@@ -369,6 +370,49 @@ public class AnalysisController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("算法版本切换接口错误:", e);
+        }
+        return result;
+    }
+
+    /**
+     * ocr识别接口
+     * @return PicAnalyseResponse
+     */
+    @ApiOperation(value = "ocr识别接口")
+    @PostMapping(value = "/ocrAnalyse")
+    @Logs(title = "ocr识别接口", content = "ocr识别接口", logType = 5, authority = "1234")
+    public Result ocrAnalyse(@RequestBody OcrAnalyseRequest request) {
+        Result result = new Result();
+        try {
+            result.setData(intelAnalysisService.ocrAnalyse(request));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("ocr识别接口错误:", e);
+        }
+        return result;
+    }
+
+    /**
+     * 自动标注识别接口
+     *
+     * @param imagePath 待识别图片路径
+     * @param type  类型   "zz_bj","sx_bj","yb","zsd","xn"
+     * @return PicAnalyseResponse
+     */
+    @ApiOperation(value = "自动标注识别接口")
+    @PostMapping(value = "/autoLabelAnalyse")
+    @Logs(title = "ocr识别接口", content = "ocr识别接口", logType = 5, authority = "1234")
+    public Result autoLabelAnalyse(@RequestParam(value = "imagePath") String imagePath, @RequestParam(value = "type") String type) {
+        Result result = new Result();
+        try {
+            result.setData(intelAnalysisService.autoLabelAnalyse(imagePath, type));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("自动标注识别接口错误:", e);
         }
         return result;
     }
