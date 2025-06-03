@@ -3560,4 +3560,37 @@ public class RobotService {
         TRobotInfo robotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
         Constant.sendProcess(robotCode, robotInfo.getRobotName() + "远程升级", 1, "远程升级开始");
     }
+
+    /**
+     * 充电区域下发
+     * @param chargingAreaInfo
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public String deviceChargerAreaIssued(ChargingAreaInfo chargingAreaInfo) {
+        Long robotId = chargingAreaInfo.getRobotId();
+        String chargingArea = chargingAreaInfo.getCoordinates();
+        TRobotInfo robotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
+        // 像素坐标转换地图坐标
+
+        robotInfo.setChargingArea(chargingArea);
+        tRobotInfoDao.update(robotInfo);
+        String robotCode = robotInfo.getRobotCode();
+        List<Map<String, Object>> itemList = new ArrayList<>();
+        Map<String, Object> item = new HashMap<>(1);
+        item.put("charging_area", chargingArea);
+        itemList.add(item);
+        XMLBaseModel xmlBaseModel =
+            new XMLBaseModel()
+                .setSendCode(Constant.sendCode())
+                .setReceiveCode(robotCode)
+                .setCode(Constant.stationCode())
+                .setType("42003")
+                .setCommand("4")
+                .setItems(itemList);
+        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+        log.info("生成的充电区域指令xml是<start>{}<end>", xmlString);
+        RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
+        return "true";
+    }
 }

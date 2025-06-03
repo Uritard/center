@@ -13,12 +13,14 @@ import com.yjh.accessrobot.commons.result.ResultCodeEnum;
 import com.yjh.accessrobot.module.command.entity.RobotTaskInstanceInfo;
 import com.yjh.accessrobot.module.command.entity.TCameraPreset;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
+import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.module.command.service.TCameraPresetService;
 import com.yjh.accessrobot.netty.handler.*;
 import com.yjh.accessrobot.netty.server.RobotServerHandlerImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -261,6 +263,30 @@ public class RobotController {
         try {
             log.info("platform传来的map是==={}", resMap);
             result.setData(robotService.deviceMaintenanceIssued(resMap));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("巡视主机向机器人下发检修区域指令接口发生错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "设置充电区域")
+    @PostMapping(value = "/setChargingArea")
+    @Logs(title = "设置充电区域",content = "设置充电区域",logType = 2)
+    public Result setChargingArea(@RequestBody ChargingAreaInfo chargingAreaInfo){
+        Result result = new Result();
+        try {
+            if (chargingAreaInfo.getRobotId() == null) {
+                result.setCode(ResultCodeEnum.PARAMERROR.getCode(), "机器人ID不能为空");
+                return result;
+            }
+            if (StringUtils.isBlank(chargingAreaInfo.getCoordinates())) {
+                result.setCode(ResultCodeEnum.PARAMERROR.getCode(), "充电区域坐标格式错误");
+                return result;
+            }
+            result.setData(robotService.deviceChargerAreaIssued(chargingAreaInfo));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

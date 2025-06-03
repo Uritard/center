@@ -55,6 +55,9 @@ public class TDeviceMaintenanceService{
             Collectors.toList());
         tDeviceMaintenance.setDeviceIds(StringUtils.join(deviceList, ","));
         tDeviceMaintenance.setInstanceIds(StringUtils.join(instanceList, ","));
+        String coordinatePixel = tDeviceMaintenance.getCoordinatePixel();
+        // TODO 转换为真实地图点坐标
+        tDeviceMaintenance.setCoordinatePixel(coordinatePixel);
         this.tDeviceMaintenanceDao.add(tDeviceMaintenance);
         createMaintenance(tDeviceMaintenance, instanceList, deviceList, 1);
         return 1;
@@ -74,6 +77,9 @@ public class TDeviceMaintenanceService{
     public int update(TDeviceMaintenance tDeviceMaintenance) {
         this.deleteByPrimaryId(tDeviceMaintenance.getMaintenanceId());
         tDeviceMaintenance.setConfigCode(String.valueOf(UUID.randomUUID()).replace("-", ""));
+        String coordinatePixel = tDeviceMaintenance.getCoordinatePixel();
+        // TODO 转换为真实地图点坐标
+        tDeviceMaintenance.setCoordinatePixel(coordinatePixel);
         return this.add(tDeviceMaintenance);
     }
 

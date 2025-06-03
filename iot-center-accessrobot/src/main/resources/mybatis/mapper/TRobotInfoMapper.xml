@@ -157,6 +157,7 @@
         <if test="buildingUser != null ">a.building_user = #{buildingUser},</if>
         <if test="robotSource != null ">a.robot_source = #{robotSource},</if>
         <if test="systemVersion != null">a.system_version = #{systemVersion},</if>
+        <if test="chargingArea != null">a.charging_area = #{chargingArea},</if>
     </set>
             where a.robot_id = #{robotId, jdbcType=BIGINT}
     </update>
