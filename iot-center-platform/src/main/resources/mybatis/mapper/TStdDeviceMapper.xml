@@ -1534,8 +1534,8 @@ group by camera_id
 		SELECT
 		up_region_id
 		FROM
-		t_std_device
-		WHERE up_region_id IS NOT NULL AND position_type = 'simple'
+		t_robot_info
+		WHERE up_region_id IS NOT NULL AND robot_type = 901
 		)
 		<if test="name != null and name != ''">and region_name like concat('%', #{name}, '%')</if>
 		UNION ALL
@@ -1553,9 +1553,9 @@ group by camera_id
 		SELECT
 		e.up_region_id
 		FROM
-		t_std_device e
+		t_robot_info e
 		join cte on e.up_region_id = cte.region_id
-		WHERE e.up_region_id IS NOT NULL AND position_type = 'simple'
+		WHERE e.up_region_id IS NOT NULL AND robot_type = 901
 		)
 	</select>
 
