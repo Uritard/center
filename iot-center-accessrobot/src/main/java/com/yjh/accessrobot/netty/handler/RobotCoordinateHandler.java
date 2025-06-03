@@ -2,6 +2,7 @@ package com.yjh.accessrobot.netty.handler;
 
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.CommonUtils;
+import com.yjh.accessrobot.common.utils.CoordinateUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
@@ -165,7 +166,7 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
             robotCoordinateMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
             robotCoordinateMap.put("robotCode",robotCode);
             robotCoordinateMap.put("time", String.valueOf(res.get("time")));
-            robotCoordinateMap.put("coordinatePixel", String.valueOf(res.get("coordinate_pixel")));
+            robotCoordinateMap.put("coordinatePixel", CoordinateUtil.actualToPixel(robotCode, String.valueOf(res.get("coordinate_pixel"))));
             robotCoordinateMap.put("coordinateGeography", coordinateGeography);
         }
 

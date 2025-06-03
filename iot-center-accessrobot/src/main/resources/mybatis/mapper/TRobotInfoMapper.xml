@@ -54,7 +54,7 @@
         <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
         <result property="imageSize" column="image_size" jdbcType="VARCHAR"/>
         <result property="envRegionId" column="env_region_id" jdbcType="BIGINT"/>
-        <result property="systemVersion" column="system_version" javaType="VARCHAR"/>
+        <result property="systemVersion" column="system_version" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
