@@ -14,6 +14,7 @@ import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
+import com.yjh.platform.module.device.entity.AnalyseTypeEnum;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.interlanalysis.AnalyseObject;
@@ -24,6 +25,7 @@ import com.yjh.platform.module.patrol.service.AnalyticsService;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -225,6 +227,9 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                 }
                 // 上传基准图
                 uploadFileToFtps(imageNormalUrlPath, "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
+            } else if (AnalyseTypeEnum.OCR_RECOGNITION.getCode().equals(analyseType)) {
+                //ocr识别imageNormalPath字段为识别框的信息
+                analyseObject.setImageNormalPath(analysis.getPicModelPath());
             } else {
                 String presetId = StringUtils.substringAfterLast(analysis.getPicModelPath(), "/");
                 //急速模式 非相机任务的表计算法
@@ -256,11 +261,17 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
      * @param typeList typeList
      */
     private List<String> processDefectAnalyseType(String analyseType, List<String> typeList) {
-        if (StringUtils.isNotEmpty(analyseType) && "11".equals(analyseType)) {
-            String defectAnalyseType = (String)redisTemplate.opsForHash().get("t_sys_param:defectAnalyseType", "content");
-            if (StringUtils.isNotEmpty(defectAnalyseType)) {
-                log.info("特殊处理AI判别，优先获取redis上的值: {}", defectAnalyseType);
-                return Arrays.asList(defectAnalyseType);
+        if (StringUtils.isNotEmpty(analyseType)) {
+            if (AnalyseTypeEnum.DETECTION.getCode().equals(analyseType)) {
+                String defectAnalyseType = (String)redisTemplate.opsForHash().get("t_sys_param:defectAnalyseType", "content");
+                if (StringUtils.isNotEmpty(defectAnalyseType)) {
+                    log.info("特殊处理AI判别，优先获取redis上的值: {}", defectAnalyseType);
+                    return Collections.singletonList(defectAnalyseType);
+                }
+            }
+            //目标框识别通过传参方式确定typeList
+            if (ArrayUtils.contains(new String[] {"zz_bj", "sx_bj", "yb", "zsd", "xn"}, analyseType)) {
+                return Collections.singletonList(analyseType);
             }
         }
 
