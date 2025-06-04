@@ -1520,7 +1520,7 @@ group by camera_id
 			b.region_name AS upName,
 			"region" AS infoType,
 			r.robot_id AS robotId
-		FROM t_std_region a LEFT JOIN t_std_region b ON a.up_region_id = b.region_id LEFT JOIN t_robot_info r ON a.region_id = r.up_region_id
+		FROM t_std_region a LEFT JOIN t_std_region b ON a.up_region_id = b.region_id LEFT JOIN t_robot_info r ON a.region_id = r.up_region_id and r.robot_type = 905
 		WHERE
 		    a.region_id IN
 		( WITH RECURSIVE cte AS (
@@ -1535,7 +1535,7 @@ group by camera_id
 		up_region_id
 		FROM
 		t_robot_info
-		WHERE up_region_id IS NOT NULL AND robot_type = 901
+		WHERE up_region_id IS NOT NULL AND robot_type = 905
 		)
 		<if test="name != null and name != ''">and region_name like concat('%', #{name}, '%')</if>
 		UNION ALL
@@ -1555,7 +1555,7 @@ group by camera_id
 		FROM
 		t_robot_info e
 		join cte on e.up_region_id = cte.region_id
-		WHERE e.up_region_id IS NOT NULL AND robot_type = 901
+		WHERE e.up_region_id IS NOT NULL AND robot_type = 905
 		)
 	</select>
 
