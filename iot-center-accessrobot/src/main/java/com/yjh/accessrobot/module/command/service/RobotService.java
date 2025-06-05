@@ -1473,6 +1473,11 @@ public class RobotService {
      * @param str        点位id
      */
     private void packageXMLBaseModel(RobotTaskInstanceInfo item, String uniqueFlag, String taskId, Set<String> str) {
+        // 简易机器人只支持 102任务
+        TRobotInfo robotInfo = tRobotInfoDao.selectRobotInfoByCode(uniqueFlag);
+        if (905 == robotInfo.getRobotType()){
+            item.setUnionTaskStatus("1");
+        }
         Map<String, Object> resMap = packageItem(str, item, taskId);
         String code = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
         List<TStdRegion> tStdRegionList = tStdRegionDao.selectByRegionCodeAndState(uniqueFlag, 1);
@@ -1652,7 +1657,7 @@ public class RobotService {
             } else {
                 log.info("This is a linkage task！！！！！！！！！！！！！");
                 map.put("priority", "4");
-                map.put("device_level", 3);
+                map.put("device_level", Optional.ofNullable(item.getDeviceLevel()).orElse(3));
                 mapList.add(map);
                 taskItemMap.put("type", LINKAGE_TASK.getType());
                 taskItemMap.put("mapList", mapList);

@@ -1,6 +1,7 @@
 package com.yjh.accessrobot.netty.handler;
 
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.common.utils.CoordinateUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
@@ -40,6 +41,8 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
     private TStdRegionDao tStdRegionDao;
     @Autowired
     private HeartBeatCheckScheduled heartBeatCheckScheduled;
+    @Autowired
+    private CoordinateUtil coordinateUtil;
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
@@ -120,8 +123,8 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
             Constant.robotChannels.put(robotCode, ctx.channel().id().toString());
             log.info("++++++之后的Constant.robotChannels:{}", Constant.robotChannels);
             Constant.robotThreadFlag.put(robotCode, true);
-
-
+            //加载简易机器人地图信息
+            coordinateUtil.loadMapInfo(robotCode);
             String registerXmlString = PlatformXMLUtil.generateXml(xmlBaseModelTemp);
             byte[] registerProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, registerXmlString);
             RobotServerHandler.send(registerProtocol, robotCode);

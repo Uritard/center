@@ -1,8 +1,10 @@
 package com.yjh.manager.common.logs;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.manager.common.Constant;
 import com.yjh.manager.common.result.BusinessException;
 import com.yjh.manager.common.result.Result;
+import com.yjh.manager.common.websocket.WebSocketServer;
 import com.yjh.manager.module.log.controller.SysLogController;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -95,7 +97,7 @@ public class LogsAspect {
                             jsonMap.put("userName", userName);
                             jsonMap.put("title", annotation.title());
                             jsonMap.put("content", String.valueOf(content));
-                            // TODO Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jsonMap);
+                            WebSocketServer.sendMsg(JSON.toJSONString(jsonMap));
                             content.append(";用户").append(userName).append("存在越权访问!");
                             params.put("content", content.toString());
                             post(params);
