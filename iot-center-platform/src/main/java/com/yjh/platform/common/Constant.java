@@ -782,6 +782,14 @@ public class Constant {
      * 视频录制相对路径
      */
     public static final String VIDEO_REAL_PATH = "/imgs/video/";
+    /**
+     * 简易机器人底图相对路径
+     */
+    public static final String SIMPLE_PIC = "/imgs/simplePic/";
+    /**
+     * 简易机器人测点图相对路径
+     */
+    public static final String SIMPLE_POINT_PIC = "/imgs/simplePointPic/";
 
 }
 

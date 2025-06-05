@@ -37,37 +37,61 @@ public class TRobotInspection implements Serializable {
     @TableField(value = "inspection_code", updateStrategy = FieldStrategy.IGNORED)
     private String inspectionCode;
 
-    @Max(value = 999999999999999999l)
+    @TableField(value = "inspection_type",updateStrategy = FieldStrategy.IGNORED)
+    @ApiModelProperty(value = "测点类型, 1.巡检点 2.操作点")
+    private Integer inspectionType;
+
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "机器人ID")
-    @TableField(value = "robot_id", updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "robot_id",updateStrategy = FieldStrategy.IGNORED)
     private Long robotId;
 
-    @Length(max = 60, message = "inspectionName长度必须小于等于60")
+    @Length(max = 60,message = "inspectionName长度必须小于等于60")
     @ApiModelProperty(value = "测点名称")
-    @TableField(value = "inspection_name", updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "inspection_name",updateStrategy = FieldStrategy.IGNORED)
     private String inspectionName;
 
+    @ApiModelProperty(value = "主设备ID")
+    @TableField(value = "main_device_id",updateStrategy = FieldStrategy.IGNORED)
+    private String mainDeviceId;
     @ApiModelProperty(value = "部件ID")
-    @TableField(value = "component_id", updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "component_id",updateStrategy = FieldStrategy.IGNORED)
     private String componentId;
     @ApiModelProperty(value = "表计类型")
     private Integer meterType;
     @ApiModelProperty(value = "外观类型")
     private Integer appearanceType;
+    @ApiModelProperty(value = "主操作类型")
+    private Integer mainOperationType;
+    @ApiModelProperty(value = "操作类型")
+    private Integer operationType;
     @ApiModelProperty(value = "采集/保存文件类型列表")
-    @TableField(value = "save_type_list", updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "save_type_list",updateStrategy = FieldStrategy.IGNORED)
     private String saveTypeList;
     @ApiModelProperty(value = "识别类型列表")
-    @TableField(value = "recognition_type_list", updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "recognition_type_list",updateStrategy = FieldStrategy.IGNORED)
     private String recognitionTypeList;
     @ApiModelProperty(value = "相位，A相B相C相")
-    @TableField(value = "phase", updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "phase",updateStrategy = FieldStrategy.IGNORED)
     private String phase;
     @ApiModelProperty(value = "备注信息")
-    @TableField(value = "device_info", updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "device_info",updateStrategy = FieldStrategy.IGNORED)
     private String deviceInfo;
-
+    @ApiModelProperty(value = "属性图")
+    @TableField(value = "property_pic_path",updateStrategy = FieldStrategy.IGNORED)
+    private String propertyPicPath;
     private Integer type;
+    @ApiModelProperty(value = "照片序号")
+    @TableField(value = "photo_num",updateStrategy = FieldStrategy.IGNORED)
+    private Integer photoNum;
+    /**
+     * 节点编码
+     */
+    private String edgeCode;
+    /**
+     * 原始id(下级同步的id)
+     */
+    private String originId;
 
     private Integer pageNum = 1;
 
