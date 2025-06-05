@@ -11,6 +11,7 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.enumeration.ModelFileEnum;
 import com.yjh.accessrobot.common.handler.MyException;
 import com.yjh.accessrobot.common.smUtil.Demo;
+import com.yjh.accessrobot.common.utils.CoordinateUtil;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
@@ -3574,11 +3575,17 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public String deviceChargerAreaIssued(ChargingAreaInfo chargingAreaInfo) {
         Long robotId = chargingAreaInfo.getRobotId();
-        String chargingArea = chargingAreaInfo.getCoordinates();
+        String areaCoordinates = chargingAreaInfo.getCoordinates();
         TRobotInfo robotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
         // 像素坐标转换地图坐标
-
-        robotInfo.setChargingArea(chargingArea);
+        String[] coordinates = areaCoordinates.split(",");
+        StringBuffer chargingArea = new StringBuffer();
+        for (int i = 0; i < coordinates.length; i+=3) {
+            String coordinate = coordinates[i] + ',' + coordinates[i+1];
+            String actualCoordinate = CoordinateUtil.pixelToActual(robotInfo.getRobotCode(), coordinate);
+            chargingArea.append(actualCoordinate);
+        }
+        robotInfo.setChargingArea(chargingArea.toString());
         tRobotInfoDao.update(robotInfo);
         String robotCode = robotInfo.getRobotCode();
         List<Map<String, Object>> itemList = new ArrayList<>();

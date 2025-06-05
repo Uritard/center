@@ -27,6 +27,8 @@ public class TRobotChargingAreaInfo implements Serializable {
 
     @ApiModelProperty(value = "机器人id")
     private Long robotId;
+    @ApiModelProperty(value = "机器人地图")
+    private String imgUrl;
     @ApiModelProperty(value = "充电区域左上角坐标x")
     private Double x;
     @ApiModelProperty(value = "充电区域左上角坐标y")

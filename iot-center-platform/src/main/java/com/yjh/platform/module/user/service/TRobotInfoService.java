@@ -746,6 +746,7 @@ public class TRobotInfoService{
         tRobotChargingAreaInfo.setWidth(width);
         tRobotChargingAreaInfo.setHeight(height);
         tRobotChargingAreaInfo.setRobotId(robotId);
+        tRobotChargingAreaInfo.setImgUrl(tRobotInfo.getPhotePath());
 
         return tRobotChargingAreaInfo;
     }
