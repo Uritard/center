@@ -24,9 +24,11 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -204,16 +206,16 @@ public class CoordinateUtil {
         try {
             String[] coordinates = pixelCoordinates.split(",");
             if (mapInfo.getMapPath().endsWith(SVG_SUFFIX)) {
-                actualX = Integer.parseInt(coordinates[0]) / mapInfo.getProportion();
-                actualY = Integer.parseInt(coordinates[1]) / mapInfo.getProportion();
+                actualX = Double.parseDouble(coordinates[0]) / mapInfo.getProportion();
+                actualY = Double.parseDouble(coordinates[1]) / mapInfo.getProportion();
             } else {
-                actualX = Integer.parseInt(coordinates[0]) * mapInfo.getResolution() + mapInfo.getLeft();
-                actualY = mapInfo.getTop() - Integer.parseInt(coordinates[1]) * mapInfo.getResolution();
+                actualX = Double.parseDouble(coordinates[0]) * mapInfo.getResolution() + mapInfo.getLeft();
+                actualY = mapInfo.getTop() - Double.parseDouble(coordinates[1]) * mapInfo.getResolution();
             }
         } catch (Exception e) {
             return "0,0,0"; //任何异常统一返回
         }
-        return String.format("%.3f,%.3f,0", actualX, actualY);
+        return String.join(",", formatToThreeDecimals(actualX), formatToThreeDecimals(actualY), "0");
     }
 
     /**
@@ -224,20 +226,29 @@ public class CoordinateUtil {
      */
     public static String actualToPixel(String robotCode, String actualCoordinate) {
         MapInfo mapInfo = robotReMapData.get(robotCode);
-        int pixelX, pixelY;
+        double pixelX, pixelY;
         try {
             if (ObjectUtils.notEqual(mapInfo.getRobotType(), 905)) return actualCoordinate;
             String[] coordinates = actualCoordinate.split(",");
             if (mapInfo.getMapPath().endsWith(SVG_SUFFIX)) {
-                pixelX = (int) Math.round(Double.parseDouble(coordinates[0]) * mapInfo.getProportion());
-                pixelY = (int) Math.round(Double.parseDouble(coordinates[1]) * mapInfo.getProportion());
+                pixelX = Double.parseDouble(coordinates[0]) * mapInfo.getProportion();
+                pixelY = Double.parseDouble(coordinates[1]) * mapInfo.getProportion();
             } else {
-                pixelX = (int) Math.round((Double.parseDouble(coordinates[0]) - mapInfo.getLeft()) / mapInfo.getResolution());
-                pixelY = (int) Math.round((mapInfo.getTop() - Double.parseDouble(coordinates[1])) / mapInfo.getResolution());
+                pixelX = (Double.parseDouble(coordinates[0]) - mapInfo.getLeft()) / mapInfo.getResolution();
+                pixelY = (mapInfo.getTop() - Double.parseDouble(coordinates[1])) / mapInfo.getResolution();
             }
         } catch (Exception e) {
             return "0,0,0,0"; //任何异常统一返回
         }
-        return String.format("%d,%d,0,0", pixelX, pixelY);
+        return String.join(",", formatToThreeDecimals(pixelX), formatToThreeDecimals(pixelY), "0", "0");
+    }
+
+    /**
+     * 四舍五入保留三位小数(末尾去零)
+     */
+    public static String formatToThreeDecimals(Number number) {
+        DecimalFormat df = new DecimalFormat("0.###");
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        return df.format(number);
     }
 }
