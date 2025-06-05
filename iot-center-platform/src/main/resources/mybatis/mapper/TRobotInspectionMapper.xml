@@ -163,13 +163,17 @@
         inspection_code,
         robot_id,
         inspection_name,
+        inspection_type,
+        main_device_id,
         component_id,
         meter_type,
         appearance_type,
         save_type_list,
         recognition_type_list,
         phase,
-        device_info
+        device_info,
+        property_pic_path,
+        photo_num
         )values
         <foreach collection="list" item="TRobotInspection" separator=",">
             (
@@ -177,13 +181,17 @@
             #{TRobotInspection.inspectionCode, jdbcType=VARCHAR},
             #{TRobotInspection.robotId, jdbcType=BIGINT},
             #{TRobotInspection.inspectionName, jdbcType=VARCHAR},
+            #{TRobotInspection.inspectionType, jdbcType=INTEGER},
+            #{TRobotInspection.mainDeviceId, jdbcType=VARCHAR},
             #{TRobotInspection.componentId, jdbcType=VARCHAR},
             #{TRobotInspection.meterType, jdbcType=INTEGER},
             #{TRobotInspection.appearanceType, jdbcType=INTEGER},
             #{TRobotInspection.saveTypeList, jdbcType=VARCHAR},
             #{TRobotInspection.recognitionTypeList, jdbcType=VARCHAR},
             #{TRobotInspection.phase, jdbcType=VARCHAR},
-            #{TRobotInspection.deviceInfo, jdbcType=VARCHAR}
+            #{TRobotInspection.deviceInfo, jdbcType=VARCHAR},
+            #{TRobotInspection.propertyPicPath, jdbcType=VARCHAR},
+            #{TRobotInspection.photoNum, jdbcType=INTEGER}
             )
         </foreach>
     </insert>
