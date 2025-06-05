@@ -11,6 +11,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.service.TStdDeviceService;
+import com.yjh.platform.module.user.entity.TRobotChargingAreaInfo;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.service.TRobotInfoService;
 import io.swagger.annotations.Api;
@@ -236,6 +237,21 @@ public class TRobotInfoController {
         Result result = new Result();
         try {
             TRobotInfo tRobotInfo = tRobotInfoService.selectByPrimaryId(robotId);
+            result.setData(tRobotInfo);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "根据主键查询充电区域")
+    @GetMapping(value = "/selectChargingAreaById")
+    @Logs(title = "查询巡检设备信息",content = "根据主键查询充电区域",logType = 1,authority = "1234")
+    public Result selectChargingAreaById(@RequestParam(value = "robotId", required = true) Long robotId) {
+        Result result = new Result();
+        try {
+            TRobotChargingAreaInfo tRobotInfo = tRobotInfoService.selectChargingAreaById(robotId);
             result.setData(tRobotInfo);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

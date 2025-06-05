@@ -304,4 +304,8 @@ public class TRobotInfo implements Serializable {
     private String infraredChannelId;
 
     private Integer apiType;
+
+    @ApiModelProperty(value = "充电区域")
+    @TableField(value = "charging_area", updateStrategy = FieldStrategy.IGNORED)
+    private String chargingArea;
 }

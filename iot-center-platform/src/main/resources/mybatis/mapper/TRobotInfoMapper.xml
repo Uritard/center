@@ -78,7 +78,7 @@
         channel_num_inferad,last_online_time,duration,
         off_line_count,edge_code,origin_id,image_size,
         env_region_id,light_channel_id,infrared_channel_id,
-        light_vendor,infrared_vendor,api_type
+        light_vendor,infrared_vendor,api_type,charging_area
     </sql>
 
 
@@ -208,6 +208,7 @@
         <if test="infraredVendor != null ">a.infrared_vendor = #{infraredVendor},</if>
         <if test="envRegionId != null">a.env_region_id = #{envRegionId},</if>
         <if test="apiType != null">a.api_type = #{apiType},</if>
+        <if test="chargingArea != null">a.charging_area = #{chargingArea},</if>
     </set>
             where a.robot_id = #{robotId, jdbcType=BIGINT}
     </update>

@@ -13,6 +13,7 @@ import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.SysUserDevicePermissionDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.SysUserDevicePermissionDO;
+import com.yjh.platform.module.user.entity.TRobotChargingAreaInfo;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
 import com.yjh.platform.module.user.entity.output.SysUserDTO;
@@ -706,5 +707,47 @@ public class TRobotInfoService{
                 }
             }
         }
+    }
+
+    /**
+     * 查询充电区域
+     * @param robotId
+     * @return
+     */
+    public TRobotChargingAreaInfo selectChargingAreaById(Long robotId) {
+        TRobotInfo tRobotInfo = this.selectByPrimaryId(robotId);
+        String chargingAreaStr = tRobotInfo.getChargingArea();
+        String[] split = chargingAreaStr.split(",");
+        List<Double> xList = new ArrayList<>();
+        List<Double> yList = new ArrayList<>();
+
+        for (int i = 0; i < split.length; i+=3) {
+            double x = Double.parseDouble(split[i]);
+            double y = Double.parseDouble(split[i + 1]);
+
+            xList.add(x);
+            yList.add(y);
+        }
+
+        // 找最小 x 和 y
+        double minX = Collections.min(xList);
+        double minY = Collections.min(yList);
+
+        // 找最大 x 和 y
+        double maxX = Collections.max(xList);
+        double maxY = Collections.max(yList);
+
+        // 计算宽高
+        double width = maxX - minX;
+        double height = maxY - minY;
+        TRobotChargingAreaInfo tRobotChargingAreaInfo = new TRobotChargingAreaInfo();
+        tRobotChargingAreaInfo.setX(minX);
+        tRobotChargingAreaInfo.setY(minY);
+        tRobotChargingAreaInfo.setWidth(width);
+        tRobotChargingAreaInfo.setHeight(height);
+        tRobotChargingAreaInfo.setRobotId(robotId);
+        tRobotChargingAreaInfo.setImgUrl(tRobotInfo.getPhotePath());
+
+        return tRobotChargingAreaInfo;
     }
 }
