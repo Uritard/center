@@ -80,6 +80,7 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -1675,7 +1676,10 @@ public class IntelAnalysisService {
     public List<AnalyseResultItem> ocrAnalyse(OcrAnalyseRequest ocrAnalyseRequest) {
         Analysis analysis = new Analysis();
         Long id = IdUtil.getSnowflakeNextId();
-        analysis.setTaskId(AnalyseTypeEnum.OCR_RECOGNITION.getName()).setPicPath(ocrAnalyseRequest.getImagePath())
+        //路径转换
+        String picPath = ImageSplitUtil.convertPath(ocrAnalyseRequest.getImagePath(), Constant.SIMPLE_PIC,
+            SysParamConfig.getSysContent("simplePicPath"));
+        analysis.setTaskId(AnalyseTypeEnum.OCR_RECOGNITION.getName()).setPicPath(picPath)
             .setAnalyseType(AnalyseTypeEnum.OCR_RECOGNITION.getCode()).setInstanceId(id);
         analysis.setPicModelPath(JSON.toJSONString(ocrAnalyseRequest.getOcrBoxes()));
         try {
@@ -1691,7 +1695,11 @@ public class IntelAnalysisService {
                 throw new BusinessException("OCR分析失败！");
             }
             return res.getData();
+        } catch (TimeoutException te) {
+            log.error("OCR分析超时！", te);
+            throw new BusinessException("OCR分析超时！");
         } catch (Exception e) {
+            log.error("OCR分析失败！", e);
             throw new BusinessException("OCR分析失败！");
         } finally {
             CommonFutureUtil.removeFuture(String.valueOf(id));
@@ -1701,14 +1709,17 @@ public class IntelAnalysisService {
     /**
      * 自动标注识别接口
      *
-     * @param imagePath 图片地址
-     * @param type      类型   "zz_bj","sx_bj","yb","zsd","xn"
+     * @param targetBoxRequest 目标框选实体类
      * @return 识别结果
      */
-    public List<TargetBoxResult> autoLabelAnalyse(String imagePath, String type) {
+    public List<TargetBoxResult> autoLabelAnalyse(TargetBoxRequest targetBoxRequest) {
         Analysis analysis = new Analysis();
         Long id = IdUtil.getSnowflakeNextId();
-        analysis.setTaskId(AnalyseTypeEnum.TARGET_BOX_RECOGNITION.getName()).setPicPath(imagePath).setAnalyseType(type).setInstanceId(id);
+        //路径转换
+        String picPath = ImageSplitUtil.convertPath(targetBoxRequest.getImagePath(), Constant.SIMPLE_PIC,
+            SysParamConfig.getSysContent("simplePicPath"));
+        analysis.setTaskId(AnalyseTypeEnum.TARGET_BOX_RECOGNITION.getName()).setPicPath(picPath)
+            .setAnalyseType(targetBoxRequest.getType()).setInstanceId(id);
         try {
             CompletableFuture<com.yjh.video.api.result.Result<List<TargetBoxResult>>> future =
                 CommonFutureUtil.registerFuture(String.valueOf(id));
@@ -1721,7 +1732,11 @@ public class IntelAnalysisService {
                 throw new BusinessException("自动标注识别失败！");
             }
             return res.getData();
+        } catch (TimeoutException te) {
+            log.error("自动标注识分析超时！", te);
+            throw new BusinessException("自动标注识分析超时！");
         } catch (Exception e) {
+            log.error("自动标注识别失败！", e);
             throw new BusinessException("自动标注识别失败！");
         } finally {
             CommonFutureUtil.removeFuture(String.valueOf(id));

@@ -786,10 +786,6 @@ public class Constant {
      * 简易机器人底图相对路径
      */
     public static final String SIMPLE_PIC = "/imgs/simplePic/";
-    /**
-     * 简易机器人测点图相对路径
-     */
-    public static final String SIMPLE_POINT_PIC = "/imgs/simplePointPic/";
 
 }
 

@@ -15,6 +15,7 @@ import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.entity.interlanalysis.OcrAnalyseRequest;
+import com.yjh.platform.module.patrol.entity.interlanalysis.TargetBoxRequest;
 import com.yjh.platform.module.patrol.entity.interlanalysis.UpdateRequest;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
@@ -397,17 +398,16 @@ public class AnalysisController {
     /**
      * 自动标注识别接口
      *
-     * @param imagePath 待识别图片路径
-     * @param type  类型   "zz_bj","sx_bj","yb","zsd","xn"
+     * @param request 目标框选实体类
      * @return PicAnalyseResponse
      */
     @ApiOperation(value = "自动标注识别接口")
     @PostMapping(value = "/autoLabelAnalyse")
-    @Logs(title = "ocr识别接口", content = "ocr识别接口", logType = 5, authority = "1234")
-    public Result autoLabelAnalyse(@RequestParam(value = "imagePath") String imagePath, @RequestParam(value = "type") String type) {
+    @Logs(title = "自动标注识别接口", content = "自动标注识别接口", logType = 5, authority = "1234")
+    public Result autoLabelAnalyse(@RequestBody TargetBoxRequest request) {
         Result result = new Result();
         try {
-            result.setData(intelAnalysisService.autoLabelAnalyse(imagePath, type));
+            result.setData(intelAnalysisService.autoLabelAnalyse(request));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

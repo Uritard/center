@@ -1,6 +1,5 @@
 package com.yjh.platform.module.device.entity;
 
-import com.sun.org.glassfish.gmbal.Description;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

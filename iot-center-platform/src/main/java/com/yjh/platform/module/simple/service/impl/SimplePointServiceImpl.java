@@ -16,6 +16,7 @@ import com.yjh.platform.module.simple.entity.BasePhotoInfo;
 import com.yjh.platform.module.simple.service.SimplePointService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SimplePointServiceImpl implements SimplePointService {
 
+    /**
+     * 临时路径
+     */
+    private static final String TEMP_PATH = "temp";
     /**
      * 主图分割命名前缀
      */
@@ -76,8 +81,7 @@ public class SimplePointServiceImpl implements SimplePointService {
         }
         try {
             //将底图拷贝到临时目录下
-            String tempPath =
-                SysParamConfig.getSysContent("tempReflect") + File.separator + deviceId + File.separator + photoFile.getName();
+            String tempPath = photoFile.getParent() + File.separator + TEMP_PATH + File.separator + photoFile.getName();
             File tempFile = new File(tempPath);
             FileUtil.mkParentDirs(tempFile);
             FileUtil.copyFile(photoFile, tempFile, StandardCopyOption.REPLACE_EXISTING);
@@ -107,11 +111,9 @@ public class SimplePointServiceImpl implements SimplePointService {
             throw new BusinessException("拆分数量必须大于0");
         }
 
-        String tempPath = SysParamConfig.getSysContent("tempReflect");
-        String tempRePath = SysParamConfig.getSysContent("meteModelPath");
-
         // 转换获取绝对路径
-        String mainPath = ImageSplitUtil.convertPath(basePhotoInfo.getMainPath(), tempRePath, tempPath);
+        String mainPath = ImageSplitUtil.convertPath(basePhotoInfo.getMainPath(), Constant.SIMPLE_PIC,
+                SysParamConfig.getSysContent("simplePicPath"));
         File file = new File(mainPath);
 
         if (!file.exists()) {
@@ -125,7 +127,8 @@ public class SimplePointServiceImpl implements SimplePointService {
                 ImageSplitUtil.splitImage(file, splitNum, ImageSplitUtil.ImageSplitType.HORIZONTAL, MAIN_POINT_PREFIX);
             result.put("mainPaths", splitImageList);
             if (StringUtils.isNotBlank(basePhotoInfo.getSparePath())) {
-                String sparePath = ImageSplitUtil.convertPath(basePhotoInfo.getSparePath(), tempRePath, tempPath);
+                String sparePath = ImageSplitUtil.convertPath(basePhotoInfo.getSparePath(), Constant.SIMPLE_PIC,
+                    SysParamConfig.getSysContent("simplePicPath"));
                 File spareFile = new File(sparePath);
                 if (spareFile.exists()) {
                     List<String> splitSpareImageList =
@@ -154,21 +157,23 @@ public class SimplePointServiceImpl implements SimplePointService {
         if (buildList == null || buildList.size() == 0) {
             throw new BusinessException("底图信息不能为空！");
         }
-        String tempPath = SysParamConfig.getSysContent("tempReflect");
-        String tempRePath = SysParamConfig.getSysContent("meteModelPath");
-        String simplePointPicPath = SysParamConfig.getSysContent("simplePointPicPath");
+        String simplePicPath = SysParamConfig.getSysContent("simplePicPath");
         List<TRobotInspection> robotInspections = new ArrayList<>();
         Long deviceId = buildList.get(0).getDeviceId();
+        String devicePath = simplePicPath + File.separator + deviceId + File.separator;
+        List<TRobotInspection> inspections =
+            tRobotInspectionService.selectByPage(new TRobotInspection().setMainDeviceId(String.valueOf(deviceId)));
         try {
             String componentId = IdUtil.getSnowflakeNextIdStr();
             for (BasePhotoBuild build : buildList) {
                 String inspectionCode = IdUtil.getSnowflakeNextIdStr();
-                String sourcePath = ImageSplitUtil.convertPath(build.getPhotoPath(), tempRePath, tempPath);
+                String sourcePath = ImageSplitUtil.convertPath(build.getPhotoPath(), Constant.SIMPLE_PIC, simplePicPath);
                 File sourceFile = new File(sourcePath);
                 if (!sourceFile.exists()) {
                     throw new BusinessException("底图文件不存在！");
                 }
-                String targetPath = simplePointPicPath + File.separator + inspectionCode + File.separator + ORIGINAL_PIC;
+                //目标路径确认
+                String targetPath = devicePath + inspectionCode + File.separator + ORIGINAL_PIC;
                 FileUtil.mkParentDirs(targetPath);
                 //将临时文件拷贝到简易测点图片目录下
                 FileUtil.copyFile(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
@@ -176,20 +181,30 @@ public class SimplePointServiceImpl implements SimplePointService {
                 robotInspection.setInspectionType(1).setInspectionCode(inspectionCode).setRobotId(build.getRobotId()).setSaveTypeList("jpg")
                     .setInspectionName(build.getDeviceName() + "/" + build.getPhotoName()).setPhotoNum(build.getPhotoNum())
                     .setMainDeviceId(String.valueOf(build.getDeviceId())).setComponentId(componentId)
-                    .setPropertyPicPath(ImageSplitUtil.convertPath(targetPath, simplePointPicPath, Constant.SIMPLE_POINT_PIC));
+                    .setPropertyPicPath(ImageSplitUtil.convertPath(targetPath, simplePicPath, Constant.SIMPLE_PIC));
                 robotInspections.add(robotInspection);
             }
             int res = tRobotInspectionService.batchInsert(robotInspections);
             if (res > 0) {
+                //如果该点位之前有数据，则删除
+                if (CollectionUtils.isNotEmpty(inspections)) {
+                    for (TRobotInspection inspection : inspections) {
+                        FileUtil.del(ImageSplitUtil.convertPath(inspection.getPropertyPicPath(), Constant.SIMPLE_PIC, simplePicPath));
+                        tRobotInspectionService.deleteByPrimaryId(inspection.getInspectionId());
+                    }
+                }
                 //清理临时文件
-                FileUtil.clean(tempPath + File.separator + deviceId + File.separator);
+                FileUtil.clean(devicePath + TEMP_PATH);
             }
             return res > 0;
         } catch (Exception e) {
             log.error("底图保存异常！", e);
             robotInspections.forEach(
-                f -> FileUtil.del(ImageSplitUtil.convertPath(f.getPropertyPicPath(), Constant.SIMPLE_POINT_PIC, simplePointPicPath)));
+                f -> FileUtil.del(ImageSplitUtil.convertPath(f.getPropertyPicPath(), Constant.SIMPLE_PIC, simplePicPath)));
             throw new BusinessException("底图保存异常！");
+        } finally {
+            //清理临时文件
+            FileUtil.cleanEmpty(new File(devicePath));
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.yjh.platform.common.utils;
 
 import cn.hutool.core.io.FileUtil;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.configuration.SysParamConfig;
 
 import javax.imageio.ImageIO;
@@ -23,15 +24,14 @@ public class ImageSplitUtil {
     /**
      * 图片分割
      *
-     * @param file     图片文件
-     * @param splitNum 分割数量
-     * @param type     分割类型
-     * @return 分割后的图片相对路径 临时路径下
+     * @param file       图片文件
+     * @param splitNum   分割数量
+     * @param type       分割类型
+     * @param namePrefix 图片名称前缀
+     * @return 分割后的图片相对路径
      * @throws Exception 抛出异常
      */
     public static List<String> splitImage(File file, Integer splitNum, ImageSplitType type, String namePrefix) throws Exception {
-        String tempPath = SysParamConfig.getSysContent("tempReflect");
-        String tempRePath = SysParamConfig.getSysContent("meteModelPath");
         BufferedImage image = ImageIO.read(file);
         // 获取图片宽度和高度
         int width = image.getWidth();
@@ -58,7 +58,8 @@ public class ImageSplitUtil {
             String splitPath = file.getParent() + File.separator + namePrefix + (i + 1) + ".jpg";
             File output = new File(splitPath);
             ImageIO.write(splitImage, "jpg", output);
-            paths.add(convertPath(splitPath, tempPath, tempRePath));
+            //路径转换
+            paths.add(convertPath(splitPath, SysParamConfig.getSysContent("simplePicPath"), Constant.SIMPLE_PIC));
         }
         return paths;
     }
