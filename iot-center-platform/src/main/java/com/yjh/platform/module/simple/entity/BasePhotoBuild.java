@@ -29,6 +29,11 @@ public class BasePhotoBuild {
     private String deviceName;
 
     /**
+     * 中心点偏移量
+     */
+    private String offset;
+
+    /**
      * 底图信息
      */
     private List<PointPhotoInfo> photoInfo;

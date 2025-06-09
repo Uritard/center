@@ -161,6 +161,7 @@ public class SimplePointServiceImpl implements SimplePointService {
      * @return Boolean
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean basePhotoBuild(BasePhotoBuild photoBuild) {
         if (CollectionUtils.isNotEmpty(photoBuild.getPhotoInfo())) {
             throw new BusinessException("底图信息不能为空！");
@@ -201,6 +202,10 @@ public class SimplePointServiceImpl implements SimplePointService {
                         tRobotInspectionService.deleteByPrimaryId(inspection.getInspectionId());
                     }
                 }
+                //更新设备名称 + 偏移量
+                TStdDevice stdDevice = new TStdDevice();
+                stdDevice.setDeviceId(photoBuild.getDeviceId()).setDeviceName(photoBuild.getDeviceName());
+                stdDeviceService.update(stdDevice);
                 //清理临时文件
                 FileUtil.clean(devicePath + TEMP_PATH);
             }
