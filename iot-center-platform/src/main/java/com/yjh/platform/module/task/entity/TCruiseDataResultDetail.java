@@ -175,6 +175,10 @@ public class TCruiseDataResultDetail implements Serializable {
      */
     private Integer meteType;
     /**
+     * 测点类型名称
+     */
+    private String meteTypeName;
+    /**
      * 分贝告警值
      */
     private String dbValue;
@@ -210,5 +214,16 @@ public class TCruiseDataResultDetail implements Serializable {
     private Long instanceId;
 
     private  Integer isWarn;
+
+    /**
+     * 任务结果对象
+     * */
+     private TaskVO taskVO;
+
+     private Integer redundantType;
+
+     private String redundantTypeName;
+
+     private Integer identifyState;
 
 }

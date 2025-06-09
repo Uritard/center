@@ -10,9 +10,9 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.*;
-import com.yjh.platform.common.utils.smUtil.report.ReportDataModel;
 import com.yjh.platform.common.utils.smUtil.report.ReportDataRepo;
 import com.yjh.platform.common.utils.smUtil.report.ReportHelper;
+import com.yjh.platform.common.utils.smUtil.report.SIReportDataModel;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -217,7 +218,7 @@ public class ReportManageService {
         try {
             // 明细
             List<TCruiseDataResultDetail> cruiseDataResultDetailList =  uPatrolResultDao.selectTaskResult(taskId);
-            DictConvertUtil.optional("alarmLevel").add("alarmRuleType").covertToDict(cruiseDataResultDetailList);
+            DictConvertUtil.optional("alarmLevel").add("alarmRuleType").add("meteType").add("redundantType").covertToDict(cruiseDataResultDetailList);
             // 更新任务进度
             REPORT_CACHE.put(taskId, 15);
             log.info("查询任务结果完成，{}", taskId);
@@ -242,13 +243,14 @@ public class ReportManageService {
 
                     ReportData recordData = new ReportData();
                     recordData.setTaskVO(taskVO);
+                    detailList.forEach(s->s.setTaskVO(taskVO));
 
                     recordData.setDownResultPic(downResultPic);
 
                     recordData.setTCDRDList(detailList);
                     recordData.setNonList(nonList);
 
-                    ContentData contentData = ReportDataModel.getData(recordData);
+                    ContentData contentData = SIReportDataModel.getData(recordData);
 
                     contentDataList.add(new DefaultKeyValue<>(k.getValue(), contentData));
                 } catch (Exception e) {
@@ -427,22 +429,29 @@ public class ReportManageService {
         long unReviewCount = tCruiseDataResultDetailList.stream().filter(detail -> CommonUtils.equals(detail.getEvaluationState(), CruiseConstant.EVALUATION_STATE_UN)
                 && CommonUtils.equals(detail.getCruiseResult(), CruiseConstant.CRUISE_RESULT_ABNORMAL)).count();
         // 已检点数
-        // long alreadyCount = tCruiseDataResultDetailList.stream().filter(detail ->
-        //         !ArrayUtils.contains(new String[]{"超时", "任务终止", "设备检修中", "机器人离线,未执行", "机器人处于检修状态,未执行"}, detail.getResultDesc())).count();
         long alreadyCount = tCruiseDataResultDetailList.stream().filter(detail -> CommonUtils.equals(detail.getCruiseState(), CruiseConstant.CRUISE_STATE_DONE)).count();
+        //缺陷点数
+        long defectCount = tCruiseDataResultDetailList.stream().filter(datail -> CommonUtils.equals(datail.getIsWarn(), 1)).count();
         //未检点数
         long waitCount= allCount - alreadyCount;
-        //异常点数
-        long abnormalCount = allCount - normalCount - unReviewCount;
-
-        StringJoiner stringJoiner = new StringJoiner(",","","。");
-        stringJoiner.add("总点位" + allCount + "个");
-        stringJoiner.add("已检点位" + alreadyCount + "个");
-        stringJoiner.add("未检点位" + waitCount + "个");
-        stringJoiner.add("正常点位" + normalCount + "个");
-        stringJoiner.add("异常点位" + abnormalCount + "个");
-        stringJoiner.add("待人工确认点位" + unReviewCount + "个");
-        return stringJoiner.toString();
+        //误报点数
+        long abnormalCount = tCruiseDataResultDetailList.stream().filter(datail->CommonUtils.equals(datail.getIdentifyState(),259)).count();
+        //构建格式化对象
+        DecimalFormat df = new DecimalFormat("#");
+        //漏检率
+        double undetectedRate=((double)waitCount/allCount)*100;
+        //任务闭环率
+        double taskClosureRate=((double)normalCount/allCount)*100;
+        //构建StringBuilder对象
+        StringBuilder sb = new StringBuilder();
+        sb.append("本次任务共巡视点位"+allCount+"个,");
+        sb.append("其中: 缺陷点位"+defectCount+"个、");
+        sb.append("漏报点位"+waitCount+"个、");
+        sb.append("误报点位"+abnormalCount+"个、");
+        sb.append("正常点位"+normalCount+"个,");
+        sb.append("漏检率"+df.format(undetectedRate)+"%,");
+        sb.append("任务闭环率"+df.format(taskClosureRate)+"%。");
+        return sb.toString();
     }
 
     @Transactional(rollbackFor = Exception.class)
