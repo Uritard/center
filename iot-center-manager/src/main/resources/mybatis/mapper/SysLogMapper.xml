@@ -145,6 +145,7 @@
         <if test="userName != null and userName != ''"> and a.user_name like CONCAT('%',#{userName, jdbcType=VARCHAR},'%')</if>
         <if test="logType != null and logType != ''"> and a.log_type = #{logType, jdbcType=VARCHAR}</if>
         <if test="startTime != null and endTime != null"> and  a.create_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+
          order by a.create_time desc
     </select>
 

@@ -15,11 +15,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 public class BasePhotoInfo {
-
-    /**
-     * 设备Id
-     */
-    private Long deviceId;
     /**
      * 主图路径
      */
@@ -32,8 +27,4 @@ public class BasePhotoInfo {
      * 分割数
      */
     private Integer splitNum;
-    /**
-     * 中心点偏移量
-     */
-    private String offset;
 }

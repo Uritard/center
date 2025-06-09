@@ -617,4 +617,12 @@ public class TCruisePointInstanceService{
         return object == null || function == null ? null : function.apply(object);
     }
 
+    /**
+     * 根据巡检任务id删除巡检点实例
+     * @param inspectionId 机器人巡检任务id
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteByCruiseId(Long inspectionId) {
+        tCruisePointInstanceDao.deleteByCruiseId(inspectionId);
+    }
 }

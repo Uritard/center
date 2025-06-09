@@ -5,6 +5,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.simple.entity.BasePhotoBuild;
 import com.yjh.platform.module.simple.entity.BasePhotoInfo;
+import com.yjh.platform.module.simple.entity.CalibrationDataBuild;
 import com.yjh.platform.module.simple.service.SimplePointService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -51,7 +52,7 @@ public class SimplePointController {
         Result result = new Result();
         try {
             result.setData(simplePointService.splitPhoto(basePhotoInfo));
-        } catch (BusinessException b) { 
+        } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -62,15 +63,30 @@ public class SimplePointController {
 
     @ApiOperation(value = "底图保存")
     @PostMapping(value = "/basePhotoBuild")
-    public Result basePhotoBuild(@RequestBody List<BasePhotoBuild> buildList) {
+    public Result basePhotoBuild(@RequestBody BasePhotoBuild photoBuild) {
         Result result = new Result();
         try {
-            result.setData(simplePointService.basePhotoBuild(buildList));
+            result.setData(simplePointService.basePhotoBuild(photoBuild));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("底图保存接口调用错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "子点位标定数据保存")
+    @PostMapping(value = "/calibrationDataBuild")
+    public Result calibrationDataBuild(@RequestBody CalibrationDataBuild dataBuild) {
+        Result result = new Result();
+        try {
+            result.setData(simplePointService.calibrationDataBuild(dataBuild));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("子点位标定数据保存接口调用错误:", e);
         }
         return result;
     }

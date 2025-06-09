@@ -611,6 +611,9 @@
             #{instanceId,jdbcType=BIGINT}
         </foreach>
     </delete>
+    <delete id="deleteByCruiseId">
+        delete from t_cruise_point_instance where cruise_id = #{inspectionId,jdbcType=BIGINT}
+    </delete>
 
     <select id="selectInstanceName" parameterType="java.lang.Long" resultType="java.lang.String">
         SELECT

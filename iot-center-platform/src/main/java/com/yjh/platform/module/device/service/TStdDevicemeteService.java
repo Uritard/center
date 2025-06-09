@@ -717,6 +717,14 @@ public class TStdDevicemeteService{
         }
         return response;
     }
-
+    /**
+     * 根据部件id 删除标准测点信息
+     * @param componentId 部件id
+     * @return 删除数量
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteByComponentId(String componentId) {
+        return tStdDevicemeteDao.deleteByComponentId(componentId);
+    }
 }
 

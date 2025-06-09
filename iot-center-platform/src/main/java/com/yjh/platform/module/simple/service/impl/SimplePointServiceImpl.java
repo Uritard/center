@@ -1,24 +1,30 @@
 package com.yjh.platform.module.simple.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import cn.hutool.core.io.FileUtil;
 import com.yjh.platform.common.utils.ImageSplitUtil;
 import com.yjh.platform.configuration.SysParamConfig;
+import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.device.entity.TStdDevice;
+import com.yjh.platform.module.device.service.TCruisePointInstanceService;
 import com.yjh.platform.module.device.service.TRobotInspectionService;
 import com.yjh.platform.module.device.service.TStdDeviceService;
-import com.yjh.platform.module.simple.entity.BasePhotoBuild;
-import com.yjh.platform.module.simple.entity.BasePhotoInfo;
+import com.yjh.platform.module.device.entity.TStdDeviceMete;
+import com.yjh.platform.module.device.service.TStdDevicemeteService;
+import com.yjh.platform.module.patrol.CruiseConstant;
+import com.yjh.platform.module.simple.entity.*;
 import com.yjh.platform.module.simple.service.SimplePointService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,6 +66,8 @@ public class SimplePointServiceImpl implements SimplePointService {
 
     private final TRobotInspectionService tRobotInspectionService;
     private final TStdDeviceService stdDeviceService;
+    private final TStdDevicemeteService stdDeviceMeteService;
+    private final TCruisePointInstanceService cruisePointInstanceService;
 
     /**
      * 获取底图
@@ -149,23 +157,24 @@ public class SimplePointServiceImpl implements SimplePointService {
     /**
      * 底图保存
      *
-     * @param buildList 底图信息
+     * @param photoBuild 底图信息
      * @return Boolean
      */
     @Override
-    public Boolean basePhotoBuild(List<BasePhotoBuild> buildList) {
-        if (buildList == null || buildList.size() == 0) {
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean basePhotoBuild(BasePhotoBuild photoBuild) {
+        if (CollectionUtils.isNotEmpty(photoBuild.getPhotoInfo())) {
             throw new BusinessException("底图信息不能为空！");
         }
         String simplePicPath = SysParamConfig.getSysContent("simplePicPath");
         List<TRobotInspection> robotInspections = new ArrayList<>();
-        Long deviceId = buildList.get(0).getDeviceId();
+        Long deviceId = photoBuild.getDeviceId();
         String devicePath = simplePicPath + File.separator + deviceId + File.separator;
         List<TRobotInspection> inspections =
             tRobotInspectionService.selectByPage(new TRobotInspection().setMainDeviceId(String.valueOf(deviceId)));
         try {
             String componentId = IdUtil.getSnowflakeNextIdStr();
-            for (BasePhotoBuild build : buildList) {
+            for (PointPhotoInfo build : photoBuild.getPhotoInfo()) {
                 String inspectionCode = IdUtil.getSnowflakeNextIdStr();
                 String sourcePath = ImageSplitUtil.convertPath(build.getPhotoPath(), Constant.SIMPLE_PIC, simplePicPath);
                 File sourceFile = new File(sourcePath);
@@ -178,9 +187,9 @@ public class SimplePointServiceImpl implements SimplePointService {
                 //将临时文件拷贝到简易测点图片目录下
                 FileUtil.copyFile(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
                 TRobotInspection robotInspection = new TRobotInspection();
-                robotInspection.setInspectionType(1).setInspectionCode(inspectionCode).setRobotId(build.getRobotId()).setSaveTypeList("jpg")
-                    .setInspectionName(build.getDeviceName() + "/" + build.getPhotoName()).setPhotoNum(build.getPhotoNum())
-                    .setMainDeviceId(String.valueOf(build.getDeviceId())).setComponentId(componentId)
+                robotInspection.setInspectionType(1).setInspectionCode(inspectionCode).setRobotId(photoBuild.getRobotId()).setSaveTypeList("jpg")
+                    .setInspectionName(photoBuild.getDeviceName() + "/" + build.getPhotoName()).setPhotoNum(build.getPhotoNum())
+                    .setMainDeviceId(String.valueOf(photoBuild.getDeviceId())).setComponentId(componentId)
                     .setPropertyPicPath(ImageSplitUtil.convertPath(targetPath, simplePicPath, Constant.SIMPLE_PIC));
                 robotInspections.add(robotInspection);
             }
@@ -193,6 +202,10 @@ public class SimplePointServiceImpl implements SimplePointService {
                         tRobotInspectionService.deleteByPrimaryId(inspection.getInspectionId());
                     }
                 }
+                //更新设备名称 + 偏移量
+                TStdDevice stdDevice = new TStdDevice();
+                stdDevice.setDeviceId(photoBuild.getDeviceId()).setDeviceName(photoBuild.getDeviceName());
+                stdDeviceService.update(stdDevice);
                 //清理临时文件
                 FileUtil.clean(devicePath + TEMP_PATH);
             }
@@ -206,5 +219,62 @@ public class SimplePointServiceImpl implements SimplePointService {
             //清理临时文件
             FileUtil.cleanEmpty(new File(devicePath));
         }
+    }
+
+    /**
+     * 子点位标定数据保存
+     *
+     * @param dataBuild 标定数据信息
+     * @return Boolean
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean calibrationDataBuild(CalibrationDataBuild dataBuild) {
+        if (CollectionUtils.isEmpty(dataBuild.getDeviceConfig())) {
+            throw new BusinessException("子点位标定数据不能为空！");
+        }
+        TRobotInspection robotInspection = tRobotInspectionService.selectByPrimaryId(dataBuild.getInspectionId());
+        if (robotInspection == null) {
+            throw new BusinessException("外观点位信息不存在！");
+        }
+        //清理子点位标定数据
+        cruisePointInstanceService.deleteByCruiseId(robotInspection.getInspectionId());
+        stdDeviceMeteService.deleteByComponentId(robotInspection.getComponentId());
+
+        List<DeviceConfig> deviceConfigList = dataBuild.getDeviceConfig();
+        List<TStdDeviceMete> deviceMeteList = new ArrayList<>(deviceConfigList.size());
+        for (DeviceConfig config : deviceConfigList) {
+            AnalyseMeteTypeEnum typeEnum = AnalyseMeteTypeEnum.findAny(config.getDevType());
+            TStdDeviceMete stdDeviceMete = new TStdDeviceMete();
+            stdDeviceMete.setDeviceId(Long.valueOf(robotInspection.getMainDeviceId())).setMeteName(config.getDevName()).setCustomId("700")
+                .setCustomName("本体").setMeteType(String.valueOf(typeEnum.getCode())).setAnalyseType(typeEnum.getType()).setIsAi("off")
+                .setIsJudge("off").setIsTemdif(0).setInspectionType("1").setPositionType("simple").setRedundantType("1")
+                .setComponentId(robotInspection.getComponentId());
+            deviceMeteList.add(stdDeviceMete);
+        }
+        int resMete = stdDeviceMeteService.batchAdd(deviceMeteList);
+        if (resMete > 0) {
+            List<TCruisePointInstance> cruisePointInstanceList = new ArrayList<>(resMete);
+            for (int i = 0; i < deviceMeteList.size(); i++) {
+                TCruisePointInstance cruisePointInstance = new TCruisePointInstance();
+                cruisePointInstance.setDeviceMeteId(deviceMeteList.get(i).getDeviceMeteId())
+                    .setDeviceId(deviceMeteList.get(i).getDeviceId()).setCruiseId(robotInspection.getInspectionId())
+                    .setCruiseName(deviceMeteList.get(i).getMeteName()).setCruiseType(CruiseConstant.TypeEnum.ROBOT.getCode());
+                cruisePointInstanceList.add(cruisePointInstance);
+                deviceConfigList.get(i).setDevUuid(String.valueOf(deviceMeteList.get(i).getDeviceMeteId()));
+            }
+            int resInstance = cruisePointInstanceService.batchInsert(cruisePointInstanceList);
+            if (resInstance > 0) {
+                //更新点位的标定信息
+                TRobotInspection deviceInfo = new TRobotInspection();
+                deviceInfo.setInspectionId(robotInspection.getInspectionId()).setDeviceInfo(JSON.toJSONString(deviceConfigList));
+                int a = tRobotInspectionService.update(deviceInfo);
+                if (a > 0) {
+                    //todo 调用算法模块 更新算法标定信息
+                }
+                return a > 0;
+            }
+        }
+        return false;
     }
 }

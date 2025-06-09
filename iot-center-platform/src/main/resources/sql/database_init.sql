@@ -1711,6 +1711,7 @@ CREATE TABLE `t_robot_inspection` (
   `phase` varchar(255) DEFAULT '' COMMENT '相位，A相B相C相',
   `device_info` varchar(255) DEFAULT '' COMMENT '备注信息',
   `property_pic_path` varchar(255) DEFAULT '' COMMENT '测点属性图',
+  `photo_num` INT NULL DEFAULT NULL COMMENT '照片序号 柜面第几张照片的序号',
   PRIMARY KEY (`inspection_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=100000000 DEFAULT CHARSET=utf8mb4 COMMENT='机器人测点信息表';
 

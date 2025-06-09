@@ -374,6 +374,12 @@ INSERT INTO `t_algorithm_info` VALUES ('1000056', '膨胀器冲顶', 'pzqcd', ''
 INSERT INTO `t_algorithm_info` VALUES ('1000057', '电容器鼓肚', 'drqgd', '', '', '398', '0', '688', '132');
 INSERT INTO `t_algorithm_info` VALUES ('1000058', '地面沉降', 'dmcj', '', '', '398', '0', '689', '132');
 INSERT INTO `t_algorithm_info` VALUES ('1000059', '人员闯入', 'rycr', '', '', '398', '0', '839', '132');
+INSERT INTO `t_algorithm_info` VALUES ('1000060', 'ocr识别', 'ocr', '', '015', '15', '1', '450', '1');
+INSERT INTO `t_algorithm_info` VALUES ('1000061', '新表计-指针', 'new_meter', '', '017', '17', '1', '450', '1');
+INSERT INTO `t_algorithm_info` VALUES ('1000062', '新表计-数显', 'new_meter', '', '018', '18', '1', '450', '1');
+INSERT INTO `t_algorithm_info` VALUES ('1000063', '新压板', 'new_meter', '', '019', '19', '1', '450', '1');
+INSERT INTO `t_algorithm_info` VALUES ('1000064', '新指示灯', 'new_meter', '', '020', '20', '1', '450', '1');
+INSERT INTO `t_algorithm_info` VALUES ('1000065', '新旋钮', 'new_meter', '', '021', '21', '1', '450', '1');
 -- ----------------------------
 -- Records of t_dict_business
 -- ----------------------------
@@ -982,6 +988,11 @@ INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, 
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('890', 'robot_factory', '普宙', '0', '生产厂家', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('891', 'robot_factory', '惊鸣', '0', '生产厂家', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('675', 'drone_position', '室外无人机', '0', '无人机类型', '2');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('17', 'analyse_type', '新表计-指针', '0', '算法类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('18', 'analyse_type', '新表计-数显', '0', '算法类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('19', 'analyse_type', '新压板', '0', '算法类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('20', 'analyse_type', '新指示灯', '0', '算法类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('21', 'analyse_type', '新旋钮', '0', '算法类型', '1');
 -- ----------------------------
 -- Records of t_period_model
 -- ----------------------------

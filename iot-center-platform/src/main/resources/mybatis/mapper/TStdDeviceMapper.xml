@@ -150,11 +150,11 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		<if test="upRegionName != null ">a.up_region_name = #{upRegionName},</if>
 		<if test="customType != null ">a.custom_type = #{customType, jdbcType=INTEGER},</if>
 		<if test="status != null ">a.status = #{status, jdbcType=INTEGER},</if>
-		a.preset_id = #{presetId},
-		a.camera_id = #{cameraId},
-		a.node_id = #{nodeId},
+		<if test="presetId != null ">a.preset_id = #{presetId},</if>
+		<if test="cameraId != null ">a.camera_id = #{cameraId},</if>
+		<if test="nodeId != null ">a.node_id = #{nodeId},</if>
 		a.update_time = CURRENT_TIMESTAMP(),
-		a.real_code = #{realCode},
+		<if test="realCode != null ">a.real_code = #{realCode},</if>
 	</set>
 		where a.device_id = #{deviceId, jdbcType=VARCHAR}
 	</update>
