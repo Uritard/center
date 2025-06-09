@@ -1284,6 +1284,7 @@
         b.alarm_rule_type,
         conf.db_value as dbValue,
         conf.f_value as fValue,
+        b.redundant_type,
         a.up_region_id as regionId,
         a.up_region_name as intervalName,
         m.region_name as regionName,
