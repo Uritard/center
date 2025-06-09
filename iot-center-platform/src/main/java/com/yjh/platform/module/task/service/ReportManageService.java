@@ -10,6 +10,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.*;
+import com.yjh.platform.common.utils.smUtil.report.ReportDataModel;
 import com.yjh.platform.common.utils.smUtil.report.ReportDataRepo;
 import com.yjh.platform.common.utils.smUtil.report.ReportHelper;
 import com.yjh.platform.common.utils.smUtil.report.SIReportDataModel;
@@ -232,26 +233,35 @@ public class ReportManageService {
 
             //顺便处理非同源合并问题
             List<NonhomologousInfo> nonList = uPatrolResultDao.selectWarnByTaskId(taskId);
-
+            //获取导出模板类型
+            String defaultReportExport = SysParamConfig.getSysContent("defaultReportExport");
             List<KeyValue<String, ContentData>> contentDataList = new ArrayList<>();
             TaskVO taskBaseVO = getTaskVoDefined(taskId);
             listMap.forEach((k, detailList)->{
                 try {
                     TaskVO taskVO = new TaskVO();
                     BeanUtil.copyProperties(taskBaseVO, taskVO);
-                    taskVO.setCruiseStatistics(getTaskVoCount(detailList));
-
+                    if (Boolean.parseBoolean(defaultReportExport)){
+                        //默认
+                        taskVO.setCruiseStatistics(getTaskVoCount(detailList));
+                    }else {
+                        //新模板
+                        taskVO.setCruiseStatistics(getTaskVoCount2(detailList));
+                        detailList.forEach(s->s.setTaskVO(taskVO));
+                    }
                     ReportData recordData = new ReportData();
                     recordData.setTaskVO(taskVO);
-                    detailList.forEach(s->s.setTaskVO(taskVO));
-
                     recordData.setDownResultPic(downResultPic);
-
                     recordData.setTCDRDList(detailList);
                     recordData.setNonList(nonList);
-
-                    ContentData contentData = SIReportDataModel.getData(recordData);
-
+                    ContentData contentData=null;
+                    if (CommonUtils.equals(Boolean.parseBoolean(defaultReportExport),Boolean.TRUE)){
+                          //默认模板
+                          contentData= ReportDataModel.getData(recordData);
+                    }else {
+                         //新模板
+                         contentData = SIReportDataModel.getData(recordData);
+                    }
                     contentDataList.add(new DefaultKeyValue<>(k.getValue(), contentData));
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -417,6 +427,41 @@ public class ReportManageService {
     }
 
     public String getTaskVoCount(List<TCruiseDataResultDetail> tCruiseDataResultDetailList) {
+        // 总点数
+        long allCount = tCruiseDataResultDetailList.size();
+        // 正常，巡视结果正常且无告警，且未审核 或 无需审核 或 审核结果正常
+        long normalCount = tCruiseDataResultDetailList.stream()
+            .filter(detail -> CommonUtils.equals(detail.getCruiseResult(), CruiseConstant.CRUISE_RESULT_NORMAL) && CommonUtils.equals(detail.getIsWarn(), 0)
+                && (CommonUtils.equals(detail.getEvaluationState(), CruiseConstant.EVALUATION_STATE_UN) || CommonUtils.equals(detail.getEvaluationState(), CruiseConstant.EVALUATION_STATE_IGNORE)
+                || CommonUtils.equals(detail.getIdentifyResult(), CruiseConstant.IDENTIFY_RESULT_NORMAL)))
+            .count();
+        // 待人工确认，未审核，且巡视结果异常
+        long unReviewCount = tCruiseDataResultDetailList.stream()
+            .filter(detail -> CommonUtils.equals(detail.getEvaluationState(), CruiseConstant.EVALUATION_STATE_UN) && CommonUtils.equals(
+                detail.getCruiseResult(), CruiseConstant.CRUISE_RESULT_ABNORMAL))
+            .count();
+        // 已检点数
+        // long alreadyCount = tCruiseDataResultDetailList.stream().filter(detail ->
+        //         !ArrayUtils.contains(new String[]{"超时", "任务终止", "设备检修中", "机器人离线,未执行", "机器人处于检修状态,未执行"}, detail.getResultDesc())).count();
+        long alreadyCount = tCruiseDataResultDetailList.stream()
+            .filter(detail -> CommonUtils.equals(detail.getCruiseState(), CruiseConstant.CRUISE_STATE_DONE))
+            .count();
+        //未检点数
+        long waitCount = allCount - alreadyCount;
+        //异常点数
+        long abnormalCount = allCount - normalCount - unReviewCount;
+
+        StringJoiner stringJoiner = new StringJoiner(",", "", "。");
+        stringJoiner.add("总点位" + allCount + "个");
+        stringJoiner.add("已检点位" + alreadyCount + "个");
+        stringJoiner.add("未检点位" + waitCount + "个");
+        stringJoiner.add("正常点位" + normalCount + "个");
+        stringJoiner.add("异常点位" + abnormalCount + "个");
+        stringJoiner.add("待人工确认点位" + unReviewCount + "个");
+        return stringJoiner.toString();
+    }
+
+    public String getTaskVoCount2(List<TCruiseDataResultDetail> tCruiseDataResultDetailList) {
         // 总点数
         long allCount = tCruiseDataResultDetailList.size();
         // 正常，巡视结果正常且无告警，且未审核 或 无需审核 或 审核结果正常
