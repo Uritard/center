@@ -21,4 +21,14 @@ public class OcrBox {
      * 旋转后的坐标框
      */
     private RotateBox rotateBox;
+
+    /**
+     * 文字类型的参数
+     */
+    private String ocrType;
+
+    /**
+     * 旋钮文字信息
+     */
+    private String ocrContent;
 }

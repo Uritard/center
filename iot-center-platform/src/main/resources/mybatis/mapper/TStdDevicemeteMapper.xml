@@ -559,7 +559,7 @@
         <if test="meteName != null and meteName != ''"> and a.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
     </select>
 
-    <insert id="batchAdd">
+    <insert id="batchAdd" useGeneratedKeys="true" keyProperty="deviceMeteId" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete">
         insert into t_std_devicemete(
             device_mete_id,
             device_id,
@@ -591,15 +591,17 @@
             alarm_cnt,
             threshold_abs,
             threshold_per,
-            mete_type
+            mete_type,
             modulus,
             remark,
+            redundant_type,
             state_zero,
             state_one,
             is_temdif,
             alarm_state,
             alarm_rule_type,
-            label_attri
+            label_attri,
+            component_id
         )values
         <foreach collection="list" item="TStdDevicemete" separator=",">
             (
@@ -636,12 +638,14 @@
                 #{TStdDevicemete.meteType, jdbcType=VARCHAR},
                 #{TStdDevicemete.modulus, jdbcType=INTEGER},
                 #{TStdDevicemete.remark, jdbcType=VARCHAR},
+                #{TStdDevicemete.redundantType, jdbcType=VARCHAR},
                 #{TStdDevicemete.stateZero, jdbcType=VARCHAR},
                 #{TStdDevicemete.stateOne, jdbcType=VARCHAR},
                 #{TStdDevicemete.isTemdif, jdbcType=INTEGER},
                 #{TStdDevicemete.alarmState, jdbcType=INTEGER},
                 #{TStdDevicemete.alarmRuleType,jdbcType=INTEGER},
-                #{TStdDevicemete.labelAttri,jdbcType=VARCHAR}
+                #{TStdDevicemete.labelAttri,jdbcType=VARCHAR},
+                #{TStdDevicemete.componentId,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -737,6 +741,9 @@
         <foreach collection="list" item="deviceMeteId"  separator="," open="(" close=")" >
         #{deviceMeteId,jdbcType=BIGINT}
         </foreach>
+    </delete>
+    <delete id="deleteByComponentId">
+        delete from t_std_devicemete where component_id = #{componentId,jdbcType=VARCHAR}
     </delete>
 
     <select id="selectDeviceMete" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo">

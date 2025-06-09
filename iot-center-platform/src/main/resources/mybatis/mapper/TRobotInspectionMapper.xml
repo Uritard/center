@@ -51,7 +51,7 @@
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TRobotInspection">
         update t_robot_inspection a <set>
-        <if test="inspectionCode != null "> a.inspection_code = #{inspectionCod},</if>
+        <if test="inspectionCode != null "> a.inspection_code = #{inspectionCode},</if>
         <if test="robotId != null ">a.robot_id = #{robotId},</if>
         <if test="inspectionName != null ">a.inspection_name = #{inspectionName},</if>
         <if test="componentId != null ">a.component_id = #{componentId},</if>

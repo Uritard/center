@@ -216,6 +216,10 @@ public class TStdDeviceMete implements Serializable {
 
     private String labelAttri;
 
+    @ApiModelProperty(value = "部件id")
+    @TableField(value = "component_id",updateStrategy = FieldStrategy.IGNORED)
+    private String componentId;
+
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<KeyValue<String, String>> labelAttriName;
 

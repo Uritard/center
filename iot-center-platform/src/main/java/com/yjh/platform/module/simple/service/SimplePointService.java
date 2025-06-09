@@ -2,6 +2,7 @@ package com.yjh.platform.module.simple.service;
 
 import com.yjh.platform.module.simple.entity.BasePhotoBuild;
 import com.yjh.platform.module.simple.entity.BasePhotoInfo;
+import com.yjh.platform.module.simple.entity.CalibrationDataBuild;
 
 import java.io.IOException;
 import java.util.List;
@@ -32,8 +33,15 @@ public interface SimplePointService {
 
     /**
      * 底图保存
-     * @param buildList 底图信息
+     * @param photoBuild 底图信息
      * @return Boolean
      */
-    Boolean basePhotoBuild(List<BasePhotoBuild> buildList);
+    Boolean basePhotoBuild(BasePhotoBuild photoBuild);
+
+    /**
+     * 子点位标定数据保存
+     * @param dataBuild 标定数据信息
+     * @return Boolean
+     */
+    Boolean calibrationDataBuild(CalibrationDataBuild dataBuild);
 }

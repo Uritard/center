@@ -104,4 +104,12 @@ public interface TCruisePointInstanceDao {
     TIotDevicePoint getBindIotDevicePoint(@Param(value = "devicePointId") String devicePointId);
 
     TStdDeviceMete selectMeteByInsId(@Param(value = "instanceId") Long instanceId);
+
+    /**
+     * 根据巡检任务id删除巡检点实例
+     * @param inspectionId 机器人巡检任务id
+     * @return 删除数量
+     */
+    int deleteByCruiseId(@Param(value = "inspectionId") Long inspectionId);
+
 }

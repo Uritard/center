@@ -2,6 +2,8 @@ package com.yjh.platform.module.simple.entity;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * <功能描述>
  *
@@ -12,19 +14,9 @@ import lombok.Data;
 @Data
 public class BasePhotoBuild {
     /**
-     * 底图序号
-     */
-    private Integer photoNum;
-
-    /**
      * 机器人id
      */
     private Long robotId;
-
-    /**
-     * 底图url
-     */
-    private String photoPath;
 
     /**
      * 设备id
@@ -37,8 +29,8 @@ public class BasePhotoBuild {
     private String deviceName;
 
     /**
-     * 底图名称
+     * 底图信息
      */
-    private String photoName;
+    private List<PointPhotoInfo> photoInfo;
 
 }

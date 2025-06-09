@@ -21,6 +21,10 @@ public class BasePhotoInfo {
      */
     private Long deviceId;
     /**
+     * 设备名称
+     */
+    private String deviceName;
+    /**
      * 主图路径
      */
     private String mainPath;
