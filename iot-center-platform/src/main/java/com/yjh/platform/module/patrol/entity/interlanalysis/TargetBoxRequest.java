@@ -20,7 +20,17 @@ public class TargetBoxRequest {
     private String imagePath;
 
     /**
-     * type  类型   "zz_bj","sx_bj","yb","zsd","xn"
+     * type     类型
+     * 指针      zhizhen
+     * 文字      wenzi
+     * 压板      yaban
+     * 分合闸    fenhezha
+     * 呼吸器    huxiqi
+     * 旋钮      xuanniu
+     * 刀闸      daozha
+     * 空开      kongkai
+     * 刻度      kedu
+     * 指示灯    zhishideng
      */
     private String type;
 
