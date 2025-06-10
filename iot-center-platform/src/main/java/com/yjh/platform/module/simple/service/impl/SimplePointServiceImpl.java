@@ -2,11 +2,15 @@ package com.yjh.platform.module.simple.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import cn.hutool.core.io.FileUtil;
 import com.yjh.platform.common.utils.ImageSplitUtil;
+import com.yjh.platform.common.utils.JSONUtil;
+import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TRobotInspection;
@@ -17,6 +21,8 @@ import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.service.TStdDevicemeteService;
 import com.yjh.platform.module.patrol.CruiseConstant;
+import com.yjh.platform.module.patrol.entity.CalibrationData;
+import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.simple.entity.*;
 import com.yjh.platform.module.simple.service.SimplePointService;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <功能描述>
@@ -61,13 +65,20 @@ public class SimplePointServiceImpl implements SimplePointService {
      * 备图点位分割命名前缀
      */
     private static final String SPARE_POINT_PREFIX = "sparePoint_";
-
+    /**
+     * 标定原图
+     */
     private static final String ORIGINAL_PIC = "bigi_0.jpg";
+    /**
+     * 标定文件
+     */
+    private static final String T_MODEL_JSON = "tmodel.json";
 
     private final TRobotInspectionService tRobotInspectionService;
     private final TStdDeviceService stdDeviceService;
     private final TStdDevicemeteService stdDeviceMeteService;
     private final TCruisePointInstanceService cruisePointInstanceService;
+    private final IntelAnalysisService analysisService;
 
     /**
      * 获取底图
@@ -270,11 +281,73 @@ public class SimplePointServiceImpl implements SimplePointService {
                 deviceInfo.setInspectionId(robotInspection.getInspectionId()).setDeviceInfo(JSON.toJSONString(deviceConfigList));
                 int a = tRobotInspectionService.update(deviceInfo);
                 if (a > 0) {
-                    //todo 调用算法模块 更新算法标定信息
+                    // 调用算法模块 更新算法标定信息
+                    robotInspection.setDeviceInfo(JSON.toJSONString(deviceConfigList));
+                    ThreadPoolUtil.PATROL_POOL.addThread(() -> calibrationDataUpload(robotInspection));
                 }
                 return a > 0;
             }
         }
         return false;
+    }
+
+    /**
+     * 调用算法模块 添加标定信息
+     *
+     * @param robotInspection 标定信息
+     */
+    private void calibrationDataUpload(TRobotInspection robotInspection) {
+        CalibrationData data = buildCalibrationData(robotInspection);
+        boolean res = analysisService.calibrationDataUpload(Collections.singletonList(data));
+        if (res) {
+            log.info("上传标定文件成功！");
+        }
+    }
+
+    /**
+     * 构建标定数据
+     *
+     * @param robotInspection 巡检信息
+     * @return CalibrationData
+     */
+    private CalibrationData buildCalibrationData(TRobotInspection robotInspection) {
+        String picPath = robotInspection.getPropertyPicPath();
+        if (StringUtils.isBlank(picPath)) {
+            log.error("上传标定文件，基础图片为空！");
+            return null;
+        }
+        picPath = picPath.replace(Constant.SIMPLE_PIC, SysParamConfig.getSysContent("simplePicPath"));
+        File file = new File(picPath);
+        if (!file.exists()) {
+            log.error("上传标定文件，基础图片不存在！");
+            return null;
+        }
+        String filePath = file.getParent() + File.separator + T_MODEL_JSON;
+        FileUtil.writeUtf8String(JSONUtil.beautifyJson(robotInspection.getDeviceInfo()), filePath);
+        CalibrationData data = new CalibrationData();
+        data.setTemplateId(String.valueOf(robotInspection.getInspectionId())).setPicPath(picPath).setFilePath(filePath);
+        return data;
+    }
+
+    /**
+     * 标定数据批量上传
+     *
+     * @param inspectionIds 巡检id
+     * @return Boolean
+     */
+    @Override
+    public Boolean calibrationDataBatchUpload(List<Long> inspectionIds) {
+        List<TRobotInspection> robotInspectionList = tRobotInspectionService.selectByInspectionIds(inspectionIds);
+        List<CalibrationData> calibrationDataList = new ArrayList<>();
+        robotInspectionList.forEach(robotInspection -> {
+            CalibrationData data = buildCalibrationData(robotInspection);
+            if (Objects.nonNull(data)) {
+                calibrationDataList.add(data);
+            }
+        });
+        if (calibrationDataList.isEmpty()) {
+            return true;
+        }
+        return analysisService.calibrationDataUpload(calibrationDataList);
     }
 }

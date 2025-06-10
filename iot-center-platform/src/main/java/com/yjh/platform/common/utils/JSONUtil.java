@@ -1,5 +1,6 @@
 package com.yjh.platform.common.utils;
 
+import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 
 /**
@@ -76,6 +78,19 @@ public class JSONUtil {
             log.error("Jsons.toBean error: ", e);
         }
         return null;
+    }
+
+    public static String beautifyJson(String str) {
+        if (StringUtils.isEmpty(str)) {
+            return StringUtils.EMPTY;
+        }
+        try {
+            Object jsonNode = objectMapper.readTree(str);
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
+        } catch (IOException e) {
+            log.error("str beautify fail: " , e);
+        }
+        return str;
     }
 
     /**

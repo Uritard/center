@@ -110,4 +110,11 @@ public interface TRobotInspectionDao {
     List<TCruisePointInstanceNameDetail> selectRealInstanceByDevicePoints(@Param(value = "list") String[] devicePointIds);
 
     List<TCruisePointInstanceNameDetail> selectRealInstances(@Param(value = "list") String[] deviceId,@Param(value = "edgeCode") String edgeCode);
+
+    /**
+     * 通过巡检id查询巡检信息
+     * @param inspectionIds 巡检id
+     * @return 巡检信息
+     */
+    List<TRobotInspection> selectByInspectionIds(@Param(value = "list") List<Long> inspectionIds);
 }

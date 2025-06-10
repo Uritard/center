@@ -1099,5 +1099,14 @@ public class TRobotInspectionService {
 
         return listEntity;
     }
+
+    /**
+     * 通过巡检id查询巡检信息
+     * @param inspectionIds 巡检id
+     * @return 巡检信息
+     */
+    public List<TRobotInspection> selectByInspectionIds(List<Long> inspectionIds) {
+        return this.tRobotInspectionDao.selectByInspectionIds(inspectionIds);
+    }
 }
 

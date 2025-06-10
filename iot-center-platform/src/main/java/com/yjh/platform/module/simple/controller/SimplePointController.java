@@ -90,4 +90,19 @@ public class SimplePointController {
         }
         return result;
     }
+
+    @ApiOperation(value = "标定数据批量上传")
+    @PostMapping(value = "/calibrationDataBatchUpload")
+    public Result calibrationDataBatchUpload(@RequestBody List<Long> inspectionIds) {
+        Result result = new Result();
+        try {
+            result.setData(simplePointService.calibrationDataBatchUpload(inspectionIds));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("标定数据批量上传接口调用错误:", e);
+        }
+        return result;
+    }
 }

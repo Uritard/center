@@ -6,6 +6,7 @@ package com.yjh.platform.module.patrol.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONArray;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -17,6 +18,7 @@ import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.entity.AnalyseTypeEnum;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.CruiseConstant;
+import com.yjh.platform.module.patrol.entity.CalibrationData;
 import com.yjh.platform.module.patrol.entity.interlanalysis.AnalyseObject;
 import com.yjh.platform.module.patrol.entity.interlanalysis.PicAnalyseRequest;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
@@ -161,6 +163,44 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
             String result = HttpClientUtils.getInstance().postUrl(url, testJson.toJSONString());
             log.info("result==={}", result);
 
+            if (StringUtils.isEmpty(result)) {
+                return Response.basRequest();
+            }
+            JSONObject jsonObject = JSON.parseObject(result);
+            int code = jsonObject.getIntValue("code");
+            return new Response(code);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Response.serverError();
+        }
+    }
+
+    /**
+     * 上传标定数据
+     * @param dataList 标定数据
+     * @return res
+     */
+    public Response calibrationDataUpload(List<CalibrationData> dataList) {
+        try {
+            dataList.forEach(data -> {
+                log.info("上传基础图片");
+                String templatePath = "/template/" + data.getTemplateId() + "/";
+                String picName = StringUtils.substringAfterLast(data.getPicPath(), data.getPicPath().contains("\\") ? "\\" : "/");
+                String picTargetPath = templatePath + picName;
+                uploadFileToFtps(data.getPicPath(), picTargetPath, applicationProperties.getIntelAnalysisFtps());
+                data.setPicPath(picTargetPath);
+                log.info("上传标定文件");
+                String fileName = StringUtils.substringAfterLast(data.getFilePath(), data.getFilePath().contains("\\") ? "\\" : "/");
+                String fileTargetPath = templatePath + "/" + fileName;
+                uploadFileToFtps(data.getFilePath(), fileTargetPath, applicationProperties.getIntelAnalysisFtps());
+                data.setFilePath(fileTargetPath);
+            });
+
+            JSONArray testJson = JSONArray.from(dataList);
+            log.info(JSONUtil.prettyJSONString(testJson));
+
+            String result = HttpClientUtils.getInstance().postUrl(algorithmConfig.getCalibrationDataUploadUrl(), testJson.toJSONString());
+            log.info("calibrationDataUpload result==={}", result);
             if (StringUtils.isEmpty(result)) {
                 return Response.basRequest();
             }

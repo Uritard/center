@@ -44,4 +44,11 @@ public interface SimplePointService {
      * @return Boolean
      */
     Boolean calibrationDataBuild(CalibrationDataBuild dataBuild);
+
+    /**
+     * 标定数据批量上传
+     * @param inspectionIds 巡检id
+     * @return Boolean
+     */
+    Boolean calibrationDataBatchUpload(List<Long> inspectionIds);
 }

@@ -146,6 +146,7 @@ public class ApplicationProperties {
         private String defectAnalysisUrl;
         private String updateUrl;
         private String algorithmResourceUrl;
+        private String calibrationDataUploadUrl;
         private String systemCheckUrl;
         private String resultIp;
         private String resultPort;

@@ -27,10 +27,7 @@ import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdDevicemeteService;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
-import com.yjh.platform.module.patrol.entity.AlgorithmExceptionEnum;
-import com.yjh.platform.module.patrol.entity.AnalysePatrolTaskResult;
-import com.yjh.platform.module.patrol.entity.TAlgorithmInfo;
-import com.yjh.platform.module.patrol.entity.XMLBaseModel;
+import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Point;
 import com.yjh.platform.module.patrol.entity.interlanalysis.*;
 import com.yjh.platform.module.patrol.service.impl.HttpAnalyticsServiceImpl;
@@ -85,6 +82,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
+import static org.bouncycastle.asn1.x509.X509ObjectIdentifiers.id;
 
 /**
  * @author 丫C
@@ -1741,5 +1739,15 @@ public class IntelAnalysisService {
         } finally {
             CommonFutureUtil.removeFuture(String.valueOf(id));
         }
+    }
+
+    /**
+     * 标定数据上传
+     *
+     * @param dataList 标定数据
+     */
+    public Boolean calibrationDataUpload(List<CalibrationData> dataList) {
+        Response response = analyticsService.calibrationDataUpload(dataList);
+        return ResultCodeEnum.SUCCESS.getCode() == response.getCode();
     }
 }

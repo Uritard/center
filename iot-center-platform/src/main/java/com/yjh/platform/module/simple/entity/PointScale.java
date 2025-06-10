@@ -28,7 +28,7 @@ public class PointScale {
     /**
      * 指针的旋转中心点
      */
-    private List<Double> shaftPos;
+    private List<List<Double>> shaftPos;
     /**
      * 标定时给出的刻度点，每一个刻度点有6个参数，分别是刻度，角度，刻度起点的x坐标，y坐标，刻度终点的x坐标，y坐标
      */
