@@ -24,6 +24,7 @@ import com.yjh.platform.module.patrol.entity.interlanalysis.PicAnalyseRequest;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.AnalyticsService;
+import com.yjh.platform.module.simple.entity.AnalyseMeteTypeEnum;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import org.apache.commons.collections4.CollectionUtils;
@@ -310,7 +311,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                 }
             }
             //目标框识别通过传参方式确定typeList
-            if (ArrayUtils.contains(new String[] {"zz_bj", "sx_bj", "yb", "zsd", "xn"}, analyseType)) {
+            if (AnalyseMeteTypeEnum.contains(analyseType)) {
                 return Collections.singletonList(analyseType);
             }
         }
