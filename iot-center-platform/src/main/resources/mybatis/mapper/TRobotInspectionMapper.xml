@@ -684,5 +684,28 @@
         WHERE b.device_point_id in
         <foreach collection="list" item="pointId" open="(" separator="," close=")"> #{pointId} </foreach>
     </select>
+    <select id="selectByInspectionIds" resultType="com.yjh.platform.module.device.entity.TRobotInspection">
+        select
+            a.inspection_id,
+            a.inspection_code,
+            a.robot_id,
+            a.inspection_name,
+            a.inspection_type,
+            a.main_device_id,
+            a.component_id,
+            a.meter_type,
+            a.appearance_type,
+            a.main_operation_type,
+            a.operation_type,
+            a.save_type_list,
+            a.recognition_type_list,
+            a.phase,
+            a.device_info,
+            a.property_pic_path,
+            a.photo_num
+        from t_robot_inspection a
+        where a.inspection_id in
+        <foreach collection="list" item="inspectionId" open="(" separator="," close=")"> #{inspectionId} </foreach>
+    </select>
 
 </mapper>
