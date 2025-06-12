@@ -1562,7 +1562,8 @@ group by camera_id
 	<select id="selectSplitBackground" resultType="com.yjh.platform.module.device.entity.AreaInfo">
 		SELECT DISTINCT
 			inspection_id AS Id,
-			inspection_name AS label
+			inspection_name AS label,
+			"simpleComponent" AS infoType
 		FROM
 			t_robot_inspection
 		where main_device_id =#{deviceId}
