@@ -422,9 +422,11 @@
         AND up_region_id > 0
         )as temp where upRegionId != -1;
     </select>
-    <select id="selectDownRegion" resultType="java.lang.Long">
+    <select id="selectDownRegion" resultMap="BaseResultMap">
         SELECT
-            DATA.region_id
+            DATA.region_id, DATA.region_name, DATA.up_region_id, DATA.region_code, DATA.station_id,DATA.station_name,
+        DATA.state, DATA.region_path, DATA.longitude, DATA.latitude, DATA.voltage_level, DATA.commissioning_time,
+        DATA.remark, DATA.create_time
         FROM
             (
                 SELECT
@@ -433,7 +435,7 @@
             @l := @l + 1 AS LEVEL
                 FROM
                     t_std_region,
-                    ( SELECT @ids := #{regionIdString}, @l := 0 ) b
+                    ( SELECT @ids := #{regionId,jdbcType=BIGINT}, @l := 0 ) b
                 WHERE
                     @ids IS NOT NULL
             ) ID,
@@ -506,4 +508,23 @@
           AND up_region_id != -1
           AND region_code != ''
     </select>
+
+    <insert id="batchInsert" useGeneratedKeys="true" keyProperty="regionId" parameterType="com.yjh.platform.module.device.entity.TStdRegion">
+        insert into t_std_region
+        ( region_name, sort
+        , up_region_id, up_region_ids, region_code
+        , origin_region_id, station_id, station_name
+        , state, edge_status, region_path
+        , longitude, latitude, voltage_level
+        , remark, create_time)
+        values
+        <foreach collection="list" separator="," item="item">
+            ( #{item.regionName,jdbcType=VARCHAR}, #{item.sort,jdbcType=INTEGER}
+            , #{item.upRegionId,jdbcType=BIGINT}, #{item.upRegionIds,jdbcType=VARCHAR}, #{item.regionCode,jdbcType=VARCHAR}
+            , #{item.originRegionId,jdbcType=VARCHAR}, #{item.stationId,jdbcType=VARCHAR}, #{item.stationName,jdbcType=VARCHAR}
+            , #{item.state,jdbcType=INTEGER}, #{item.edgeStatus,jdbcType=VARCHAR}, #{item.regionPath,jdbcType=VARCHAR}
+            , #{item.longitude,jdbcType=VARCHAR}, #{item.latitude,jdbcType=VARCHAR}, #{item.voltageLevel,jdbcType=VARCHAR}
+            , #{item.remark,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
 </mapper>

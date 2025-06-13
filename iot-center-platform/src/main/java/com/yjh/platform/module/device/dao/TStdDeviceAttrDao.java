@@ -41,4 +41,6 @@ public interface TStdDeviceAttrDao {
     List<TStdDeviceAttr> selectByPage(TStdDeviceAttr tStdDeviceAttr);
 
     int batchInsert(List<TStdDeviceAttr> list);
+
+    int batchUpdate(@Param(value = "list") List<TStdDeviceAttr> list);
 }

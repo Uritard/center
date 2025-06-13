@@ -187,17 +187,17 @@ public class TRobotInfoService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TRobotInfo> select(Long robotId, String robotCode, String robotNum, String robotName, String robotStatus, Integer robotType, String robotIp, Integer robotPort,
-                                    String upRegionName, String lightIp, String lightPort, String identityManager, String identityCode,
-                                   String lnferadIp, Integer inferadPort, String inferadUsername, String inferadPassword, String photePath,
-                                   String createBy, Date createDate, String updateBy, Date updateDate, String robotFactory,String isUse,
-                                   Date commissionDateString, Long upRegionId, String robotPosition, String robotSource,
-                                   String address,String buildingUser,String appearanceNumber,String defectRecord,String repairRecord,
-                                   String exitPutIntoRecord,String remarks) {
-        return tRobotInfoDao.select(robotId, robotCode, robotNum, robotName, robotStatus, robotType, robotIp, robotPort,
-                upRegionName, lightIp, lightPort, identityManager, identityCode, lnferadIp, inferadPort, inferadUsername, inferadPassword,
-                photePath, createBy, createDate, updateBy, updateDate, robotFactory, isUse, commissionDateString, upRegionId, robotPosition,
-                robotSource,address,buildingUser,appearanceNumber,defectRecord,repairRecord,exitPutIntoRecord,remarks);
+    public List<TRobotInfo> select(Long robotId, String robotCode, String robotNum, String robotName, String robotStatus, Integer robotType,
+        Integer droneType, String robotIp, Integer robotPort, String upRegionName, String lightIp, String lightPort, String identityManager,
+        String identityCode, String lnferadIp, Integer inferadPort, String inferadUsername, String inferadPassword, String photePath,
+        String createBy, Date createDate, String updateBy, Date updateDate, String robotFactory, String isUse, Date commissionDateString,
+        Long upRegionId, String robotPosition, String robotSource, String address, String buildingUser, String appearanceNumber,
+        String defectRecord, String repairRecord, String exitPutIntoRecord, String remarks) {
+
+        return tRobotInfoDao.select(robotId, robotCode, robotNum, null, null, robotName, robotStatus, robotType, droneType, robotIp,
+            robotPort, upRegionName, lightIp, lightPort, identityManager, identityCode, lnferadIp, inferadPort, inferadUsername,
+            inferadPassword, photePath, createBy, createDate, updateBy, updateDate, robotFactory, isUse, commissionDateString, upRegionId,
+            robotPosition, robotSource, address, buildingUser, appearanceNumber, defectRecord, repairRecord, exitPutIntoRecord, remarks);
     }
 
     @Transactional(rollbackFor = Exception.class)

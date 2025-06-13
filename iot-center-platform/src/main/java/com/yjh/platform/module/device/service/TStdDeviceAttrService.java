@@ -62,5 +62,12 @@ public class TStdDeviceAttrService{
         return this.tStdDeviceAttrDao.batchInsert(list);
     }
 
+    /**
+     * 批量更新
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public int batchUpdate(List<TStdDeviceAttr> list) {
+        return this.tStdDeviceAttrDao.batchUpdate(list);
+    }
 }
 

@@ -199,8 +199,28 @@ public class TStdRegionService{
         return tStdRegionDao.selectDownId(regionId);
     }
 
+    public List<TStdRegion> selectDownRegion(Long  regionId) {
+        return tStdRegionDao.selectDownRegion(regionId);
+    }
+
     public List<TStdRegion> queryAll() {
         return tStdRegionDao.queryAll();
+    }
+
+    /**
+     * 查询root节点，up_regionId为-1
+     * @return
+     */
+    public TStdRegion selectRootRegion() {
+        return tStdRegionDao.selectRootRegion();
+    }
+
+    /**
+     * 批量插入区域信息
+     * @return
+     */
+    public int batchInsert(List<TStdRegion> list) {
+        return tStdRegionDao.batchInsert(list);
     }
 
     public int loadRegionIntoRedis() {
@@ -226,9 +246,9 @@ public class TStdRegionService{
         log.info("开始加载区域对应上下级关系......");
         try {
             for (TStdRegion region : list) {
-                String regionId = region.getRegionId().toString();
-                List<Long> upRegionList = tStdRegionDao.selectAllUpRegion(regionId);
-                List<Long> lowRegionList = tStdRegionDao.selectDownRegion(regionId);
+                Long regionId = region.getRegionId();
+                List<Long> upRegionList = tStdRegionDao.selectAllUpRegion(String.valueOf(regionId));
+                List<Long> lowRegionList = tStdRegionDao.selectDownId(regionId);
                 if (CollectionUtils.isNotEmpty(upRegionList)) {
                     redisTemplate.opsForSet().add(UP_REF_KEY + regionId, upRegionList.toArray(new Long[0]));
                 }
@@ -262,7 +282,7 @@ public class TStdRegionService{
             downToStationMap = new HashMap<>(64);
             for (TStdRegion station : stationList) {
                 Long stationId = station.getRegionId();
-                List<Long> downRegionList = tStdRegionDao.selectDownRegion(String.valueOf(stationId));
+                List<Long> downRegionList = tStdRegionDao.selectDownId(stationId);
                 for (Long downId : downRegionList) {
                     downToStationMap.put(downId, new LineKeyValue<>(stationId, station.getRegionName()));
                 }
@@ -314,7 +334,9 @@ public class TStdRegionService{
         return tStdRegionDao.selectStationVoltageData();
     }
 
-    // 判断当前区域编码是否在本级已经存在
+    /**
+     * 判断当前区域编码是否在本级已经存在
+     */
     public Integer countByRegionCode(String regionCode, Long upRegionId) {
         return tStdRegionDao.countByRegionCode(regionCode, upRegionId);
     }

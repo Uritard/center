@@ -302,19 +302,18 @@
         <if test="createDate != null"> and a.create_date = #{createDate, jdbcType=TIMESTAMP}</if>
         <if test="updateBy != null and updateBy != ''"> and a.update_by = #{updateBy, jdbcType=VARCHAR}</if>
         <if test="updateDate != null"> and a.update_date = #{updateDate, jdbcType=TIMESTAMP}</if>
-        <if test="robotFactory != null">and a.robot_factory = #{robotFactory, jdbcType=VARCHAR},</if>
-        <if test="isUse != null">and a.is_use = #{isUse, jdbcType=VARCHAR},</if>
-        <if test="commissionDate != null">and a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
-        <if test="upRegionId != null and upRegionId !=''">and a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
-        <if test="robotPosition != null and robotPosition !=''">and a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
-        <if test="dronePosition != null and dronePosition !=''">and a.drone_position = #{dronePosition, jdbcType=VARCHAR},</if>
-        <if test="robotSource != null and robotSource !=''">and a.robot_source = #{robotSource, jdbcType=VARCHAR},</if>
-        <if test="address != null and address !=''">and a.address = #{address, jdbcType=VARCHAR},</if>
-        <if test="buildingUser != null and buildingUser !=''">and a.building_user = #{buildingUser, jdbcType=VARCHAR},</if>
-        <if test="appearanceNumber != null and appearanceNumber !=''">and a.appearance_number = #{appearanceNumber, jdbcType=VARCHAR},</if>
-        <if test="defectRecord != null and defectRecord !=''">and a.defect_record = #{defectRecord, jdbcType=VARCHAR},</if>
-        <if test="repairRecord != null and repairRecord !=''">and a.repair_record = #{repairRecord, jdbcType=VARCHAR},</if>
-        <if test="exitPutIntoRecord != null and exitPutIntoRecord !=''">and a.exit_putInto_record = #{exitPutIntoRecord, jdbcType=VARCHAR},</if>
+        <if test="robotFactory != null">and a.robot_factory = #{robotFactory, jdbcType=VARCHAR}</if>
+        <if test="isUse != null">and a.is_use = #{isUse, jdbcType=VARCHAR}</if>
+        <if test="commissionDate != null">and a.commission_date = #{commissionDate, jdbcType=TIMESTAMP}</if>
+        <if test="upRegionId != null and upRegionId !=''">and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
+        <if test="robotPosition != null and robotPosition !=''">and a.robot_position = #{robotPosition, jdbcType=VARCHAR}</if>
+        <if test="robotSource != null and robotSource !=''">and a.robot_source = #{robotSource, jdbcType=VARCHAR}</if>
+        <if test="address != null and address !=''">and a.address = #{address, jdbcType=VARCHAR}</if>
+        <if test="buildingUser != null and buildingUser !=''">and a.building_user = #{buildingUser, jdbcType=VARCHAR}</if>
+        <if test="appearanceNumber != null and appearanceNumber !=''">and a.appearance_number = #{appearanceNumber, jdbcType=VARCHAR}</if>
+        <if test="defectRecord != null and defectRecord !=''">and a.defect_record = #{defectRecord, jdbcType=VARCHAR}</if>
+        <if test="repairRecord != null and repairRecord !=''">and a.repair_record = #{repairRecord, jdbcType=VARCHAR}</if>
+        <if test="exitPutIntoRecord != null and exitPutIntoRecord !=''">and a.exit_putInto_record = #{exitPutIntoRecord, jdbcType=VARCHAR}</if>
         <if test="remarks != null and remarks != ''"> and a.remarks = #{remarks, jdbcType=VARCHAR}</if>
     </select>
 
