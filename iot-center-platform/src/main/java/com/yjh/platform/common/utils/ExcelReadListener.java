@@ -2,22 +2,18 @@ package com.yjh.platform.common.utils;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.context.AnalysisContext;
+import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.exception.ExcelDataConvertException;
-import com.alibaba.excel.metadata.CellData;
-import com.alibaba.excel.read.listener.ReadListener;
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.annotation.ExcelExtend;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.module.device.entity.ExcelEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
@@ -29,10 +25,10 @@ import java.util.*;
  * @since [产品/模块版本] （可选）
  */
 @Slf4j
-public class ExcelReadListener<E> implements ReadListener<E> {
+public class ExcelReadListener<E> extends AnalysisEventListener<E> {
     private final String[] headerList;
-    private List<E> excelEntities = new ArrayList<>();
-    private List<String> errorExcelEntities = new ArrayList<>();
+    private final List<E> excelEntities = new ArrayList<>();
+    private final List<String> errorExcelEntities = new ArrayList<>();
 
     public ExcelReadListener(String[] headerList) {
         this.headerList = headerList;
@@ -40,30 +36,26 @@ public class ExcelReadListener<E> implements ReadListener<E> {
 
     @Override
     public void onException(Exception e, AnalysisContext analysisContext){
-        int idx = analysisContext.readRowHolder().getRowIndex() + 1;
-        try {
-            throw e;
-        }catch (ExcelDataConvertException e1){
-            int idy = e1.getColumnIndex() + 1;
-            String errorStr = "行号: " + idx + "列数: " + idy + ";内容" + e1.getCellData() + "异常";
+        if (e instanceof ExcelDataConvertException) {
+            ExcelDataConvertException excelException = (ExcelDataConvertException) e;
+            int idx = excelException.getRowIndex() + 1;
+            int idy = excelException.getColumnIndex() + 1;
+            String errorStr = "行号: " + idx + "列数: " + idy + ";内容" + excelException.getCellData() + "异常";
             log.error(errorStr);
             errorExcelEntities.add(errorStr);
-        } catch (Exception ex) {
+        } else {
             errorExcelEntities.add("导入失败，请检查上传 excel 格式是否正确!");
-            log.error("模型文件读取失败！，错误", ex);
+            log.error("模型文件读取失败！，错误", e);
         }
-
     }
 
     @Override
-    public void invokeHead(Map<Integer, CellData> map, AnalysisContext analysisContext) {
-        Set<String> importHeaderList = new HashSet<>(map.size());
-        map.forEach((integer, cellData) -> importHeaderList.add(cellData.getStringValue()));
+    public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
 
-        if (importHeaderList.size() < headerList.length || !importHeaderList.containsAll(Arrays.asList(headerList))) {
+        if (headMap.size() < headerList.length || !CollectionUtils.containsAll(headMap.values(), Arrays.asList(headerList))) {
             throw new BusinessException(ResultCodeEnum.CODE20018.getCode(), ResultCodeEnum.CODE20018.getName());
         }
-        log.info("map:{}", JSON.toJSONString(map));
+        log.info("map:{}", JSON.toJSONString(headMap));
     }
 
     @Override
@@ -83,17 +75,19 @@ public class ExcelReadListener<E> implements ReadListener<E> {
         log.info("模型Excel读取完毕！");
     }
 
-    @Override
-    public boolean hasNext(AnalysisContext analysisContext) {
-        return true;
-    }
-
     public List<E> getExcelEntities() {
         return excelEntities;
     }
 
     public List<String> getErrorExcelEntities() {
         return errorExcelEntities;
+    }
+
+    /**
+     * 读取成功，没有错误行则表示读取成功
+     */
+    public boolean success() {
+        return CollectionUtils.isNotEmpty(errorExcelEntities);
     }
 
     public String valid(E excelEntity) {

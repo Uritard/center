@@ -61,7 +61,8 @@ public enum ResultCodeEnum {
     CODE10108(10108, "密码超期登录失败，请联系管理员处理！"),
     CODE10109(10109, "当前用户无权限添加或修改敏感字段"),
     CODE20017(20017, "参数规则不匹配"),
-    CODE20018(20018, "导入表格缺少字段");
+    CODE20018(20018, "导入表格缺少字段"),
+    CODE20019(20019, "数据格式错误");
 
     private int code;
     private String name;

@@ -783,6 +783,10 @@ public class Constant {
      */
     public static final String VIDEO_REAL_PATH = "/imgs/video/";
     /**
+     * 简易机器人设备标识
+     */
+    public static final String SIMPLE_DEVICE_POSITION_TYPE = "simple";
+    /**
      * 简易机器人底图相对路径
      */
     public static final String SIMPLE_PIC = "/imgs/simplePic/";

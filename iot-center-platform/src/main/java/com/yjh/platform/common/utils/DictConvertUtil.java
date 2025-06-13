@@ -54,7 +54,7 @@ public enum DictConvertUtil {
             // 下划线转驼峰
             String colName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, dict.getColName());
             dictMap.put(colName + ":" + dict.getDictCode(), dict.getDictNote());
-            dictReverseMap.put(colName + ":" + dict.getDictNote(), dict.getDictCode());
+            dictReverseMap.put(colName + ":" + dict.getDictNote().toLowerCase(), dict.getDictCode());
         }
     }
 
@@ -95,7 +95,7 @@ public enum DictConvertUtil {
         if (StringUtils.isEmpty(dictNote) || StringUtils.isEmpty(colName)) {
             return "";
         }
-        String key = colName + ":" + dictNote;
+        String key = colName + ":" + dictNote.toLowerCase();
         return dictReverseMap.getOrDefault(key, "");
     }
 

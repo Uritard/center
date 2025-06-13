@@ -4,7 +4,9 @@ import java.util.Date;
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -31,6 +33,7 @@ public class TStdDevice implements Serializable {
     @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "设备ID")
     @TableField(value = "device_id",updateStrategy = FieldStrategy.IGNORED)
+    @TableId(type = IdType.AUTO)
     private Long deviceId;
 
 //    @Length(max = 32, message = "customId长度必须小于等于32")
@@ -110,17 +113,23 @@ public class TStdDevice implements Serializable {
     @TableField(value = "real_code", updateStrategy = FieldStrategy.IGNORED)
     private String realCode;
 
+    @TableField(exist = false)
     private Integer pageNum = 1;
 
+    @TableField(exist = false)
     private Integer pageSize = 0;
 
+    @TableField(exist = false)
     private Long presetId;
 
+    @TableField(exist = false)
     private Long cameraId;
 
     private Long nodeId;
 
+    @TableField(exist = false)
     private String mainDeviceId;
 
+    @TableField(exist = false)
     private TStdDeviceAttr tStdDeviceAttr;
 }

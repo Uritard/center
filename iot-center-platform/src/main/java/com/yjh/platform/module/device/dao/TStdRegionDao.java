@@ -57,7 +57,7 @@ public interface TStdRegionDao {
     List<Long> selectRegionByRegName(@Param(value = "regionName") String regionName);
     List<AreaInfoRegionCode> selectRegTreeByRegionList(@Param(value = "list") Set<Long> list);
     List<Long> selectAllUpRegion(@Param("regionIdString")String regionIdString);
-    List<Long> selectDownRegion(@Param("regionIdString")String regionIdString);
+    List<TStdRegion> selectDownRegion(@Param(value = "regionId") Long regionId);
     TStdRegion selectRootRegion();
 
     /**
@@ -79,4 +79,6 @@ public interface TStdRegionDao {
     List<IotDeviceDataEx> getEnvByRegion(@Param(value = "regionId") Long regionId);
 
     List<TStdRegion> selectAllEdgeRegion();
+
+    int batchInsert(@Param("list") List<TStdRegion> tStdRegionList);
 }

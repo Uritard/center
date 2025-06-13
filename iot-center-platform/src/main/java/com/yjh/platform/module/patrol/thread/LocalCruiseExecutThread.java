@@ -7,6 +7,7 @@ package com.yjh.platform.module.patrol.thread;
 import com.alibaba.fastjson2.JSON;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.utils.NumberUtil;
+import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.service.CruiseExecuteFactory;
 import com.yjh.platform.module.patrol.service.CruiseInspectionExecute;
@@ -74,7 +75,8 @@ public class LocalCruiseExecutThread<T> implements Runnable {
     @Override
     public void run() {
         //随机暂停 控制调用设备频率
-        int waitTime = NumberUtil.getIntRandomNum(0, 10000);
+        int wait = NumberUtils.toInt(SysParamConfig.getSysContent("waitTime"), 10000);
+        int waitTime = NumberUtil.getIntRandomNum(0, wait);
         log.warn("cruiseExecutThread start, cruisePoints size: {}, skip: {}, forceStop: {}", CollectionUtils.size(cruisePointList), skip,
             forceStop);
 
