@@ -879,6 +879,13 @@ public class TStdDeviceService{
                 break;
             case "simpleRobot":
                 deviceTree = tStdDeviceDao.selectSimpleRobotDeviceByRegionId(upRegionId);
+                // 根据deviceId查询t_robot_inspection表获取robotId
+                for (AreaInfo device : deviceTree) {
+                    List<AreaInfo> components = tStdDeviceDao.selectSplitBackground(device.getId());
+                    if (CollectionUtils.isNotEmpty(components)) {
+                        device.setRobotId(components.get(0).getRobotId());
+                    }
+                }
                 break;
             default:throw new BusinessException("设备树展示内容输入有误！");
         }

@@ -1563,7 +1563,8 @@ group by camera_id
 		SELECT DISTINCT
 			inspection_id AS Id,
 			inspection_name AS label,
-			"simpleComponent" AS infoType
+			"simpleComponent" AS infoType,
+			robot_id AS robotId
 		FROM
 			t_robot_inspection
 		where main_device_id =#{deviceId}
