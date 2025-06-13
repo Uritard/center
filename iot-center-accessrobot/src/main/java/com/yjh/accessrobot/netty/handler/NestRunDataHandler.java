@@ -10,6 +10,7 @@ import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,13 +56,13 @@ public class NestRunDataHandler implements MessageHandlerStrategy, InitializingB
 
         for (Map<String, Object> res : xmlBaseModel.getItems()) {
             Map<String, String> nestOperationMap = new HashMap<>(16);
-            nestOperationMap.put("nestName", res.get("nest_name").toString());
-            nestOperationMap.put("nestCode", res.get("nest_code").toString());
-            nestOperationMap.put("moduleNo", res.get("module_no").toString());
-            nestOperationMap.put("type", res.get("type").toString());
-            nestOperationMap.put("value", res.get("value").toString());
-            nestOperationMap.put("valueUnit", res.get("value_unit").toString());
-            nestOperationMap.put("unit", res.get("unit").toString());
+            nestOperationMap.put("nestName", MapUtils.getString(res, "nest_name"));
+            nestOperationMap.put("nestCode", MapUtils.getString(res, "nest_code"));
+            nestOperationMap.put("moduleNo", MapUtils.getString(res, "module_no"));
+            nestOperationMap.put("type", MapUtils.getString(res, "type"));
+            nestOperationMap.put("value", MapUtils.getString(res, "value"));
+            nestOperationMap.put("valueUnit", MapUtils.getString(res, "value_unit"));
+            nestOperationMap.put("unit", MapUtils.getString(res, "unit"));
             boolean validateValueUnit = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:validateValueUnit", "content"));
             if (validateValueUnit && !unitCheck(nestOperationMap)) {
                 continue;
