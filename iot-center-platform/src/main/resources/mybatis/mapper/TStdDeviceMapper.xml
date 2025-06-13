@@ -1012,17 +1012,19 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 	</select>
 
 	<select id="selectSimpleRobotDeviceByRegionId" resultType="com.yjh.platform.module.device.entity.AreaInfo">
-		SELECT DISTINCT
+		SELECT
 			b.device_id AS Id,
 			b.device_name AS label,
 			b.up_region_id AS upId,
 			d.region_name AS upName,
 			"simpleRobot" AS infoType,
-			b.device_type AS deviceTypeId
+			b.device_type AS deviceTypeId,
+			r.robot_id AS robotId
 		FROM
 			t_std_device b
-				LEFT JOIN t_std_region d ON b.up_region_id = d.region_id
+				LEFT JOIN t_std_region d ON b.up_region_id = d.region_id LEFT JOIN t_robot_inspection r ON r.main_device_id = b.device_id
 		where b.up_region_id =#{upRegionId} and b.position_type = 'simple'
+		GROUP BY b.device_id
 	</select>
 
 	<select id="selectCustomByRegionId" resultType="com.yjh.platform.module.device.entity.AreaInfo">
