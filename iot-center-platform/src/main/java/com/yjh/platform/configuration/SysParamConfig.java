@@ -143,4 +143,8 @@ public class SysParamConfig {
     public static String getSysContent(String paramCode) {
         return SYS_PARAM_CACHE_MAP.get(paramCode);
     }
+
+    public static boolean getBooleanContent(String paramCode) {
+        return Boolean.parseBoolean(SYS_PARAM_CACHE_MAP.get(paramCode));
+    }
 }
