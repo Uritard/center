@@ -2,7 +2,10 @@ package com.yjh.platform.module.patrol.thread;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.utils.*;
+import com.yjh.platform.common.utils.CommonUtils;
+import com.yjh.platform.common.utils.ResultConvertUtil;
+import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
@@ -18,7 +21,6 @@ import com.yjh.platform.module.user.entity.TRobotInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -26,12 +28,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
-import static com.yjh.platform.module.patrol.service.UPatrolTaskService.MAP_LOCK;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
@@ -79,49 +77,14 @@ public class InspectionResultThread implements Runnable{
             String instanceId = infoMap.get("instanceId");
             String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
             Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
-            if (MapUtils.isEmpty(tCruiseTaskResultMap) || !tCruiseTaskResultMap.containsKey("deviceId") || !tCruiseTaskResultMap.containsKey("cruiseId")) {
-                tCruiseTaskResultMap = new HashMap<>(32);
-                upSystemTaskInfoInitialize(tCruiseTaskResultMap, taskId, insInfo);
-            }
-
-            tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
-
-            tCruiseTaskResultMap.put("picpath", infoMap.getOrDefault("relativePath", ""));
-            tCruiseTaskResultMap.put("origpic", infoMap.getOrDefault("absolutePath", ""));
-            tCruiseTaskResultMap.put("allFilePath", infoMap.getOrDefault("allFilePath", ""));
-            tCruiseTaskResultMap.put("confirmPicPath", infoMap.getOrDefault("confirmRelativePath", ""));
-            tCruiseTaskResultMap.put("origConfirmPicPath", infoMap.getOrDefault("confirmAbsolutePath", ""));
-            if ("3".equals(robotPatrolTaskResult.getFileType())) {
-                // 声音文件处理
-                tCruiseTaskResultMap.put("voicePath", infoMap.getOrDefault("relativePath", ""));
-            }
-            tCruiseTaskResultMap.putIfAbsent("evaluationState", String.valueOf(EVALUATION_STATE_UN));
-            tCruiseTaskResultMap.put("recognitionType", robotPatrolTaskResult.getRecognitionType());
-            tCruiseTaskResultMap.put("fileType", robotPatrolTaskResult.getFileType());
-            tCruiseTaskResultMap.put("rectangle", Optional.ofNullable(robotPatrolTaskResult.getRectangle()).orElse("1,1;2,2;3,3;4,4"));
-            tCruiseTaskResultMap.put("valueType", robotPatrolTaskResult.getValueType());
-            if (StringUtils.isNotEmpty(robotPatrolTaskResult.getUnit())){
-                tCruiseTaskResultMap.put("unit", robotPatrolTaskResult.getUnit());
-            }
+            resultHandler.cruiseTaskResultInitialize(tCruiseTaskResultMap, infoMap, robotPatrolTaskResult, taskId, insInfo);
             // 巡视结果、异常原因、执行状态处理
             boolean res = setCruiseResult(tCruiseTaskResultMap, instanceId);
             if (res) {
                 log.info("本测点 {} 结果下级已经返回过并且正常，本次返回的结果不正确，本次结果不处理！", instanceId);
                 return;
             }
-
-            log.info("tCruiseTaskResultMap {}", tCruiseTaskResultMap);
-
-            redisTemplate.opsForHash().putAll(redisKeyName, tCruiseTaskResultMap);
-            redisTemplate.expire(redisKeyName, 7, TimeUnit.DAYS);
-            Object waiter = MAP_LOCK.get(taskId + instanceId);
-            if (Objects.nonNull(waiter)) {
-                synchronized (waiter) {
-                    waiter.notifyAll();
-                }
-                MAP_LOCK.remove(taskId + instanceId);
-            }
-
+            resultHandler.saveTaskResultAndNotify(tCruiseTaskResultMap, taskId, instanceId, redisKeyName);
             // 是否为本级系统下发给下级系统的任务
             boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode, tCruiseTaskResultMap.get("cruiseType"), robotPatrolTaskResult.getValue());
             if (Boolean.FALSE.equals(flag)) {
@@ -204,95 +167,8 @@ public class InspectionResultThread implements Runnable{
         tCruiseTaskResultMap.put("cruiseAbnormal", cruiseAbnormal);
 //        computeEmpty(tCruiseTaskResultMap, "cruiseResult", cruiseResult);
 //        computeEmpty(tCruiseTaskResultMap, "cruiseAbnormal", cruiseAbnormal);
-
-        // 重新获取一下异常状态，可能异常状态已经设置过了，譬如超时，终止
-        cruiseAbnormal = tCruiseTaskResultMap.get("cruiseAbnormal");
-        // 更改点位执行状态
-        int cruiseStatus;
-        int cruiseAbnormalTemp = NumberUtils.toInt(cruiseAbnormal);
-        switch (cruiseAbnormalTemp) {
-            // 超时-执行遗漏、任务终止和检修-执行忽略、采集失败和离线-执行失败
-            case CRUISE_ABNORMAL_TIMEOUT:
-                cruiseStatus = CRUISE_STATE_OMIT;
-                break;
-            case CRUISE_ABNORMAL_INTERRUPT:
-            case CRUISE_ABNORMAL_OVERHAUL:
-                cruiseStatus = CRUISE_STATE_IGNORE;
-                break;
-            case CRUISE_ABNORMAL_NOPIC:
-            case CRUISE_ABNORMAL_OFFLINE:
-                cruiseStatus = CRUISE_STATE_FAILED;
-                break;
-            default:
-                cruiseStatus = CRUISE_STATE_DONE;
-                break;
-        }
-        tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(cruiseStatus));
-        return whetherDiscarded(oldCruiseResult, cruiseResult);
-    }
-
-    /**
-     *
-     * @param oldCruiseResult 已入库数据
-     * @param cruiseResult 当前数据
-     * @return 是否丢弃消息
-     */
-    private boolean whetherDiscarded(String oldCruiseResult, String cruiseResult) {
-        //未入库 不丢弃
-        if (CommonUtils.isEmptyOrNullstr(oldCruiseResult)) {
-            return false;
-        } else {
-            //已入库 入库结果为正常 并且 新的结果是异常 丢弃 不更新，其余情况都更新
-            return String.valueOf(CRUISE_RESULT_NORMAL).equals(oldCruiseResult)
-                    && String.valueOf(CRUISE_RESULT_ABNORMAL).equals(cruiseResult);
-        }
-    }
-
-    private void upSystemTaskInfoInitialize(Map<String, String> map, String taskId, TCruisePointInstance insInfo) {
-        log.info("upSystemTaskInfoInitialize, taskId: {}", taskId);
-        if(insInfo == null){
-            log.error("task upSystem is error. taskId: {}", taskId);
-        } else {
-            String instanceId = String.valueOf(insInfo.getInstanceId());
-            map.put("deviceId", String.valueOf(insInfo.getDeviceId()));
-            map.put("instanceId", instanceId);
-            map.put("cruiseName", insInfo.getCruiseName());
-            map.put("cruiseId", String.valueOf(insInfo.getCruiseId()));
-            map.put("cruiseType", String.valueOf(insInfo.getCruiseType()));
-
-            HashMap<String, String> patrolDevice = analyseDataOperateDao.selectPatrolDevice(instanceId);
-            map.put("deviceName", MapUtils.getString(patrolDevice, "deviceName"));
-            map.put("cruiseDeviceId", MapUtils.getString(patrolDevice, "patroldevice_code"));
-            map.put("cruiseDeviceName", MapUtils.getString(patrolDevice, "patroldevice_name", ""));
-            map.put("deviceMeteId", MapUtils.getString(patrolDevice, "deviceMeteId"));
-            map.put("deviceMeteName", MapUtils.getString(patrolDevice, "deviceMeteName"));
-            map.put("customId", MapUtils.getString(patrolDevice, "customId"));
-            map.put("customName", MapUtils.getString(patrolDevice, "customName"));
-            map.put("devicePointId", MapUtils.getString(patrolDevice, "devicePointId", ""));
-        }
-
-        map.put("instanceName", robotPatrolTaskResult.getDeviceName());
-        map.put("picPathAnl", "");
-        map.putIfAbsent("remark", "");
-        map.putIfAbsent("points", "");
-        map.putIfAbsent("origConfirmPicPath", "");
-        map.putIfAbsent("firDate", "");
-        map.putIfAbsent("confirmPicPath", "");
-        map.putIfAbsent("modifyNum", "");
-        map.putIfAbsent("origPicAnl", "");
-        map.putIfAbsent("identifyResult", "");
-        map.putIfAbsent("personCheck", "");
-        map.putIfAbsent("createtime", DateTimeUtil.getDateTimeString());
-        map.putIfAbsent("identifyState", "");
-        map.putIfAbsent("resultPic", "");
-        map.putIfAbsent("firName", "");
-        map.putIfAbsent("resultDesc", "");
-        map.putIfAbsent("checkDate", "");
-        map.put("cruiseTime", robotPatrolTaskResult.getTime());
-        map.putIfAbsent("checkUser", "");
-        map.putIfAbsent("cameraId", "");
-        map.putIfAbsent("voicePath", "");
-        map.put("taskId", taskId);
+        resultHandler.updateCruiseStatus(tCruiseTaskResultMap);
+        return resultHandler.whetherDiscarded(oldCruiseResult, cruiseResult);
     }
 
     /**

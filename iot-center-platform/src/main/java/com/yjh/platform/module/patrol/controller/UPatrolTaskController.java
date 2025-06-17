@@ -23,6 +23,8 @@ import com.yjh.platform.module.task.dao.TPeriodModelDao;
 import com.yjh.platform.module.task.entity.TCruiseTaskAdd;
 import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
 import com.yjh.platform.module.task.entity.TCruiseTaskList;
+import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.user.entity.TRobotInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -63,6 +65,8 @@ public class UPatrolTaskController {
     private RobotProxy robotProxy;
     @Autowired
     private UpdatePatrolService updatePatrolService;
+    @Autowired
+    private TRobotInfoDao tRobotInfoDao;
 
     private Logger log = LoggerFactory.getLogger(UPatrolTaskController.class);
 
@@ -81,7 +85,12 @@ public class UPatrolTaskController {
         try {
             log.info("The resultList from accessRobot is=={}", resultList);
             resultList = patrolResultHandler.robotPatrolTaskResultCopy(resultList);
-            patrolResultHandler.robotPatrolTaskResult(resultList);
+            TRobotInfo robotInfo = tRobotInfoDao.selectByRobotCode(resultList.get(0).getSendCode());
+            if (Objects.equals(robotInfo.getRobotType(), 905)) {
+                patrolResultHandler.simpleRobotPatrolResult(resultList);
+            } else {
+                patrolResultHandler.robotPatrolTaskResult(resultList);
+            }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
