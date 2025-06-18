@@ -368,7 +368,7 @@
         a.if_videotape,
         a.videotape_time,
         a.text_desc,
-        a.sort,
+        a.sort
         from t_cruise_point_instance a
         where 1 = 1
         <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>

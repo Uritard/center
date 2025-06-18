@@ -1,5 +1,9 @@
 package com.yjh.platform.module.device.entity;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
+
 /**
  * <功能描述>
  *
@@ -28,7 +32,8 @@ public enum AnalyseTypeEnum {
     PRESET_POSITION_OFFSET_DETECTION("14", "presetCheck"),
     DEFECT_RECOGNITION("398", "缺陷识别"),
     OCR_RECOGNITION("15", "ocrAnalyse"),
-    TARGET_BOX_RECOGNITION("16", "autoLabelAnalyse");
+    TARGET_BOX_RECOGNITION("16", "autoLabelAnalyse"),
+    ANALYSE_NEW_METER_TEST("17", "analyseNewMeterTest");
 
     private final String code;
 
@@ -45,5 +50,18 @@ public enum AnalyseTypeEnum {
 
     public String getName() {
         return name;
+    }
+
+    /**
+     * 判断是否存在
+     *
+     * @param name 名称
+     * @return 是否存在
+     */
+    public static Boolean contains(String name) {
+        if (StringUtils.isBlank(name)) {
+            return false;
+        }
+        return Arrays.stream(AnalyseTypeEnum.values()).anyMatch(item -> name.contains(item.getName()));
     }
 }

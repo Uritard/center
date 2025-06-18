@@ -2,8 +2,6 @@ package com.yjh.platform.module.simple.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
@@ -12,13 +10,10 @@ import com.yjh.platform.common.utils.ImageSplitUtil;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.configuration.SysParamConfig;
-import com.yjh.platform.module.device.entity.TCruisePointInstance;
-import com.yjh.platform.module.device.entity.TRobotInspection;
-import com.yjh.platform.module.device.entity.TStdDevice;
+import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.device.service.TCruisePointInstanceService;
 import com.yjh.platform.module.device.service.TRobotInspectionService;
 import com.yjh.platform.module.device.service.TStdDeviceService;
-import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.service.TStdDevicemeteService;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.CalibrationData;
@@ -29,11 +24,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
@@ -79,6 +77,7 @@ public class SimplePointServiceImpl implements SimplePointService {
     private final TStdDevicemeteService stdDeviceMeteService;
     private final TCruisePointInstanceService cruisePointInstanceService;
     private final IntelAnalysisService analysisService;
+    private final RedisTemplate redisTemplate;
 
     /**
      * 获取底图
@@ -89,24 +88,23 @@ public class SimplePointServiceImpl implements SimplePointService {
     @Override
     public BasePhotoInfo basePhoto(Long deviceId) {
         TStdDevice stdDevice = stdDeviceService.selectByPrimaryId(deviceId);
+        if (StringUtils.isBlank(stdDevice.getRegionPath())) {
+            throw new BusinessException("该设备目前没有底图！");
+        }
         String photoPath =
             ImageSplitUtil.convertPath(stdDevice.getRegionPath(), Constant.SIMPLE_PIC, SysParamConfig.getSysContent("simplePicPath"));
-        if (StringUtils.isBlank(photoPath)) {
-            throw new BusinessException("该设备没有底图！");
-        }
         File photoFile = new File(photoPath);
         if (!photoFile.exists()) {
             throw new BusinessException("底图文件不存在！");
         }
         try {
-            //将底图拷贝到临时目录下
-            String tempPath = photoFile.getParent() + File.separator + TEMP_PATH + File.separator + photoFile.getName();
-            File tempFile = new File(tempPath);
-            FileUtil.mkParentDirs(tempFile);
-            FileUtil.copyFile(photoFile, tempFile, StandardCopyOption.REPLACE_EXISTING);
             //拆图
-            List<String> mainPaths = ImageSplitUtil.splitImage(tempFile, 2, ImageSplitUtil.ImageSplitType.VERTICAL, BASE_PREFIX);
-            return new BasePhotoInfo().setMainPath(mainPaths.get(0)).setSparePath(mainPaths.get(1));
+            int splitNum = 2;
+            String[] mainPaths = ImageSplitUtil.splitImage(photoFile, splitNum, ImageSplitUtil.ImageSplitType.VERTICAL, BASE_PREFIX);
+            if (mainPaths.length != splitNum) {
+                throw new BusinessException("底图分割异常！");
+            }
+            return new BasePhotoInfo().setMainPath(mainPaths[0]).setSparePath(mainPaths[1]);
         } catch (Exception e) {
             log.error("底图处理异常！", e);
             throw new BusinessException("底图处理异常！");
@@ -131,8 +129,8 @@ public class SimplePointServiceImpl implements SimplePointService {
         }
 
         // 转换获取绝对路径
-        String mainPath = ImageSplitUtil.convertPath(basePhotoInfo.getMainPath(), Constant.SIMPLE_PIC,
-                SysParamConfig.getSysContent("simplePicPath"));
+        String mainPath =
+            ImageSplitUtil.convertPath(basePhotoInfo.getMainPath(), Constant.SIMPLE_PIC, SysParamConfig.getSysContent("simplePicPath"));
         File file = new File(mainPath);
 
         if (!file.exists()) {
@@ -142,16 +140,20 @@ public class SimplePointServiceImpl implements SimplePointService {
         Map<String, Object> result = Maps.newHashMap();
 
         try {
-            List<String> splitImageList =
-                ImageSplitUtil.splitImage(file, splitNum, ImageSplitUtil.ImageSplitType.HORIZONTAL, MAIN_POINT_PREFIX);
+            //将底图拷贝到临时目录下
+            File mainTempFile = copyFile(file);
+            String[] splitImageList =
+                ImageSplitUtil.splitImage(mainTempFile, splitNum, ImageSplitUtil.ImageSplitType.HORIZONTAL, MAIN_POINT_PREFIX);
             result.put("mainPaths", splitImageList);
             if (StringUtils.isNotBlank(basePhotoInfo.getSparePath())) {
                 String sparePath = ImageSplitUtil.convertPath(basePhotoInfo.getSparePath(), Constant.SIMPLE_PIC,
                     SysParamConfig.getSysContent("simplePicPath"));
                 File spareFile = new File(sparePath);
                 if (spareFile.exists()) {
-                    List<String> splitSpareImageList =
-                        ImageSplitUtil.splitImage(spareFile, splitNum, ImageSplitUtil.ImageSplitType.HORIZONTAL, SPARE_POINT_PREFIX);
+                    //将底图拷贝到临时目录下
+                    File splitTempFile = copyFile(spareFile);
+                    String[] splitSpareImageList =
+                        ImageSplitUtil.splitImage(splitTempFile, splitNum, ImageSplitUtil.ImageSplitType.HORIZONTAL, SPARE_POINT_PREFIX);
                     result.put("sparePaths", splitSpareImageList);
                 }
             }
@@ -166,6 +168,21 @@ public class SimplePointServiceImpl implements SimplePointService {
     }
 
     /**
+     * 拷贝文件
+     *
+     * @param file 文件
+     * @return File
+     */
+    private File copyFile(File file) {
+        //将底图拷贝到临时目录下
+        String tempPath = file.getParent() + File.separator + TEMP_PATH + File.separator + file.getName();
+        File tempFile = new File(tempPath);
+        FileUtil.mkParentDirs(tempFile);
+        FileUtil.copyFile(file, tempFile, StandardCopyOption.REPLACE_EXISTING);
+        return tempFile;
+    }
+
+    /**
      * 底图保存
      *
      * @param photoBuild 底图信息
@@ -174,7 +191,7 @@ public class SimplePointServiceImpl implements SimplePointService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean basePhotoBuild(BasePhotoBuild photoBuild) {
-        if (CollectionUtils.isNotEmpty(photoBuild.getPhotoInfo())) {
+        if (CollectionUtils.isEmpty(photoBuild.getPhotoInfo())) {
             throw new BusinessException("底图信息不能为空！");
         }
         String simplePicPath = SysParamConfig.getSysContent("simplePicPath");
@@ -198,9 +215,9 @@ public class SimplePointServiceImpl implements SimplePointService {
                 //将临时文件拷贝到简易测点图片目录下
                 FileUtil.copyFile(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
                 TRobotInspection robotInspection = new TRobotInspection();
-                robotInspection.setInspectionType(1).setInspectionCode(inspectionCode).setRobotId(photoBuild.getRobotId()).setSaveTypeList("jpg")
-                    .setInspectionName(photoBuild.getDeviceName() + "/" + build.getPhotoName()).setPhotoNum(build.getPhotoNum())
-                    .setMainDeviceId(String.valueOf(photoBuild.getDeviceId())).setComponentId(componentId)
+                robotInspection.setInspectionType(1).setInspectionCode(inspectionCode).setRobotId(photoBuild.getRobotId())
+                    .setSaveTypeList("jpg").setInspectionName(photoBuild.getDeviceName() + "/" + build.getPhotoName())
+                    .setPhotoNum(build.getPhotoNum()).setMainDeviceId(String.valueOf(photoBuild.getDeviceId())).setComponentId(componentId)
                     .setPropertyPicPath(ImageSplitUtil.convertPath(targetPath, simplePicPath, Constant.SIMPLE_PIC));
                 robotInspections.add(robotInspection);
             }
@@ -272,6 +289,12 @@ public class SimplePointServiceImpl implements SimplePointService {
                     .setDeviceId(deviceMeteList.get(i).getDeviceId()).setCruiseId(robotInspection.getInspectionId())
                     .setCruiseName(deviceMeteList.get(i).getMeteName()).setCruiseType(CruiseConstant.TypeEnum.ROBOT.getCode());
                 cruisePointInstanceList.add(cruisePointInstance);
+                if (deviceConfigList.get(i).getDevType().equals(AnalyseMeteTypeEnum.NEW_SX_BJ.getName())) {
+                    if (CollectionUtils.isEmpty(deviceConfigList.get(i).getParams())) {
+                        throw new BusinessException(deviceConfigList.get(i).getDevName() + "的标定参数不能为空！");
+                    }
+                    deviceConfigList.get(i).getParams().get(0).setDevUuid(deviceConfigList.get(i).getDevUuid());
+                }
                 deviceConfigList.get(i).setDevUuid(String.valueOf(deviceMeteList.get(i).getDeviceMeteId()));
             }
             int resInstance = cruisePointInstanceService.batchInsert(cruisePointInstanceList);
@@ -330,6 +353,22 @@ public class SimplePointServiceImpl implements SimplePointService {
     }
 
     /**
+     * 获取子点位标定数据
+     *
+     * @param inspectionId 巡检id
+     * @return CalibrationDataBuild
+     */
+    @Override
+    public List<DeviceConfig> selectCalibrationDataBuild(Long inspectionId) {
+        TRobotInspection robotInspection = tRobotInspectionService.selectByPrimaryId(inspectionId);
+        List<DeviceConfig> deviceConfigList = new ArrayList<>();
+        if (robotInspection != null && StringUtils.isNotBlank(robotInspection.getDeviceInfo())) {
+            deviceConfigList = JSON.parseArray(robotInspection.getDeviceInfo(), DeviceConfig.class);
+        }
+        return deviceConfigList;
+    }
+
+    /**
      * 标定数据批量上传
      *
      * @param inspectionIds 巡检id
@@ -349,5 +388,49 @@ public class SimplePointServiceImpl implements SimplePointService {
             return true;
         }
         return analysisService.calibrationDataUpload(calibrationDataList);
+    }
+
+    /**
+     * 测试分析
+     *
+     * @param inspectionId 巡检id
+     * @return Boolean
+     */
+    @Override
+    public Boolean analyseTest(Long inspectionId, Long userId) {
+        TRobotInspection robotInspection = tRobotInspectionService.selectByPrimaryId(inspectionId);
+        String picPath = robotInspection.getPropertyPicPath().replace(Constant.SIMPLE_PIC, SysParamConfig.getSysContent("simplePicPath"));
+        File file = new File(picPath);
+        if (!file.exists()) {
+            log.error("基础图片不存在！");
+            throw new BusinessException("基础图片不存在！");
+        }
+        // 调用算法接口分析结果
+        List<Analysis> analysisList = new ArrayList<>();
+        Analysis analysis = new Analysis().setAnalyseType(AnalyseTypeEnum.ANALYSE_NEW_METER_TEST.getCode()).setInstanceId(inspectionId)
+            .setTaskId(AnalyseTypeEnum.ANALYSE_NEW_METER_TEST.getName() + "_" + robotInspection.getInspectionId() + "_" + userId)
+            .setPicPath(picPath).setPicModelPath("/" + inspectionId);
+        analysisList.add(analysis);
+        return analysisService.analyseTest(analysisList);
+    }
+
+    /**
+     * 查询巡视点位的算法分析结果数据
+     *
+     * @param inspectionId 巡检id
+     * @return 算法分析结果数据
+     */
+    @Override
+    public List<MeterAnalyseResult> selectMeterAnalyseResult(Long inspectionId) {
+        String key = AnalyseTypeEnum.ANALYSE_NEW_METER_TEST.getName() + ":" + inspectionId;
+        Map<String, String> meterAnalyseMapList = redisTemplate.opsForHash().entries(key);
+        List<MeterAnalyseResult> meterAnalyseList = new ArrayList<>();
+        meterAnalyseMapList.forEach((k, v) -> {
+            MeterAnalyseResult meterAnalyseResult = new MeterAnalyseResult();
+            meterAnalyseResult.setId(k);
+            meterAnalyseResult.setValue(v);
+            meterAnalyseList.add(meterAnalyseResult);
+        });
+        return meterAnalyseList;
     }
 }

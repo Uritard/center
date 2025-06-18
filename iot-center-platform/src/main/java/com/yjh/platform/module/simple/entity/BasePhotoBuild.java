@@ -2,6 +2,9 @@ package com.yjh.platform.module.simple.entity;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -16,16 +19,19 @@ public class BasePhotoBuild {
     /**
      * 机器人id
      */
+    @NotNull(message = "robotId不为空！")
     private Long robotId;
 
     /**
      * 设备id
      */
+    @NotNull(message = "deviceId不为空！")
     private Long deviceId;
 
     /**
      * 设备名称
      */
+    @NotBlank(message = "设备名称不能为空！")
     private String deviceName;
 
     /**
@@ -36,6 +42,7 @@ public class BasePhotoBuild {
     /**
      * 底图信息
      */
+    @NotEmpty(message = "底图信息不能为空！")
     private List<PointPhotoInfo> photoInfo;
 
 }

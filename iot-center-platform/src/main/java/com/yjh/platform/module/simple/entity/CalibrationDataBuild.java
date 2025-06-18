@@ -2,6 +2,8 @@ package com.yjh.platform.module.simple.entity;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -17,11 +19,13 @@ public class CalibrationDataBuild {
     /**
      * 外观id
      */
+    @NotNull(message = "外观id不能为空")
     private Long inspectionId;
 
     /**
      * 标定数据
      */
+    @NotEmpty(message = "子点位标定数据不能为空")
     private List<DeviceConfig> deviceConfig;
 
 }

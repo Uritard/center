@@ -11,8 +11,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -32,7 +36,7 @@ public class SimplePointController {
     private final SimplePointService simplePointService;
 
     @ApiOperation(value = "获取底图")
-    @PostMapping(value = "/basePhoto")
+    @GetMapping(value = "/basePhoto")
     public Result basePhoto(@RequestParam(value = "deviceId", required = false) Long deviceId) {
         Result result = new Result();
         try {
@@ -63,7 +67,7 @@ public class SimplePointController {
 
     @ApiOperation(value = "底图保存")
     @PostMapping(value = "/basePhotoBuild")
-    public Result basePhotoBuild(@RequestBody BasePhotoBuild photoBuild) {
+    public Result basePhotoBuild(@RequestBody @Valid BasePhotoBuild photoBuild) {
         Result result = new Result();
         try {
             result.setData(simplePointService.basePhotoBuild(photoBuild));
@@ -78,10 +82,26 @@ public class SimplePointController {
 
     @ApiOperation(value = "子点位标定数据保存")
     @PostMapping(value = "/calibrationDataBuild")
-    public Result calibrationDataBuild(@RequestBody CalibrationDataBuild dataBuild) {
+    public Result calibrationDataBuild(@RequestBody @Valid CalibrationDataBuild dataBuild) {
         Result result = new Result();
         try {
             result.setData(simplePointService.calibrationDataBuild(dataBuild));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("子点位标定数据保存接口调用错误:", e);
+        }
+        return result;
+    }
+
+
+    @ApiOperation(value = "查询子点位标定数据")
+    @GetMapping(value = "/selectCalibrationDataBuild")
+    public Result selectCalibrationDataBuild(@RequestParam(value = "inspectionId") Long inspectionId) {
+        Result result = new Result();
+        try {
+            result.setData(simplePointService.selectCalibrationDataBuild(inspectionId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -102,6 +122,37 @@ public class SimplePointController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("标定数据批量上传接口调用错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "算法测试识别")
+    @GetMapping(value = "/analyseTest")
+    public Result analyseTest(HttpServletRequest request, @RequestParam(value = "inspectionId", required = false) Long inspectionId) {
+        Result result = new Result();
+        try {
+            String userIdStr = request.getHeader("userId");
+            Long userId = NumberUtils.toLong(userIdStr, 10001L);
+            result.setData(simplePointService.analyseTest(inspectionId, userId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("算法测试识别接口调用错误:", e);
+        }
+        return result;
+    }
+
+
+    @ApiOperation(value = "查询巡视点位的算法分析结果数据")
+    @GetMapping(value = "/selectMeterAnalyseResult")
+    public Result selectMeterAnalyseResult(@RequestParam(value = "inspectionId", required = false) Long inspectionId) {
+        Result result = new Result();
+        try {
+            result.setData(simplePointService.selectMeterAnalyseResult(inspectionId));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询巡视点位的结果数据失败描述：", e);
         }
         return result;
     }
