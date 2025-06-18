@@ -436,8 +436,7 @@ public class IntelAnalysisService {
         String flagId = response.getRequestId().split("#")[1];
         // 正常的巡视多了接口会阻塞，所以放在线程池
         if (ArrayUtils.contains(new String[] {"jm", "yjsk", "666666"}, flagId) || StringUtils.endsWith(flagId, "presetCheck")
-            || StringUtils.equals(AnalyseTypeEnum.OCR_RECOGNITION.getName(), flagId)
-            || StringUtils.equals(AnalyseTypeEnum.TARGET_BOX_RECOGNITION.getName(), flagId)) {
+            || AnalyseTypeEnum.contains(flagId)) {
             picResAnalyse(response);
         } else {
             AlgorithmAnalyseThread analyseThread = new AlgorithmAnalyseThread(response, flagId);
@@ -502,13 +501,58 @@ public class IntelAnalysisService {
             presetCheckHandle(response, flagId);
             return;
         }
-        if (StringUtils.equals(AnalyseTypeEnum.OCR_RECOGNITION.getName(), flagId)) {
+        if (StringUtils.contains(flagId, AnalyseTypeEnum.OCR_RECOGNITION.getName())) {
             log.info("flagId判断为==>{}", flagId);
-            ocrHandle(response);
+            ocrHandle(response, flagId);
         }
-        if (StringUtils.equals(AnalyseTypeEnum.TARGET_BOX_RECOGNITION.getName(), flagId)) {
+        if (StringUtils.contains(flagId, AnalyseTypeEnum.TARGET_BOX_RECOGNITION.getName())) {
             log.info("flagId判断为==>{}", flagId);
-            targetBoxHandle(response);
+            targetBoxHandle(response, flagId);
+        }
+        //新表计测试 flagId包含了inspectionId
+        if (StringUtils.contains(flagId, AnalyseTypeEnum.ANALYSE_NEW_METER_TEST.getName())) {
+            log.info("flagId判断为==>{}", flagId);
+            newMeterHandle(response, flagId);
+        }
+    }
+
+    /**
+     * 新表计测试
+     * 结果放入redis中
+     * @param response 返回结果
+     * @param flagId flagId包含了inspectionId userId analyseNewMeterTest_inspectionId_userId
+     */
+    private void newMeterHandle(PicAnalyseResponse response, String flagId) {
+        try {
+            String ids = StringUtils.substringAfter(flagId, "_");
+            String [] str = ids.split("_");
+            String inspectionId = str[0];
+            String userId = str[1];
+            if (CollectionUtils.isNotEmpty(response.getResultList())) {
+                Map<String, String> stringMap = Maps.newHashMap();
+                for (AnalyseResult result : response.getResultList()) {
+                    // objectId 测点id
+                    String objectId = result.getObjectId();
+                    List<AnalyseResultItem> resultList = result.getResults();
+                    if (CollectionUtils.isNotEmpty(resultList)) {
+                        String value = resultList.get(0).getValue();
+                        //  保存结果入redis
+                        stringMap.put(objectId, value);
+                    }
+                }
+                if (!stringMap.isEmpty()) {
+                    String meterKey = AnalyseTypeEnum.ANALYSE_NEW_METER_TEST.getName() + ":" + inspectionId;
+                    redisTemplate.opsForHash().putAll(meterKey, stringMap);
+                    redisTemplate.expire(meterKey, 7, TimeUnit.DAYS);
+                    //  发送消息给前端
+                    Map<String, String> map = Maps.newHashMap();
+                    map.put("type", AnalyseTypeEnum.ANALYSE_NEW_METER_TEST.getName());
+                    map.put("inspectionId", inspectionId);
+                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL, map, userId);
+                }
+            }
+        } catch (Exception e) {
+            log.error("newMeterHandle resultList is empty !");
         }
     }
 
@@ -516,37 +560,39 @@ public class IntelAnalysisService {
      * 自动标注识别结果处理
      * @param response 返回结果
      */
-    private void targetBoxHandle(PicAnalyseResponse response) {
+    private void targetBoxHandle(PicAnalyseResponse response, String flagId) {
         try {
+            String objectId = StringUtils.substringAfter(flagId, "_");
             if (CollectionUtils.isNotEmpty(response.getResultList())) {
-                // objectId 唯一标识
-                String objectId = response.getResultList().get(0).getObjectId();
-                List<AnalyseResultItem> resultList = response.getResultList().get(0).getResults();
-                if (CollectionUtils.isEmpty(resultList)) {
-                    CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
-                    return;
-                }
                 List<TargetBoxResult> targetBoxResultList = new ArrayList<>();
                 AtomicBoolean atomicBoolean = new AtomicBoolean(true);
-                //对返回框重新构建返回数据
-                for (AnalyseResultItem item : resultList) {
-                    List<Area> pos = item.getPos();
-                    if (CollectionUtils.isEmpty(pos)) {
-                        atomicBoolean.set(false);
-                        break;
+                for (AnalyseResult analyseResult : response.getResultList()) {
+                    // objectId 唯一标识
+                    List<AnalyseResultItem> resultList = analyseResult.getResults();
+                    if (CollectionUtils.isEmpty(resultList)) {
+                        CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
+                        return;
                     }
-                    for (Area area: pos) {
-                        List<Point> points = area.getAreas();
-                        if (CollectionUtils.isEmpty(points) || points.size() != 2) {
+                    //对返回框重新构建返回数据
+                    for (AnalyseResultItem item : resultList) {
+                        List<Area> pos = item.getPos();
+                        if (CollectionUtils.isEmpty(pos)) {
                             atomicBoolean.set(false);
                             break;
                         }
-                        TargetBoxResult targetBoxResult = new TargetBoxResult();
-                        targetBoxResult.setX1(points.get(0).getX());
-                        targetBoxResult.setY1(points.get(0).getY());
-                        targetBoxResult.setX2(points.get(1).getX());
-                        targetBoxResult.setY2(points.get(1).getY());
-                        targetBoxResultList.add(targetBoxResult);
+                        for (Area area : pos) {
+                            List<Point> points = area.getAreas();
+                            if (CollectionUtils.isEmpty(points) || points.size() != 2) {
+                                atomicBoolean.set(false);
+                                break;
+                            }
+                            TargetBoxResult targetBoxResult = new TargetBoxResult();
+                            targetBoxResult.setX1(points.get(0).getX());
+                            targetBoxResult.setY1(points.get(0).getY());
+                            targetBoxResult.setX2(points.get(1).getX());
+                            targetBoxResult.setY2(points.get(1).getY());
+                            targetBoxResultList.add(targetBoxResult);
+                        }
                     }
                 }
                 if (atomicBoolean.get()) {
@@ -555,9 +601,11 @@ public class IntelAnalysisService {
                     CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
                 }
             } else {
-              log.error("targetBoxHandle resultList is empty !");
+                CommonFutureUtil.futureComplete(id, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
+                log.error("targetBoxHandle resultList is empty !");
             }
         } catch (Exception e) {
+            CommonFutureUtil.futureComplete(id, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
             log.error("targetBoxHandle error", e);
         }
     }
@@ -566,18 +614,33 @@ public class IntelAnalysisService {
      * ocr 识别结果处理
      * @param response 返回结果
      */
-    private void ocrHandle(PicAnalyseResponse response) {
+    private void ocrHandle(PicAnalyseResponse response, String flagId) {
+        String objectId = StringUtils.substringAfter(flagId, "_");
         try {
             if (CollectionUtils.isNotEmpty(response.getResultList())) {
-                String objectId = response.getResultList().get(0).getObjectId();
-                List<AnalyseResultItem> resultList = response.getResultList().get(0).getResults();
-                if (CollectionUtils.isEmpty(resultList)) {
+                //唯一标识
+                List<OcrAnalyseResponse> ocrAnalyseResponseList = new ArrayList<>();
+                for (AnalyseResult analyseResult : response.getResultList()) {
+                    List<AnalyseResultItem> resultList = analyseResult.getResults();
+                    if (CollectionUtils.isEmpty(resultList)) {
+                        CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
+                        return;
+                    }
+                    OcrAnalyseResponse ocrAnalyseResponse = new OcrAnalyseResponse();
+                    ocrAnalyseResponse.setDevUuid(analyseResult.getObjectId());
+                    //识别结果使用描述字段
+                    String desc = resultList.get(0).getDesc();
+                    ocrAnalyseResponse.setValue(desc);
+                    ocrAnalyseResponseList.add(ocrAnalyseResponse);
+                }
+                if (CollectionUtils.isEmpty(ocrAnalyseResponseList)) {
                     CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
                 } else {
-                    CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.success(resultList));
+                    CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.success(ocrAnalyseResponseList));
                 }
             }
         } catch (Exception e) {
+            CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
             log.error("ocrHandle error", e);
         }
     }
@@ -1677,9 +1740,9 @@ public class IntelAnalysisService {
         //路径转换
         String picPath = ImageSplitUtil.convertPath(ocrAnalyseRequest.getImagePath(), Constant.SIMPLE_PIC,
             SysParamConfig.getSysContent("simplePicPath"));
-        analysis.setTaskId(AnalyseTypeEnum.OCR_RECOGNITION.getName()).setPicPath(picPath)
+        analysis.setTaskId(AnalyseTypeEnum.OCR_RECOGNITION.getName() + "_" + id).setPicPath(picPath)
             .setAnalyseType(AnalyseTypeEnum.OCR_RECOGNITION.getCode()).setInstanceId(id);
-        analysis.setPicModelPath(JSON.toJSONString(ocrAnalyseRequest.getOcrBoxes()));
+        analysis.setPicModelPath(JSON.toJSONString(ocrAnalyseRequest.getParams()));
         try {
             CompletableFuture<com.yjh.video.api.result.Result<List<AnalyseResultItem>>> future =
                 CommonFutureUtil.registerFuture(String.valueOf(id));
@@ -1716,7 +1779,7 @@ public class IntelAnalysisService {
         //路径转换
         String picPath = ImageSplitUtil.convertPath(targetBoxRequest.getImagePath(), Constant.SIMPLE_PIC,
             SysParamConfig.getSysContent("simplePicPath"));
-        analysis.setTaskId(AnalyseTypeEnum.TARGET_BOX_RECOGNITION.getName()).setPicPath(picPath)
+        analysis.setTaskId(AnalyseTypeEnum.TARGET_BOX_RECOGNITION.getName() + "_" + id).setPicPath(picPath)
             .setAnalyseType(targetBoxRequest.getType()).setInstanceId(id);
         try {
             CompletableFuture<com.yjh.video.api.result.Result<List<TargetBoxResult>>> future =
@@ -1749,5 +1812,15 @@ public class IntelAnalysisService {
     public Boolean calibrationDataUpload(List<CalibrationData> dataList) {
         Response response = analyticsService.calibrationDataUpload(dataList);
         return ResultCodeEnum.SUCCESS.getCode() == response.getCode();
+    }
+
+    /**
+     * 算法测试接口
+     *
+     * @param analysisList 算法参数
+     */
+    public Boolean analyseTest(List<Analysis> analysisList) {
+        Result result = analyticsService.analytics(analysisList);
+        return result.isSuccess();
     }
 }

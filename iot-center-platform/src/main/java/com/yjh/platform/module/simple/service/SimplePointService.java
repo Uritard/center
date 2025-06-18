@@ -1,10 +1,7 @@
 package com.yjh.platform.module.simple.service;
 
-import com.yjh.platform.module.simple.entity.BasePhotoBuild;
-import com.yjh.platform.module.simple.entity.BasePhotoInfo;
-import com.yjh.platform.module.simple.entity.CalibrationDataBuild;
+import com.yjh.platform.module.simple.entity.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -45,10 +42,33 @@ public interface SimplePointService {
      */
     Boolean calibrationDataBuild(CalibrationDataBuild dataBuild);
 
+
+    /**
+     * 获取子点位标定数据
+     * @param inspectionId 巡检id
+     * @return CalibrationDataBuild
+     */
+    List<DeviceConfig> selectCalibrationDataBuild(Long inspectionId);
+
     /**
      * 标定数据批量上传
      * @param inspectionIds 巡检id
      * @return Boolean
      */
     Boolean calibrationDataBatchUpload(List<Long> inspectionIds);
+
+    /**
+     * 测试分析
+     * @param inspectionId 巡检id
+     * @param userId userId
+     * @return Boolean
+     */
+    Boolean analyseTest(Long inspectionId, Long userId);
+
+    /**
+     * 查询巡视点位的算法分析结果数据
+     * @param inspectionId 巡检id
+     * @return 算法分析结果数据
+     */
+    List<MeterAnalyseResult> selectMeterAnalyseResult(Long inspectionId);
 }
