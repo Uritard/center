@@ -298,7 +298,7 @@ public abstract class AbstractVideoCruise {
             // 调用算法中
             inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_ANALYSE_DOING));
             inspectionMap.put("resultDesc", AbnormalResDescEnum.ANALYSISING.getDesc());
-            addCruiseAnalyScore(taskId, inspectionMap.get("instanceId"));
+            patrolResultHandler.addCruiseAnalysisScore(taskId, inspectionMap.get("instanceId"));
             // 表计
             if (StringUtils.isNotEmpty(algorithm.getMeteAnalyse())) {
                 analysis.setAnalyseType(algorithm.getMeteAnalyse());
@@ -333,23 +333,27 @@ public abstract class AbstractVideoCruise {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-
-        // 拍照结果处理
-        inspectionMap.put("resultNum", "-1");
-        // 巡视结果，异常
-        inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-        // 调用算法失败
-        inspectionMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_REQUESTFAILED));
-        // 异常值，调用算法失败
-        inspectionMap.put("resultDesc", AbnormalResDescEnum.ANALYSE_REQFAILED.getDesc());
-        // 巡检数据状态，已经执行
-        inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
+        patrolResultHandler.callFailedHandle(inspectionMap);
         return true;
     }
 
-    protected void addCruiseAnalyScore(String taskId, String instanceId) {
-        String cruiseScoresKey = UPatrolTaskService.PATROL_SUMMARY_PREFIX + taskId + UPatrolTaskService.TASK_ALL;
-        ((ZSetOperations<String, String>)redisTemplate.opsForZSet()).add(cruiseScoresKey, instanceId, 1D);
+    public boolean newAlgorithmAnalysis(String inspectionId, String taskId, Map<String, String> ret) {
+        try {
+            Analysis analysis = new Analysis();
+            analysis.setTaskId(taskId);
+            analysis.setAnalyseType("17");
+            analysis.setInstanceId(Long.parseLong(inspectionId));
+            analysis.setPicPath(ret.get("absPath"));
+            analysis.setPicModelPath("/" + inspectionId);
+            List<Analysis> analysisList = new ArrayList<>();
+            analysisList.add(analysis);
+            Result result = analysis(analysisList);
+            log.info("调用算法：   {}\n=========={}", JSON.toJSONString(analysisList), JSON.toJSONString(result));
+            if (200 == result.getCode()) return false;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return true;
     }
 
     protected boolean waitCamera2(String taskId, String cameraId, String presetName,String cameraIp) {
