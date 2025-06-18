@@ -1021,8 +1021,6 @@
             tdm.custom_id as customId,
             tdm.custom_name as customName,
             tdm.device_point_id as devicePointId,
-            c.photo_num as photoNum,
-            c.inspection_id as inspectionId,
             if(b.preset_id is null,if(c.inspection_id is null,if (d.voice_code is null,cfg.mete_id,d.voice_code),e.robot_num),b.camera_id) as patroldevice_code ,
             if(b.preset_id is null,if(c.inspection_id is null,if (d.voice_device_name is null,cfg.mete_name,d.voice_device_name),e.robot_name),f.camera_name) as patroldevice_name
         from t_cruise_point_instance a
