@@ -854,7 +854,8 @@ public class UPatrolTaskService {
             UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
             // 如果下级上报任务结束，则走任务结束处理逻辑，避免提前更改任务状态
             if (robotEnd) {
-
+                //更新redis任务描述
+                updateTaskDescriptionForRedis(taskId,robotPatrolTaskStatus.getDescription());
                 String taskIdFinal = taskId;
                 int fanalTaskState = taskState;
                 if (task.getTaskType() == SINGLE_DEVICE_PATROL
@@ -948,6 +949,8 @@ public class UPatrolTaskService {
             // taskSource==1 下级创建任务主动上报
             countChangeMap.put("taskSource", "1");
             countChangeMap.put("taskPatrolledId", robotPatrolTaskStatus.getTaskPatrolledId());
+            // 缓存添加异常描述字段
+            countChangeMap.put("description",robotPatrolTaskStatus.getDescription());
             countMap.putAll(countChangeMap);
         }
         /*if (!"1".equals(map.get("taskSource"))) {
@@ -2082,6 +2085,13 @@ public class UPatrolTaskService {
         redisTemplate.opsForHash().put(strForCountAbnormal, "taskState", state);
     }
 
+    public void updateTaskDescriptionForRedis(String taskId, String description) {
+        String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
+        log.info("任务异常原因变更, strForCountAbnormal:{}, {}", strForCountAbnormal, description);
+        redisTemplate.opsForHash().put(strForCountAbnormal, "description", description);
+    }
+
+
     public String taskStatus(String taskId) {
         String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
         HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
@@ -2691,6 +2701,7 @@ public class UPatrolTaskService {
             int taskStatus;
             int all;
             boolean ended;
+            String description;
             synchronized (LOCK_FLAG) {
                 String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
                 Map<String, String> resultCountsMap = redisTemplate.opsForHash().entries(strForCountAbnormal);
@@ -2699,6 +2710,8 @@ public class UPatrolTaskService {
 
                 taskStatus = NumberUtils.toInt(resultCountsMap.get("taskState"), TASK_STATE_FINISHED);
                 taskStatus = canFinish(taskStatus) ? TASK_STATE_FINISHED : taskStatus;
+                //获取redis中的异常原因description字段
+                description= resultCountsMap.get("description");
 
                 all = MapUtils.getIntValue(resultCountsMap, "all", 0);
 
@@ -2748,7 +2761,13 @@ public class UPatrolTaskService {
                 uPatrolDataResult.setCruiseDeviceId(redisInfoMap.get("cruiseDeviceId"));
                 uPatrolDataResult.setCruiseDeviceName(redisInfoMap.get("cruiseDeviceName"));
                 uPatrolDataResult.setResultNum(redisInfoMap.get("resultNum"));
-                uPatrolDataResult.setResultDesc(redisInfoMap.get("resultDesc"));
+                //判断任务状态是否为终止状态 如果是:设置巡视结果为任务的异常原因
+                if ((TASK_STATE_INTERRUPT==taskStatus) && (MapUtils.getIntValue(redisInfoMap, "cruiseResult") == (CruiseConstant.CRUISE_RESULT_ABNORMAL))) {
+                    //设置巡视值
+                    uPatrolDataResult.setResultDesc(description);
+                }else {
+                    uPatrolDataResult.setResultDesc(redisInfoMap.get("resultDesc"));
+                }
                 uPatrolDataResult.setUnit(redisInfoMap.get("unit"));
                 uPatrolDataResult.setPicpath(redisInfoMap.get("picpath"));
                 uPatrolDataResult.setCruiseType(NumberUtils.toInt(redisInfoMap.get("cruiseType")));
