@@ -291,7 +291,7 @@ public class RobotController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("巡视主机向机器人下发检修区域指令接口发生错误:", e);
+            log.error("巡视主机向机器人下发充电区域指令接口发生错误:", e);
         }
         return result;
     }

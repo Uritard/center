@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.controller;
 
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.entity.DeviceAndInstance;
 import com.yjh.platform.module.device.entity.IdAndNameDetail;
 import com.yjh.platform.module.device.entity.TDeviceMaintenanceDetail;
@@ -148,13 +149,15 @@ public class TDeviceMaintenanceController {
     @Logs(title = "查询设备检修区域",content = "根据用户传递的参数查询设备检修区域",logType = 1,authority = "1234")
     public Result selectByPage(@RequestParam(value = "maintenanceName", required = false) String maintenanceName,
                                @RequestParam(value = "effectiveState", required = false) Integer effectiveState,
+                               @RequestParam(value = "maintenanceStart", required = false) String maintenanceStart,
+                               @RequestParam(value = "maintenanceStop", required = false) String maintenanceStop,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
-        Map<String, Object> resultMap = new HashMap<>();
         try {
+            Map<String, Object> resultMap = new HashMap<>();
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TDeviceMaintenanceDetail> list = tDeviceMaintenanceService.selectByPage( maintenanceName,effectiveState);
+            List<TDeviceMaintenanceDetail> list = tDeviceMaintenanceService.selectByPage( maintenanceName,effectiveState,maintenanceStart,maintenanceStop);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

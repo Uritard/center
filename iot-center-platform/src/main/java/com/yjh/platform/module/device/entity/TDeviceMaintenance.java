@@ -85,5 +85,11 @@ public class TDeviceMaintenance implements Serializable {
     @TableField(value = "instance_ids",updateStrategy = FieldStrategy.IGNORED)
     private String instanceIds;
 
+    /**
+     * 检修区域地图对应的机器人id
+     */
+    @TableField(value = "robot_id")
+    private Long robotId;
+
 
 }

@@ -28,7 +28,9 @@ public interface TDeviceMaintenanceDao {
                                 @Param(value = "isValid") Integer isValid,
                                 @Param(value = "maintenanceStart") Date maintenanceStart,
                                 @Param(value = "maintenanceStop") Date maintenanceStop);
-    List<TDeviceMaintenanceDetail> selectByPage(@Param(value = "maintenanceName") String maintenanceName);
+
+    List<TDeviceMaintenanceDetail> selectByPage(@Param(value = "maintenanceName") String maintenanceName,
+        @Param(value = "maintenanceStart") String maintenanceStart, @Param(value = "maintenanceStop") String maintenanceStop);
 
     int batchAdd(List<TDeviceMaintenance> list);
     int batchDelete(List<String> list);
