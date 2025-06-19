@@ -1457,13 +1457,8 @@ public class PatrolResultHandler {
                 }
             }
         }
-        try {
-            SimpleInspectionResultThread simpleInspectionResultThread = new SimpleInspectionResultThread(redisTemplate, resultList, this);
-            ThreadPoolUtil.PATROL_POOL.addThread(simpleInspectionResultThread);
-            Thread.sleep(500L);
-        } catch (Exception e) {
-            log.error("处理简易机器人巡检结果数据异常", e);
-        }
+        SimpleInspectionResultThread simpleInspectionResultThread = new SimpleInspectionResultThread(redisTemplate, resultList, this);
+        ThreadPoolUtil.PATROL_POOL.addThread(simpleInspectionResultThread);
     }
     
     public void cruiseTaskResultInitialize(Map<String, String> tCruiseTaskResultMap, 
@@ -1490,8 +1485,6 @@ public class PatrolResultHandler {
                 tCruiseTaskResultMap.put("customId", MapUtils.getString(patrolDevice, "customId"));
                 tCruiseTaskResultMap.put("customName", MapUtils.getString(patrolDevice, "customName"));
                 tCruiseTaskResultMap.put("devicePointId", MapUtils.getString(patrolDevice, "devicePointId", ""));
-                tCruiseTaskResultMap.put("photoNum", MapUtils.getString(patrolDevice, "photoNum", ""));
-                tCruiseTaskResultMap.put("inspectionId", MapUtils.getString(patrolDevice, "inspectionId"));
             }
             tCruiseTaskResultMap.put("instanceName", robotPatrolTaskResult.getDeviceName());
             tCruiseTaskResultMap.put("picPathAnl", "");

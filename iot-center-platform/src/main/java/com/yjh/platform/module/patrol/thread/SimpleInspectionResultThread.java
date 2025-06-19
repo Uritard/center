@@ -69,7 +69,8 @@ public class SimpleInspectionResultThread implements Runnable {
                 Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
                 resultHandler.cruiseTaskResultInitialize(tCruiseTaskResultMap, infoMap, robotPatrolTaskResult, taskId, instance);
                 String oldCruiseResult = tCruiseTaskResultMap.get("cruiseResult");
-                inspectionId = tCruiseTaskResultMap.get("inspectionId");
+                //所有子点位的cruiseId相同
+                inspectionId = tCruiseTaskResultMap.get("cruiseId");
                 boolean isNormal = true;
                 String cruiseAbnormal = "";
                 String valid = robotPatrolTaskResult.getValid();
