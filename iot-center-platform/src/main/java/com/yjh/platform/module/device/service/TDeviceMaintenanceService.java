@@ -10,6 +10,8 @@ import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.dao.TDeviceMaintenanceDao;
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
+import com.yjh.platform.module.user.entity.TRobotInfo;
+import com.yjh.platform.module.user.service.TRobotInfoService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,8 +23,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -41,6 +42,9 @@ public class TDeviceMaintenanceService{
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Resource
+    private TRobotInfoService tRobotInfoService;
+
     private static final Pattern PATTERN = Pattern.compile("^((([1-9]\\d{0,4},){0,2}([1-9]\\d{0,4});){0,3}([1-9]\\d{0,4},){0,2}([1-9]\\d{0,4}))$");
 
     @Transactional(rollbackFor = Exception.class)
@@ -56,7 +60,6 @@ public class TDeviceMaintenanceService{
         tDeviceMaintenance.setDeviceIds(StringUtils.join(deviceList, ","));
         tDeviceMaintenance.setInstanceIds(StringUtils.join(instanceList, ","));
         String coordinatePixel = tDeviceMaintenance.getCoordinatePixel();
-        // TODO 转换为真实地图点坐标
         tDeviceMaintenance.setCoordinatePixel(coordinatePixel);
         this.tDeviceMaintenanceDao.add(tDeviceMaintenance);
         createMaintenance(tDeviceMaintenance, instanceList, deviceList, 1);
@@ -67,8 +70,14 @@ public class TDeviceMaintenanceService{
     public int deleteByPrimaryId(Long maintenanceId) {
         //给机器人下发检修区域指令
         TDeviceMaintenance tDeviceMaintenance = this.selectByPrimaryId(maintenanceId);
-        List<Long> instanceList = Arrays.stream(tDeviceMaintenance.getInstanceIds().split(",")).map(s -> Long.parseLong(s.trim())).collect(Collectors.toList());
-        List<Long> deviceList = Arrays.stream(tDeviceMaintenance.getDeviceIds().split(",")).map(s -> Long.parseLong(s.trim())).collect(Collectors.toList());
+        List<Long> instanceList = new ArrayList<>();
+        List<Long> deviceList = new ArrayList<>();
+        if (StringUtils.isNotBlank(tDeviceMaintenance.getInstanceIds())) {
+            instanceList = Arrays.stream(tDeviceMaintenance.getInstanceIds().split(",")).map(s -> Long.parseLong(s.trim())).collect(Collectors.toList());
+        }
+        if (StringUtils.isNotBlank(tDeviceMaintenance.getDeviceIds())) {
+            deviceList = Arrays.stream(tDeviceMaintenance.getDeviceIds().split(",")).map(s -> Long.parseLong(s.trim())).collect(Collectors.toList());
+        }
         createMaintenance(tDeviceMaintenance, instanceList, deviceList, 0);
         return this.tDeviceMaintenanceDao.deleteByPrimaryId(maintenanceId);
     }
@@ -78,7 +87,6 @@ public class TDeviceMaintenanceService{
         this.deleteByPrimaryId(tDeviceMaintenance.getMaintenanceId());
         tDeviceMaintenance.setConfigCode(String.valueOf(UUID.randomUUID()).replace("-", ""));
         String coordinatePixel = tDeviceMaintenance.getCoordinatePixel();
-        // TODO 转换为真实地图点坐标
         tDeviceMaintenance.setCoordinatePixel(coordinatePixel);
         return this.add(tDeviceMaintenance);
     }
@@ -90,6 +98,12 @@ public class TDeviceMaintenanceService{
      * @param deviceList
      */
     private void createMaintenance(TDeviceMaintenance tDeviceMaintenance, List<Long> instanceList, List<Long> deviceList, int enable) {
+        // 地图模式
+        if (tDeviceMaintenance.getRobotId() != null && StringUtils.isNotBlank(tDeviceMaintenance.getCoordinatePixel())) {
+            TRobotInfo tRobotInfo = tRobotInfoService.selectByPrimaryId(tDeviceMaintenance.getRobotId());
+            createMap(enable, "", tRobotInfo.getRobotCode(), tDeviceMaintenance);
+            return;
+        }
         //直连型机器人(所选测点所对应的机器人)
         List<String> robotCodeList = tDeviceMaintenanceDao.selectOnlineRobot(instanceList);
         String deviceLevel = tDeviceMaintenance.getDeviceLevel();
@@ -201,17 +215,18 @@ public class TDeviceMaintenanceService{
      * 参数校验
      */
     private void checkParam(TDeviceMaintenance maintenance){
-        if(StringUtils.isAnyEmpty(/*maintenance.getCoordinatePixel(),*/ maintenance.getDeviceLevel())){
+        if(StringUtils.isAnyEmpty(maintenance.getDeviceLevel())){
             throw new BusinessException(ResultCodeEnum.CODE20017.getCode(), "设备层级或坐标不可为空");
         }
         int level = NumberUtils.toInt(maintenance.getDeviceLevel());
         if (level < 1 || level > 4) {
             throw new BusinessException(ResultCodeEnum.CODE20017.getCode(), "设备层级错误(1-4)");
         }
-//        if (!PATTERN.matcher(maintenance.getCoordinatePixel()).matches()) {
-//            throw new BusinessException(ResultCodeEnum.CODE20017.getCode(), "坐标格式错误(x1,y1,z1;x2,y2,z2;x3,y3,z3;x4,y4,z4)，单个坐标最长5位");
-//        }
-        if (CollectionUtils.isEmpty(maintenance.getDeviceAndInstanceList())){
+
+        // 无有巡视点且机器人id、坐标有一个为空
+        boolean isValid = CollectionUtils.isEmpty(maintenance.getDeviceAndInstanceList()) &&
+            (maintenance.getRobotId() == null || StringUtils.isBlank(maintenance.getCoordinatePixel()));
+        if (isValid) {
             throw new BusinessException(ResultCodeEnum.CODE20017.getCode(), "巡视点不能为空");
         }
     }
@@ -264,8 +279,10 @@ public class TDeviceMaintenanceService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TDeviceMaintenanceDetail> selectByPage(String maintenanceName,Integer effectiveState) {
-        List<TDeviceMaintenanceDetail> tDeviceMaintenanceList = tDeviceMaintenanceDao.selectByPage(maintenanceName);
+    public List<TDeviceMaintenanceDetail> selectByPage(String maintenanceName, Integer effectiveState, String maintenanceStart,
+        String maintenanceStop) {
+        List<TDeviceMaintenanceDetail> tDeviceMaintenanceList =
+            tDeviceMaintenanceDao.selectByPage(maintenanceName, maintenanceStart, maintenanceStop);
         Date now = new Date();
         List<TDeviceMaintenanceDetail> re =new ArrayList<>();
         for(TDeviceMaintenanceDetail item: tDeviceMaintenanceList){

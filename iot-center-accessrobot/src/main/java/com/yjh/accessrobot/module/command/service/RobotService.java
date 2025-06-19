@@ -1257,6 +1257,23 @@ public class RobotService {
         List<TStdRegion> tStdRegionList = tStdRegionDao.selectByRegionCodeAndState(onlineCode, 1);
         String stationId = CollectionUtils.isNotEmpty(tStdRegionList) ? tStdRegionList.get(0).getStationId() : Constant.stationCode();
         resMap.remove("online_code");
+        String coordinatePixel = MapUtils.getString(resMap, "coordinate_pixel");
+        String deviceListStr = MapUtils.getString(resMap, "device_list");
+        // 地图模式下发的 像素坐标转换地图坐标
+        if (StringUtils.isNotEmpty(coordinatePixel) && StringUtils.isBlank(deviceListStr)) {
+            String[] coordinates = coordinatePixel.split(";");
+            StringBuffer chargingArea = new StringBuffer();
+            for (int i = 0; i < coordinates.length; i++) {
+                String coordinate = coordinates[i];
+                String actualCoordinate = CoordinateUtil.pixelToActual(onlineCode, coordinate);
+                if (chargingArea.length() == 0) {
+                    chargingArea.append(actualCoordinate);
+                } else {
+                    chargingArea.append(";" + actualCoordinate);
+                }
+            }
+            resMap.put("coordinate_pixel", chargingArea.toString());
+        }
         itemList.add(resMap);
         XMLBaseModel xmlBaseModel =
             new XMLBaseModel()
@@ -3577,6 +3594,8 @@ public class RobotService {
         Long robotId = chargingAreaInfo.getRobotId();
         String areaCoordinates = chargingAreaInfo.getCoordinates();
         TRobotInfo robotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
+        robotInfo.setChargingArea(areaCoordinates);
+        tRobotInfoDao.update(robotInfo);
         // 像素坐标转换地图坐标
         String[] coordinates = areaCoordinates.split(",");
         StringBuffer chargingArea = new StringBuffer();
@@ -3585,8 +3604,6 @@ public class RobotService {
             String actualCoordinate = CoordinateUtil.pixelToActual(robotInfo.getRobotCode(), coordinate);
             chargingArea.append(actualCoordinate);
         }
-        robotInfo.setChargingArea(chargingArea.toString());
-        tRobotInfoDao.update(robotInfo);
         String robotCode = robotInfo.getRobotCode();
         List<Map<String, Object>> itemList = new ArrayList<>();
         Map<String, Object> item = new HashMap<>(1);
