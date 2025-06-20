@@ -5,6 +5,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.simple.entity.BasePhotoBuild;
 import com.yjh.platform.module.simple.entity.BasePhotoInfo;
+import com.yjh.platform.module.simple.entity.InitialTask;
 import com.yjh.platform.module.simple.entity.CalibrationDataBuild;
 import com.yjh.platform.module.simple.service.SimplePointService;
 import io.swagger.annotations.Api;
@@ -76,6 +77,41 @@ public class SimplePointController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("底图保存接口调用错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "插入si300任务")
+    @RequestMapping(value = "/initTaskAdd", method = RequestMethod.POST)
+    public Result initTaskAdd(@RequestBody InitialTask initialTask) {
+        Result result = new Result();
+        try {
+            Long robotId = initialTask.getRobotId();
+            List<Long> devices = initialTask.getDevices();
+            result.setData(simplePointService.initTaskAdd(devices,robotId));
+        } catch (BusinessException e) {
+            result.setMessage(e.getCode(), e.getMessage());
+            log.error("新增si300初始任务错误: {}", e.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("更新错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询初始任务状态")
+    @RequestMapping(value = "/initTaskStatus", method = RequestMethod.POST)
+    public Result initTaskStatus(@RequestParam(value = "robotId", required = false) Long robotId,
+                                 @RequestParam(value = "regionId", required = false) Long regionId) {
+        Result result = new Result();
+        try {
+            result.setData(simplePointService.initTaskStatus(robotId,regionId));
+        } catch (BusinessException e) {
+            result.setMessage(e.getCode(), e.getMessage());
+            log.error("查询初始任务状态: {}", e.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("更新错误:", e);
         }
         return result;
     }

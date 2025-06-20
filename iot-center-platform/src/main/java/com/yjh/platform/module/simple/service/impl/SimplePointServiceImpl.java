@@ -3,9 +3,12 @@ package com.yjh.platform.module.simple.service.impl;
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
+import com.yjh.commons.DateFormat;
+import com.yjh.commons.DateUtils;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import cn.hutool.core.io.FileUtil;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.common.utils.ImageSplitUtil;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
@@ -19,12 +22,21 @@ import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.CalibrationData;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.simple.entity.*;
+import com.yjh.platform.module.patrol.CruiseConstant;
+import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
+import com.yjh.platform.module.patrol.service.UPatrolResultService;
+import com.yjh.platform.module.patrol.service.UPatrolTaskService;
+import com.yjh.platform.module.simple.entity.BasePhotoBuild;
+import com.yjh.platform.module.simple.entity.BasePhotoInfo;
+import com.yjh.platform.module.simple.entity.InitialTaskStatus;
 import com.yjh.platform.module.simple.service.SimplePointService;
+import com.yjh.platform.module.task.entity.TCruiseTaskAdd;
+import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.user.service.TRobotInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +45,16 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.*;
+
+import static com.yjh.platform.module.patrol.CruiseConstant.INITIAL_PATROL;
 
 /**
  * <功能描述>
@@ -74,6 +95,10 @@ public class SimplePointServiceImpl implements SimplePointService {
 
     private final TRobotInspectionService tRobotInspectionService;
     private final TStdDeviceService stdDeviceService;
+    private final UPatrolTaskService uPatrolTaskService;
+    private final TRobotInfoService trobotInfoService;
+    private final UPatrolResultDao uPatrolResultDao;
+    private final TRobotInfoDao tRobotInfoDao;
     private final TStdDevicemeteService stdDeviceMeteService;
     private final TCruisePointInstanceService cruisePointInstanceService;
     private final IntelAnalysisService analysisService;
@@ -248,6 +273,41 @@ public class SimplePointServiceImpl implements SimplePointService {
             FileUtil.cleanEmpty(new File(devicePath));
         }
     }
+
+        /**
+     * si300初始任务下发
+     *
+     * @param devicesId 屏柜Id
+     * @param robotId 机器人id
+     * @return Map
+     */
+    @Override
+    public Map<String, Object> initTaskAdd(List<Long> devicesId, Long robotId) {
+        String deviceList = StringUtils.join(devicesId, ",");
+        if (StringUtils.isBlank(deviceList)) {
+            //当机器人没有绑定屏柜时，默认使用机器人的上级区域下的所有屏柜
+            Long upRegionId = trobotInfoService.selectByPrimaryId(robotId).getUpRegionId();
+            List<TStdDevice> stdDevices = stdDeviceService.select(null, null, null, null, null, null, null, null, upRegionId, null, null, null, null, null);
+            deviceList = stdDevices.stream().map(TStdDevice::getDeviceId).map(String::valueOf).collect(Collectors.joining(","));
+        }
+        TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
+        //初始任务均为立即任务
+        tCruiseTaskAdd.setTaskName("si300初始任务_" + DateUtils.dateToString(new Date(), DateFormat.YYYYMMDDHHMMSS)).setRobotId(robotId).setDeviceList(deviceList).setIfRun(CruiseConstant.TaskTypeEnum.NOW.getType()).setType(INITIAL_PATROL);
+
+        return uPatrolTaskService.addTask(tCruiseTaskAdd, true);
+    }
+
+    @Override
+    public InitialTaskStatus initTaskStatus(Long robotId, Long regionId) {
+        if  (regionId != null) {
+            robotId = tRobotInfoDao.selectByRegionId(regionId).getRobotId();
+        }
+
+        InitialTaskStatus initialTaskStatus = uPatrolResultDao.initialTaskStatusQueryByRobotId(robotId);
+        initialTaskStatus.setInitStatusName(DictConvertUtil.DICT.covertToDict("taskState", initialTaskStatus.getInitStatus()));
+        return initialTaskStatus;
+    }
+
 
     /**
      * 子点位标定数据保存

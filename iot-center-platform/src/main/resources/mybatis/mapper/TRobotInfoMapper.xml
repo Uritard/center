@@ -825,4 +825,8 @@
         </foreach>
         )
     </select>
+
+    <select id="selectByRegionId" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
+        select * from t_robot_info where up_region_id = #{regionId} and robot_type = 905
+    </select>
 </mapper>

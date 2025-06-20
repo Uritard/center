@@ -33,6 +33,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -1439,7 +1440,8 @@ public class PatrolResultHandler {
                 instance = tRobotInspectionDao.selectRealInstance(deviceId, robotCode);
             }
             log.info("instanceInfo: {}", JSON.toJSONString(instance));
-            instanceId = String.valueOf(instance.getInstanceId());
+
+            instanceId = ObjectUtils.isEmpty(instance) ? "" : String.valueOf(instance.getInstanceId());
         } else {
             instance = tCruisePointInstanceDao.selectByPrimaryId(NumberUtils.toLong(instanceId));
         }

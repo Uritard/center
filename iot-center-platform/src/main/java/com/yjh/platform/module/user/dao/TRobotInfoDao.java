@@ -152,4 +152,6 @@ public interface TRobotInfoDao {
     String selectStatusByRobotCode(@Param(value = "robotId") Long robotId);
 
     List<Long> selectRobotCodeByInspectionIds(@Param(value = "list") List<Long> inspectionId);
+
+    TRobotInfo selectByRegionId(@Param(value = "regionId") Long regionId);
 }
