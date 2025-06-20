@@ -6,6 +6,7 @@ import com.yjh.platform.module.device.entity.TaskInfoBean;
 import com.yjh.platform.module.patrol.entity.NonhomologousInfo;
 import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
+import com.yjh.platform.module.simple.entity.InitialTaskStatus;
 import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -222,4 +223,6 @@ public interface UPatrolResultDao {
     List<OperationTaskRecordResult> queryOperationResult(@Param(value = "taskId")String taskId);
 
     List<CruiseOfPatrolDevice> selectCruiseInstanceByPatrol(@Param(value = "taskId") String taskId);
+
+    InitialTaskStatus initialTaskStatusQueryByRobotId(@Param(value = "robotId") Long robotId);
 }

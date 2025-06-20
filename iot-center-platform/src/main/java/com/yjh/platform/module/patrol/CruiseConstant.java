@@ -154,6 +154,11 @@ public interface CruiseConstant {
      */
     int EMERGENCY_PATROL = 509;
 
+    /**
+     * si300类型，初始任务
+     */
+    int INITIAL_PATROL = 906;
+
     String FAILED_VALUE = "-1";
 
     enum TypeEnum {

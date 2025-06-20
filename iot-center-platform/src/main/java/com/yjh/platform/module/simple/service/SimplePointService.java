@@ -1,5 +1,9 @@
 package com.yjh.platform.module.simple.service;
 
+import com.yjh.platform.module.simple.entity.BasePhotoBuild;
+import com.yjh.platform.module.simple.entity.BasePhotoInfo;
+import com.yjh.platform.module.simple.entity.InitialTaskStatus;
+import com.yjh.platform.module.simple.entity.CalibrationDataBuild;
 import com.yjh.platform.module.simple.entity.*;
 
 import java.util.List;
@@ -40,6 +44,11 @@ public interface SimplePointService {
      * @param dataBuild 标定数据信息
      * @return Boolean
      */
+    Boolean basePhotoBuild(List<BasePhotoBuild> buildList);
+
+    Map<String,Object> initTaskAdd(List<Long> devicesId, Long robotId);
+
+    InitialTaskStatus initTaskStatus(Long robotId, Long regionId);
     Boolean calibrationDataBuild(CalibrationDataBuild dataBuild);
 
 

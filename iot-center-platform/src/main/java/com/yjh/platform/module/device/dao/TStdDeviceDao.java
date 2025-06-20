@@ -177,4 +177,11 @@ public interface TStdDeviceDao {
     List<AreaInfo> selectSimpleRobotDevTreeRegion(@Param(value = "name") String name);
 
     List<AreaInfo> selectSplitBackground(@Param(value = "deviceId") Long deviceId);
+
+    List<com.yjh.platform.module.patrol.entity.TCruisePointInstance> batchSelect(@Param("deviceList") List<Long> deviceList);
+
+    List<TCruisePointInstanceNameDetail> selectForTask(@Param(value = "list")List<Long> list);
+
+    List<String> selectRobotTaskDeviceId(@Param(value = "list") List<Long> list,
+                                           @Param(value = "robotCode") String robotCode);
 }

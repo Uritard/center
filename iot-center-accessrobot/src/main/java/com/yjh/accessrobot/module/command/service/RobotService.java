@@ -1387,10 +1387,16 @@ public class RobotService {
         String taskId = item.getTaskId();
 
         Set<String> str = new LinkedHashSet<>(128);
-        // 机器人任务临时信息存放至redis
-        log.info("机器人任务临时信息存放至redis参数，robotCode：{}， taskId：{}， str：{}， item：{}", robotCode, taskId, str, JSONUtil.toJSONString(item));
-        putInfoToRedisForRobot(robotCode, taskId, str, item.getInstanceList(), item.getIsenable(),item.getCruiseType());
 
+        //SI300初始任务
+        if (item.getCruiseType() == INITIAL_PATROL) {
+            str.addAll(item.getInstanceList());
+        }else {
+            // 机器人任务临时信息存放至redis
+            log.info("机器人任务临时信息存放至redis参数，robotCode：{}， taskId：{}， str：{}， item：{}", robotCode, taskId, str, JSONUtil.toJSONString(item));
+            putInfoToRedisForRobot(robotCode, taskId, str, item.getInstanceList(), item.getIsenable(),item.getCruiseType());
+
+        }
         log.info("packageXMLBaseModel参数，robotCode：{}， taskId：{}， str：{}， item：{}", robotCode, taskId, str, JSONUtil.toJSONString(item));
         packageXMLBaseModel(item, robotCode, taskId, str);
     }

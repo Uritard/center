@@ -1521,4 +1521,11 @@
             d.task_id = #{taskId}
     </select>
 
+    <select id="initialTaskStatusQueryByRobotId" resultType="com.yjh.platform.module.simple.entity.InitialTaskStatus">
+        SELECT task_id,
+               task_state as initStatus
+        FROM u_patrol_result
+        WHERE robot_id = #{robotId}
+        ORDER BY create_time DESC LIMIT 1
+    </select>
 </mapper>

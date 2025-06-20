@@ -29,6 +29,7 @@ import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
+import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.RobotTaskMessage;
@@ -169,6 +170,9 @@ public class UPatrolTaskService {
     private TStdDevicemeteDao tStdDevicemeteDao;
     @Autowired
     private AutoreviewHandler autoreviewHandler;
+
+    @Autowired
+    private TStdDeviceDao tStdDeviceDao;
 
     private static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
 
@@ -463,6 +467,10 @@ public class UPatrolTaskService {
                     //操作票操作任务
                     taskType = 456;
                     break;
+                case INITIAL_PATROL:
+                    //si300初始任务
+                    taskType = INITIAL_PATROL;
+                    break;
                 default:
                     //自定义巡视
                     taskType = 218;
@@ -475,7 +483,12 @@ public class UPatrolTaskService {
                     instanceList.add(Long.valueOf(item));
                 }
             }
+            //此处需要作区分，si300传入的deviceList是屏柜id
             List<TCruisePointInstance> tCruisePointInstanceList = uPatrolTaskAttrDao.batchSelect(instanceList);
+            //si300初始任务的taskType对应为906，则需要根据deviceList查询屏柜id
+            if (taskType == INITIAL_PATROL) {
+                tCruisePointInstanceList = tStdDeviceDao.batchSelect(instanceList);
+            }
             if (CollectionUtils.isEmpty(tCruisePointInstanceList)) {
                 throw new BusinessException("点位ID错误");
             }
@@ -585,6 +598,10 @@ public class UPatrolTaskService {
 
         List<TCruisePointInstanceNameDetail> detailList =
                 instanceList.size() == 0 ? new ArrayList<>() : tCruisePointInstanceDao.selectForTask(instanceList);
+        //判断如果是si300任务，则需要根据instanceList查询屏柜id
+        if (task.getTaskType() == INITIAL_PATROL) {
+            detailList = tStdDeviceDao.selectForTask(instanceList);
+        }
 
         Date now = new Date();
         if (notInit) {
@@ -688,7 +705,8 @@ public class UPatrolTaskService {
             map.put("fileType", fileType);
 
             itemSets.add(new DefaultTypedTuple<>(String.valueOf(item.getInstanceId()), 0D));
-            String str = PATROL_TASK_PREFIX + task.getTaskId() + ":" + item.getInstanceId();
+            Long instanceId = task.getTaskType() == INITIAL_PATROL ? item.getDeviceId() : item.getInstanceId();
+            String str = PATROL_TASK_PREFIX + task.getTaskId() + ":" + instanceId;
             redisTemplate.opsForHash().putAll(str, map);
         }
 
@@ -1276,6 +1294,7 @@ public class UPatrolTaskService {
             // 找出机器人和无人机做任务的巡检点
             List<Long> robotCruiseList = new ArrayList<>();
             List<Long> robotInstanceList = new ArrayList<>();
+            List<Long> deviceIdList = new ArrayList<>();
             for (TCruisePointInstanceNameDetail item : detailList) {
                 if ((TypeEnum.ROBOT.getCode() == item.getCruiseType() || TypeEnum.UAV.getCode() == item.getCruiseType())) {
                     // 排除无人机在检修区域的节点
@@ -1284,6 +1303,7 @@ public class UPatrolTaskService {
                     }
                     robotCruiseList.add(item.getCruiseId());
                     robotInstanceList.add(item.getInstanceId());
+                    deviceIdList.add(item.getDeviceId());
                 }
             }
             log.info("robotCruiseList : {}", robotCruiseList);
@@ -1322,6 +1342,10 @@ public class UPatrolTaskService {
                     robotTaskInfo.setPriority(String.valueOf(task.getTaskLevel()));
                     robotTaskInfo.setTaskName(task.getTaskName());
                     List<String> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
+                    //如果是si300类型的任务，则根据deviceId查询
+                    if (task.getTaskType() == INITIAL_PATROL) {
+                        robotTaskInstanceList = tStdDeviceDao.selectRobotTaskDeviceId(deviceIdList,item);
+                    }
                     robotTaskInfo.setInstanceList(robotTaskInstanceList);
                     String ifFun = String.valueOf(tCruiseTaskAdd.getIfRun());
                     robotTaskInfo.setIfRun(ifFun);
