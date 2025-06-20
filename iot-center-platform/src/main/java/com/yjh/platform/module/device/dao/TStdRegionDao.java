@@ -80,5 +80,13 @@ public interface TStdRegionDao {
 
     List<TStdRegion> selectAllEdgeRegion();
 
+    /**
+     * 批量插入
+     */
     int batchInsert(@Param("list") List<TStdRegion> tStdRegionList);
+
+    /**
+     * 获取父级区域
+     */
+    TStdRegion selectUpRegion(@Param(value = "regionId") Long regionId);
 }

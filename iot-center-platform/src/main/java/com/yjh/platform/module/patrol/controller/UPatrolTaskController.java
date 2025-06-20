@@ -11,7 +11,7 @@ import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.module.patrol.RobotProxy;
+import com.yjh.platform.module.feign.RobotProxy;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.entity.query.TaskMeteQuery;
 import com.yjh.platform.module.patrol.entity.query.TaskQuery;

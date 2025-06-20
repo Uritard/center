@@ -39,13 +39,6 @@ public interface SimplePointService {
      */
     Boolean basePhotoBuild(BasePhotoBuild photoBuild);
 
-    /**
-     * 子点位标定数据保存
-     * @param dataBuild 标定数据信息
-     * @return Boolean
-     */
-    Boolean basePhotoBuild(List<BasePhotoBuild> buildList);
-
     Map<String,Object> initTaskAdd(List<Long> devicesId, Long robotId);
 
     InitialTaskStatus initTaskStatus(Long robotId, Long regionId);
