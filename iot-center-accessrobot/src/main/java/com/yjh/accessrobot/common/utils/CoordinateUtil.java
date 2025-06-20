@@ -31,6 +31,7 @@ import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -213,7 +214,7 @@ public class CoordinateUtil {
                 actualY = mapInfo.getTop() - Double.parseDouble(coordinates[1]) * mapInfo.getResolution();
             }
         } catch (Exception e) {
-            return "0,0,0"; //任何异常统一返回
+            return pixelCoordinates; //任何异常统一返回
         }
         return String.join(",", formatToThreeDecimals(actualX), formatToThreeDecimals(actualY), "0");
     }
@@ -228,7 +229,7 @@ public class CoordinateUtil {
         MapInfo mapInfo = robotReMapData.get(robotCode);
         double pixelX, pixelY;
         try {
-            if (ObjectUtils.notEqual(mapInfo.getRobotType(), 905)) return actualCoordinate;
+            if (Objects.isNull(mapInfo) || ObjectUtils.notEqual(mapInfo.getRobotType(), 905)) return actualCoordinate;
             String[] coordinates = actualCoordinate.split(",");
             if (mapInfo.getMapPath().endsWith(SVG_SUFFIX)) {
                 pixelX = Double.parseDouble(coordinates[0]) * mapInfo.getProportion();
@@ -238,7 +239,7 @@ public class CoordinateUtil {
                 pixelY = (mapInfo.getTop() - Double.parseDouble(coordinates[1])) / mapInfo.getResolution();
             }
         } catch (Exception e) {
-            return "0,0,0,0"; //任何异常统一返回
+            return actualCoordinate; //任何异常统一返回
         }
         return String.join(",", formatToThreeDecimals(pixelX), formatToThreeDecimals(pixelY), "0", "0");
     }
