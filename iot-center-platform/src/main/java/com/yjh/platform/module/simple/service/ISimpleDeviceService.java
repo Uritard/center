@@ -5,8 +5,8 @@
 package com.yjh.platform.module.simple.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.yjh.platform.module.config.entity.SysDiskCleanup;
 import com.yjh.platform.module.device.entity.TStdDevice;
+import com.yjh.platform.module.simple.entity.ModelCommand;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -23,4 +23,17 @@ public interface ISimpleDeviceService extends IService<TStdDevice> {
      * @return
      */
     boolean importModel(MultipartFile file);
+
+    /**
+     * 模型下发
+     * @param modelSend 模型指令
+     */
+    void modelSend(ModelCommand modelSend);
+
+    /**
+     * 模型导出
+     * @param modelSend 模型指令
+     * @return 模型路径
+     */
+    String modelExport(ModelCommand modelSend);
 }

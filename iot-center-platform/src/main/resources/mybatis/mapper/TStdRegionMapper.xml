@@ -527,4 +527,18 @@
             , #{item.remark,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP})
         </foreach>
     </insert>
+
+    <select id="selectUpRegion" resultType="com.yjh.platform.module.device.entity.TStdRegion">
+        SELECT up.region_id,up.region_name,up.sort,
+            up.up_region_id,up.up_region_ids,up.region_code,
+            up.origin_region_id,up.station_id,up.station_name,
+            up.state,up.edge_status,up.region_path,
+            up.longitude,up.latitude,up.voltage_level,up.commissioning_time,
+            up.remark,up.create_time
+        FROM
+            t_std_region r
+        LEFT JOIN t_std_region up ON r.up_region_id = up.region_id
+        WHERE
+            r.region_id = #{regionId}
+    </select>
 </mapper>

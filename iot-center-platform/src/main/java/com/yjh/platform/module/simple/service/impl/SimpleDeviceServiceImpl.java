@@ -11,23 +11,27 @@ import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.alibaba.excel.EasyExcelFactory;
-import com.alibaba.excel.read.metadata.ReadSheet;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.common.utils.ExcelReadListener;
+import com.yjh.platform.common.utils.PlatformXmlUtil;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.entity.TStdDeviceAttr;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.device.service.TStdDeviceAttrService;
 import com.yjh.platform.module.device.service.TStdRegionService;
-import com.yjh.platform.module.simple.dao.TStdDeviceMapper;
+import com.yjh.platform.module.feign.RobotProxy;
+import com.yjh.platform.module.simple.dao.SimpleDeviceMapper;
+import com.yjh.platform.module.simple.entity.ModelCommand;
 import com.yjh.platform.module.simple.entity.SimpleDeviceExcel;
+import com.yjh.platform.module.simple.entity.SimpleDeviceModel;
 import com.yjh.platform.module.simple.service.ISimpleDeviceService;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.service.TRobotInfoService;
@@ -35,15 +39,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -61,16 +69,26 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class SimpleDeviceServiceImpl extends ServiceImpl<TStdDeviceMapper, TStdDevice> implements ISimpleDeviceService {
+public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TStdDevice> implements ISimpleDeviceService {
     private final RedisTemplate<?, ?> redisTemplate;
     private final TStdRegionService tStdRegionService;
     private final TStdDeviceAttrService tStdDeviceAttrService;
     private final TRobotInfoService robotService;
+    private final RobotProxy robotProxy;
 
     public static final String MODEL_FILE_LAS = "las";
-    public static final String MODEL_FILE_XLSX = "xls";
+    public static final String MODEL_FILE_XLSX = "xlsx";
     public static final String MODEL_FILE_TXT = "txt";
     public static final String MODEL_FILE_SVG = "svg";
+    public static final String MODEL_FILE_XML = "xml";
+
+    private static final Map<String, String> COMMAND_MAP = new HashMap<>(8);
+
+    static {
+        COMMAND_MAP.put("1", MODEL_FILE_LAS);
+        COMMAND_MAP.put("2", MODEL_FILE_XLSX);
+        COMMAND_MAP.put("3", MODEL_FILE_TXT);
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -78,29 +96,11 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<TStdDeviceMapper, TStdD
 
         String outputPathParent = SysParamConfig.getSysContent("simpleModelPath");
         String outputPath = outputPathParent + File.separator + DateUtil.format(new Date(), DatePattern.PURE_DATETIME_MS_FORMATTER);
-        Map<String, String> pathMap = new HashMap<>(8);
         try {
             ZipUtil.unzip(file.getInputStream(), FileUtil.mkdir(outputPath), StandardCharsets.UTF_8);
 
             // 遍历文件夹，根据文件后缀名对应解析
-            Files.walkFileTree(Paths.get(outputPath), new SimpleFileVisitor<Path>() {
-                //遍历文件
-                @Override
-                @NotNull
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    // 获取文件后缀名，根据后缀名做不同处理。后缀名包括las，xlsx，txt，svg
-                    String suffix = FileNameUtil.getSuffix(file.toFile()).toLowerCase();
-                    String filePath = file.normalize().toAbsolutePath().toString();
-                    // 匹配 excel 文件，后缀为 xls xlsx
-                    if (StringUtils.equalsAny(suffix, "xls", "xlsx")) {
-                        pathMap.put(MODEL_FILE_XLSX, filePath);
-                    } else {
-                        pathMap.put(suffix, filePath);
-                    }
-
-                    return super.visitFile(file, attrs);
-                }
-            });
+            Map<String, String> pathMap = modelFileList(outputPath);
 
             if (pathMap.containsKey(MODEL_FILE_XLSX)) {
                 List<TStdRegion> regions = importDeviceModel(pathMap.get(MODEL_FILE_XLSX));
@@ -115,6 +115,106 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<TStdDeviceMapper, TStdD
     }
 
     /**
+     * 模型下发
+     * @param modelSend 模型指令
+     */
+    @Override
+    public void modelSend(ModelCommand modelSend) {
+        try {
+            TRobotInfo robotInfo = robotService.selectByPrimaryId(modelSend.getRobotId());
+            long regionId = robotInfo.getUpRegionId();
+            // 获取模型路径
+            Map<String, String> modelMap = loadRegionFiles(regionId);
+
+            // 模型指令固定，则下发固定模型
+            if (StringUtils.isNotEmpty(modelSend.getCommand())) {
+                String path;
+                String pathType = COMMAND_MAP.get(modelSend.getCommand());
+                if (MODEL_FILE_XLSX.equals(pathType)) {
+                    // 如果是设备模型，则不下发excel，下发xml格式模型文件
+                    // 生成xml模型文件
+                    path = pointModel(regionId, true);
+                } else {
+                    path = modelMap.get(pathType);
+                }
+                robotProxy.modelSend(robotInfo.getRobotCode(), modelSend.getCommand(), path);
+            } else {
+                // 模型指令为空，则下发所有模型
+                for (Map.Entry<String, String> entry : COMMAND_MAP.entrySet()) {
+                    String path;
+                    String pathType = entry.getValue();
+                    // 如果是设备模型，则不下发excel，下发xml格式模型文件
+                    if (MODEL_FILE_XLSX.equals(pathType)) {
+                        // 生成xml模型文件
+                        path = pointModel(regionId, true);
+                    } else {
+                        path = modelMap.get(pathType);
+                    }
+                    robotProxy.modelSend(robotInfo.getRobotCode(), modelSend.getCommand(), path);
+                }
+            }
+
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            throw new BusinessException(ResultCodeEnum.CODE10010, "获取模型文件失败");
+        }
+    }
+
+    /**
+     * 模型导出
+     * @param modelSend 模型指令
+     * @return 模型路径
+     */
+    @Override
+    public String modelExport(ModelCommand modelSend) {
+        try {
+            TRobotInfo robotInfo = robotService.selectByPrimaryId(modelSend.getRobotId());
+            long regionId = robotInfo.getUpRegionId();
+            // 获取模型路径
+            Map<String, String> modelMap = loadRegionFiles(regionId);
+            String path;
+            // 根据模型指令找出对应模型，返回给前端
+            if (StringUtils.isNotEmpty(modelSend.getCommand())) {
+                String pathType = COMMAND_MAP.get(modelSend.getCommand());
+                if (MODEL_FILE_XLSX.equals(pathType)) {
+                    // 如果是设备模型，则需重新生成 excel 文件
+                    // 生成xml模型文件
+                    // path = pointModel(regionId, true);
+                    path = modelMap.get(pathType);
+                } else {
+                    path = modelMap.get(pathType);
+                }
+
+                path = StringUtils.replace(path, SysParamConfig.getSysContent("fileAbsPath"), Constant.FILE_REAL_PATH);
+            } else {
+                // 模型指令为空，则导出所有模型，使用zip压缩文件夹
+                String zipName = regionId + ".zip";
+                String zipPath = CommonUtils.concatPath(SysParamConfig.getSysContent("zipPath"), zipName);
+                path = CommonUtils.concatPath(Constant.ZIP_REAL_PATH, zipName);
+                File zipFile = new File(zipPath);
+                FileUtil.del(zipFile);
+                // modelMap 过滤掉 xml 格式文件，然后转成 File
+                String modelDir = simpleModelDir(regionId);
+                File modelDirFile = new File(modelDir);
+
+                File[] files = modelMap.entrySet()
+                    .stream()
+                    .filter(entry -> !MODEL_FILE_XML.equals(entry.getKey()))
+                    .map(entry -> new File(entry.getValue()))
+                    .toArray(File[]::new);
+
+                // ZipUtil.zip(zipFile, StandardCharsets.UTF_8, false,
+                //     pathname -> !FilenameUtils.isExtension(pathname.getAbsolutePath(), MODEL_FILE_XML), modelDirFile);
+                ZipUtil.zip(zipFile, false, files);
+            }
+            return path;
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            throw new BusinessException(ResultCodeEnum.CODE10010, "获取模型文件失败");
+        }
+    }
+
+    /**
      * excel  导入模型
      * @param filePath excel文件路径
      * @return 区域信息
@@ -125,8 +225,7 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<TStdDeviceMapper, TStdD
             new String[] {"变电站名称", "电压等级", "区域名称", "间隔名称", "设备名称", "X1", "Y1", "Z1", "X2", "Y2", "Z2", "X3", "Y3",
                 "Z3", "X4", "Y4", "Z4"};
         ExcelReadListener<SimpleDeviceExcel> modelExcelListener = new ExcelReadListener<>(heads);
-        ReadSheet readSheet = new ReadSheet(0);
-        EasyExcelFactory.read(filePath, SimpleDeviceExcel.class, modelExcelListener).headRowNumber(1).build().read(readSheet);
+        EasyExcelFactory.read(filePath, SimpleDeviceExcel.class, modelExcelListener).headRowNumber(1).sheet(0).doRead();
 
         List<SimpleDeviceExcel> excelEntities = modelExcelListener.getExcelEntities();
         List<String> errorExcelList = modelExcelListener.getErrorExcelEntities();
@@ -408,7 +507,7 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<TStdDeviceMapper, TStdD
         }
 
         // 删除临时文件
-        // pathMap.values().stream().findFirst().map(m -> FileUtil.del(FileUtil.getParent(m, 1)));
+        pathMap.values().stream().findFirst().map(m -> FileUtil.del(FileUtil.getParent(m, 1)));
     }
 
     /**
@@ -417,8 +516,7 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<TStdDeviceMapper, TStdD
      */
     public String migrationFile(Long regionId, Map<String, String> pathMap) {
 
-        String outputPathParent = SysParamConfig.getSysContent("simpleModelPath");
-        String outputPath = outputPathParent + File.separator + regionId;
+        String outputPath = simpleModelDir(regionId);
         File out = FileUtil.mkdir(outputPath);
         // 清空文件夹
         log.info("清空文件夹: {}", outputPath);
@@ -438,6 +536,91 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<TStdDeviceMapper, TStdD
         }
 
         return svgPath;
+    }
+
+    /**
+     * 获取简易模型文件夹
+     */
+    private static @NotNull String simpleModelDir(Long regionId) {
+        String outputPathParent = SysParamConfig.getSysContent("simpleModelPath");
+        return outputPathParent + File.separator + regionId;
+    }
+
+    /**
+     * 遍历文件夹，按文件后缀对文件分类
+     */
+    private Map<String, String> modelFileList(String modelDir) throws IOException {
+        Map<String, String> pathMap = new HashMap<>(8);
+
+        // 遍历文件夹，根据文件后缀名对应解析
+        Files.walkFileTree(Paths.get(modelDir), new SimpleFileVisitor<Path>() {
+            //遍历文件
+            @Override
+            @NotNull
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                // 获取文件后缀名，根据后缀名做不同处理。后缀名包括las，xlsx，txt，svg
+                String suffix = FileNameUtil.getSuffix(file.toFile()).toLowerCase();
+                String filePath = file.normalize().toAbsolutePath().toString();
+                // 匹配 excel 文件，后缀为 xls xlsx
+                if (StringUtils.equalsAny(suffix, "xls", "xlsx")) {
+                    pathMap.put(MODEL_FILE_XLSX, filePath);
+                } else {
+                    pathMap.put(suffix, filePath);
+                }
+
+                return super.visitFile(file, attrs);
+            }
+        });
+
+        return pathMap;
+    }
+
+    /**
+     * 获取区域对应模型文件
+     * @param regionId 区域ID
+     * @return 文件列表
+     * @throws IOException 遍历文件异常
+     */
+    public Map<String, String> loadRegionFiles(Long regionId) throws IOException {
+
+        String outputPath = simpleModelDir(regionId);
+
+        return modelFileList(outputPath);
+
+    }
+
+    /**
+     * 获取设备模型
+     * @param regionId 区域ID
+     * @return 设备模型列表
+     */
+    public String pointModel(Long regionId, boolean isDevice) throws IOException {
+        List<SimpleDeviceModel> list = getBaseMapper().selectDeviceModel(regionId, isDevice);
+
+        TStdRegion station = tStdRegionService.selectUpRegion(regionId);
+        String stationCode = String.valueOf(station.getRegionId());
+        String stationName = station.getRegionName();
+        list.forEach(item -> {
+            item.setStationCode(stationCode);
+            item.setStationName(stationName);
+            // 坐标数据库内以;号分割不同点，模型要求全部以,分割
+            item.setMasterCoordinate(item.getMasterCoordinate().replace(";", ","));
+            // 相应类型全部转成文档标准的值
+            item.setMeterType(getUpDict("meterType", item.getMeterType()));
+            item.setAppearanceType(getUpDict("appearanceType", item.getAppearanceType()));
+            item.setRecognitionTypeList(getUpDict("meteType", item.getRecognitionTypeList()));//
+            item.setDeviceType(getUpDict("deviceType", item.getDeviceType()));
+        });
+        String fileName = isDevice ? "simple_device_init_model.xml" : "simple_device_model.xml";
+        return PlatformXmlUtil.createXmlFileT(list, simpleModelDir(regionId), fileName, "Device_Model");
+    }
+
+    /**
+     * 获取对应字典内标准值，不存在则使用原始值
+     */
+    private String getUpDict(String colName, String dictCode) {
+        String upDict = DictConvertUtil.DICT.getUpDictCode(colName, dictCode);
+        return StringUtils.defaultIfEmpty(upDict, dictCode);
     }
 
 }

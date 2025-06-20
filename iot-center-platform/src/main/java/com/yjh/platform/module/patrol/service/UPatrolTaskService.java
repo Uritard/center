@@ -35,7 +35,7 @@ import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.RobotTaskMessage;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.platform.module.patrol.CruiseConstant;
-import com.yjh.platform.module.patrol.RobotProxy;
+import com.yjh.platform.module.feign.RobotProxy;
 import com.yjh.platform.module.patrol.dao.*;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.*;

@@ -90,7 +90,7 @@ public class RobotService {
 
     private Logger log = LoggerFactory.getLogger(RobotService.class);
 
-    private static final String OFF_LINE = "离线";
+    public static final String OFF_LINE = "离线";
     public static final String countForAbnormalKey = "countForAbnormal:";
     @Autowired
     private RedisTemplate redisTemplate;
@@ -2570,6 +2570,28 @@ public class RobotService {
                 Integer.parseInt(managerSystemFtpsPort), managerSystemFtpsUsername, managerSystemFtpsPassword, resolveLocal);
         } catch (Exception e) {
             log.error("下载ftp文件s错误 " + e);
+        }
+    }
+
+    /**
+     * 上传文件到巡视 ftps，以供机器人下载
+     * @param sourcePath 物理地址
+     * @param targetPathName 上传地址
+     */
+    public void uploadFileToFtps(String sourcePath, String targetPathName) {
+        try {
+            if (StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {
+                return;
+            }
+            Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("systemConfigKey:algorithmSystem");
+            String ftpsIp = upSystemFtps.get("algorithmSystemFtpsIp");
+            int ftpsPort = MapUtils.getIntValue(upSystemFtps, "algorithmSystemFtpsPort");
+            String ftpsUsername = upSystemFtps.get("algorithmSystemFtpsUsername");
+            String ftpsPassword = upSystemFtps.get("algorithmSystemFtpsPassword");
+            boolean resolveLocal = Boolean.parseBoolean(upSystemFtps.get("algorithmSystemFtpsResolveLocal"));
+            FtpsUtil.putFile(sourcePath, targetPathName, ftpsIp, ftpsPort, ftpsUsername, ftpsPassword, resolveLocal);
+        } catch (Exception e) {
+            log.error("将文件上传至上级系统ftp服务器错误：", e);
         }
     }
 

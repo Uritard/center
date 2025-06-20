@@ -223,6 +223,14 @@ public class TStdRegionService{
         return tStdRegionDao.batchInsert(list);
     }
 
+    /**
+     * 获取父级区域
+     * @return
+     */
+    public TStdRegion selectUpRegion(Long regionId) {
+        return tStdRegionDao.selectUpRegion(regionId);
+    }
+
     public int loadRegionIntoRedis() {
         List<TStdRegion> list = tStdRegionDao.select(null, null, null, null, null, null, null, null, null);
         Set<String> keys = RedisUtil.redisScan("region:");
