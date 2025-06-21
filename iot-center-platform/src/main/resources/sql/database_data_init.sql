@@ -375,11 +375,11 @@ INSERT INTO `t_algorithm_info` VALUES ('1000057', '电容器鼓肚', 'drqgd', ''
 INSERT INTO `t_algorithm_info` VALUES ('1000058', '地面沉降', 'dmcj', '', '', '398', '0', '689', '132');
 INSERT INTO `t_algorithm_info` VALUES ('1000059', '人员闯入', 'rycr', '', '', '398', '0', '839', '132');
 INSERT INTO `t_algorithm_info` VALUES ('1000060', 'ocr识别', 'ocr', '', '015', '15', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000061', '新表计-指针', 'new_meter', '', '017', '17', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000062', '新表计-数显', 'new_meter', '', '018', '18', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000063', '新压板', 'new_meter', '', '019', '19', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000064', '新指示灯', 'new_meter', '', '020', '20', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000065', '新旋钮', 'new_meter', '', '021', '21', '1', '450', '1');
+INSERT INTO `t_algorithm_info` VALUES ('1000061', '新表计-指针', 'zhizhen', '', '017', '17', '1', '450', '1');
+INSERT INTO `t_algorithm_info` VALUES ('1000062', '新表计-数显', 'wenzi', '', '018', '18', '1', '450', '1');
+INSERT INTO `t_algorithm_info` VALUES ('1000063', '新压板', 'yaban', '', '019', '19', '1', '450', '1');
+INSERT INTO `t_algorithm_info` VALUES ('1000064', '新指示灯', 'zhishideng', '', '020', '20', '1', '450', '1');
+INSERT INTO `t_algorithm_info` VALUES ('1000065', '新旋钮', 'xuanniu', '', '021', '21', '1', '450', '1');
 -- ----------------------------
 -- Records of t_dict_business
 -- ----------------------------

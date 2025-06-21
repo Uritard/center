@@ -15,6 +15,7 @@ import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.service.impl.InfraredVideoCruiseExecuteImpl;
 import com.yjh.platform.module.patrol.service.impl.NormalVideoCruiseExecuteImpl;
 import com.yjh.platform.module.patrol.thread.CruiseRedisStorage;
+import com.yjh.platform.module.simple.entity.AnalyseMeteTypeEnum;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
 import com.yjh.platform.module.user.service.TCameraInfoService;
@@ -337,11 +338,19 @@ public abstract class AbstractVideoCruise {
         return true;
     }
 
+    /**
+     * 新表计算法分析
+     * analyseType new_meter
+     * @param inspectionId 机器人巡视点id
+     * @param taskId 巡视任务id
+     * @param ret 图片地址
+     * @return  boolean
+     */
     public boolean newAlgorithmAnalysis(String inspectionId, String taskId, Map<String, String> ret) {
         try {
             Analysis analysis = new Analysis();
             analysis.setTaskId(taskId);
-            analysis.setAnalyseType("17");
+            analysis.setAnalyseType(AnalyseMeteTypeEnum.NEW_METER.getName());
             analysis.setInstanceId(Long.parseLong(inspectionId));
             analysis.setPicPath(ret.get("absPath"));
             analysis.setPicModelPath("/" + inspectionId);

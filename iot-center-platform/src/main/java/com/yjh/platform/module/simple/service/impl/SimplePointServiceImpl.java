@@ -277,7 +277,7 @@ public class SimplePointServiceImpl implements SimplePointService {
             stdDeviceMete.setDeviceId(Long.valueOf(robotInspection.getMainDeviceId())).setMeteName(config.getDevName()).setCustomId("700")
                 .setCustomName("本体").setMeteType(String.valueOf(typeEnum.getCode())).setAnalyseType(typeEnum.getType()).setIsAi("off")
                 .setIsJudge("off").setIsTemdif(0).setInspectionType("1").setPositionType("simple").setRedundantType("1")
-                .setComponentId(robotInspection.getComponentId());
+                .setComponentId(robotInspection.getComponentId()).setDevicePointId("");
             deviceMeteList.add(stdDeviceMete);
         }
         int resMete = stdDeviceMeteService.batchAdd(deviceMeteList);
@@ -346,7 +346,7 @@ public class SimplePointServiceImpl implements SimplePointService {
             return null;
         }
         String filePath = file.getParent() + File.separator + T_MODEL_JSON;
-        FileUtil.writeUtf8String(JSONUtil.beautifyJson(robotInspection.getDeviceInfo()), filePath);
+        FileUtil.writeUtf8String(JSONUtil.beautifyJson(JSONUtil.toSnakeCase(robotInspection.getDeviceInfo())), filePath);
         CalibrationData data = new CalibrationData();
         data.setTemplateId(String.valueOf(robotInspection.getInspectionId())).setPicPath(picPath).setFilePath(filePath);
         return data;
@@ -407,7 +407,7 @@ public class SimplePointServiceImpl implements SimplePointService {
         }
         // 调用算法接口分析结果
         List<Analysis> analysisList = new ArrayList<>();
-        Analysis analysis = new Analysis().setAnalyseType(AnalyseTypeEnum.ANALYSE_NEW_METER_TEST.getCode()).setInstanceId(inspectionId)
+        Analysis analysis = new Analysis().setAnalyseType(AnalyseMeteTypeEnum.NEW_METER.getName()).setInstanceId(inspectionId)
             .setTaskId(AnalyseTypeEnum.ANALYSE_NEW_METER_TEST.getName() + "_" + robotInspection.getInspectionId() + "_" + userId)
             .setPicPath(picPath).setPicModelPath("/" + inspectionId);
         analysisList.add(analysis);

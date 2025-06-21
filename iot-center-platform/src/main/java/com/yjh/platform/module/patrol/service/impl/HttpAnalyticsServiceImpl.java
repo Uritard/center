@@ -333,7 +333,12 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
         try {
             picAnalyseRequest.setRequestHostIp(algorithmConfig.getResultIp());
             picAnalyseRequest.setRequestHostPort(algorithmConfig.getResultPort());
-            picAnalyseRequest.setRequestId(UUID.randomUUID() + "#" + analysis.getTaskId());
+            String requestId = UUID.randomUUID().toString();
+            if (analysis.getAnalyseType().equals(AnalyseMeteTypeEnum.NEW_METER.getName())) {
+                //"requestId": "new_meter1000000195_c69814ad-4ec4-462d-84c5-bf8efde02cc5#dff411dd939c4b52b24cc87b367592e1"
+                requestId = AnalyseMeteTypeEnum.NEW_METER.getName() + analysis.getInstanceId() + "_" + requestId;
+            }
+            picAnalyseRequest.setRequestId(requestId + "#" + analysis.getTaskId());
             String instanceId = String.valueOf(analysis.getInstanceId());
             analyseObject.setObjectId(instanceId);
 

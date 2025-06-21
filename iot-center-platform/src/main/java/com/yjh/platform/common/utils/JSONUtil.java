@@ -80,6 +80,11 @@ public class JSONUtil {
         return null;
     }
 
+    /**
+     * 美化json字符串
+     * @param str str
+     * @return  str
+     */
     public static String beautifyJson(String str) {
         if (StringUtils.isEmpty(str)) {
             return StringUtils.EMPTY;
@@ -93,6 +98,27 @@ public class JSONUtil {
         return str;
     }
 
+    /**
+     * 将字符串转换为蛇形命名
+     *
+     * @param str str
+     * @return str
+     */
+    public static String toSnakeCase(String str) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (Character.isUpperCase(c)) {
+                if (i > 0) {
+                    sb.append('_');
+                }
+                sb.append(Character.toLowerCase(c));
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
     /**
      * 格式化 json 字符串
      */
