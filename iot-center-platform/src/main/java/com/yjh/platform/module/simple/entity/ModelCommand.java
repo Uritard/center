@@ -7,6 +7,7 @@ package com.yjh.platform.module.simple.entity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 
@@ -17,7 +18,8 @@ import javax.validation.constraints.NotNull;
  * @since [产品/模块版本] （可选）
  */
 @Data
-@ApiModel(value = "ModelSend对象", description = "机器人模型下发表")
+@ApiModel(value = "ModelSend对象", description = "机器人模型命令")
+@NoArgsConstructor
 public class ModelCommand {
     /**
      * 简易机器人ID
@@ -33,4 +35,10 @@ public class ModelCommand {
      */
     @ApiModelProperty(value = "模型同步指令，为空则全部下发，1-三维模型 2-点位模型 3-参考路径模型")
     private String command;
+
+    /**
+     * 是否是设备
+     */
+    @ApiModelProperty(value = "是否仅设备，初始化前下发仅设备模型")
+    private boolean isDevice = true;
 }

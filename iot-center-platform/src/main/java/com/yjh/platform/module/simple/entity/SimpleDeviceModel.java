@@ -163,4 +163,9 @@ public class SimpleDeviceModel {
      * 自定义参量，简易机器人自定义参数：备用灯光模式：0、1、2、3。
      */
     private String args;
+
+    /**
+     * 电压等级。
+     */
+    private String voltageLevel;
 }

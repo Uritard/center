@@ -294,69 +294,68 @@
             update t_std_device_attr
             <set>
                 <if test="item.deviceModel != null">
-                    device_model = #{item.deviceModel, jdbcType=INTEGER}
+                    device_model = #{item.deviceModel, jdbcType=INTEGER},
                 </if>
                 <if test="item.pmsType != null">
-                    pms_type = #{item.pmsType, jdbcType=VARCHAR}
+                    pms_type = #{item.pmsType, jdbcType=VARCHAR},
                 </if>
                 <if test="item.pmsId != null">
-                    pms_id = #{item.pmsId, jdbcType=VARCHAR}
+                    pms_id = #{item.pmsId, jdbcType=VARCHAR},
                 </if>
                 <if test="item.deviceVendor != null and item.deviceVendor != ''">
-                    device_vendor = #{item.deviceVendor, jdbcType=VARCHAR}
+                    device_vendor = #{item.deviceVendor, jdbcType=VARCHAR},
                 </if>
                 <if test="item.productionDate != null">
-                    production_date = #{item.productionDate, jdbcType=TIMESTAMP}
+                    production_date = #{item.productionDate, jdbcType=TIMESTAMP},
                 </if>
                 <if test="item.usedTime != null">
-                    used_time = #{item.usedTime, jdbcType=TIMESTAMP}
+                    used_time = #{item.usedTime, jdbcType=TIMESTAMP},
                 </if>
                 <if test="item.disableDate != null">
-                    disable_date = #{item.disableDate, jdbcType=TIMESTAMP}
+                    disable_date = #{item.disableDate, jdbcType=TIMESTAMP},
                 </if>
                 <if test="item.lastMaintenance != null">
-                    last_maintenance = #{item.lastMaintenance, jdbcType=TIMESTAMP}
+                    last_maintenance = #{item.lastMaintenance, jdbcType=TIMESTAMP},
                 </if>
                 <if test="item.maintenanceCount != null and item.maintenanceCount != ''">
-                    maintenance_count = #{item.maintenanceCount, jdbcType=VARCHAR}
+                    maintenance_count = #{item.maintenanceCount, jdbcType=VARCHAR},
                 </if>
                 <if test="item.organization != null">
-                    organization = #{item.organization, jdbcType=VARCHAR}
+                    organization = #{item.organization, jdbcType=VARCHAR},
                 </if>
                 <if test="item.department != null">
-                    department = #{item.department, jdbcType=VARCHAR}
+                    department = #{item.department, jdbcType=VARCHAR},
                 </if>
                 <if test="item.responsiblePerson != null">
-                    responsible_person = #{item.responsiblePerson, jdbcType=VARCHAR}
+                    responsible_person = #{item.responsiblePerson, jdbcType=VARCHAR},
                 </if>
                 <if test="item.latitude != null">
-                    latitude = #{item.latitude, jdbcType=VARCHAR}
+                    latitude = #{item.latitude, jdbcType=VARCHAR},
                 </if>
                 <if test="item.longitude != null">
-                    longitude = #{item.longitude, jdbcType=VARCHAR}
+                    longitude = #{item.longitude, jdbcType=VARCHAR},
                 </if>
                 <if test="item.ip != null">
-                    ip = #{item.ip, jdbcType=VARCHAR}
+                    ip = #{item.ip, jdbcType=VARCHAR},
                 </if>
                 <if test="item.port != null">
-                    port = #{item.port, jdbcType=INTEGER}
+                    port = #{item.port, jdbcType=INTEGER},
                 </if>
                 <if test="item.voltageLevel != null">
-                    voltage_level = #{item.voltageLevel, jdbcType=VARCHAR}
+                    voltage_level = #{item.voltageLevel, jdbcType=VARCHAR},
                 </if>
                 <if test="item.sequencePoint != null">
-                    sequence_point = #{item.sequencePoint, jdbcType=VARCHAR}
+                    sequence_point = #{item.sequencePoint, jdbcType=VARCHAR},
                 </if>
                 <if test="item.realCode != null">
-                    real_code = #{item.realCode, jdbcType=VARCHAR}
+                    real_code = #{item.realCode, jdbcType=VARCHAR},
                 </if>
                 <if test="item.address != null">
-                    address = #{item.address, jdbcType=VARCHAR}
+                    address = #{item.address, jdbcType=VARCHAR},
                 </if>
             </set>
             where device_id = #{item.deviceId, jdbcType=BIGINT}
         </foreach>
     </update>
-
 
 </mapper>

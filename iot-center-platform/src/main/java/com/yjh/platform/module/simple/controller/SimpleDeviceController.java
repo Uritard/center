@@ -72,7 +72,7 @@ public class SimpleDeviceController {
     public Result simpleModelExport(@RequestBody @Valid ModelCommand modelSend) {
         Result result = new Result();
         try {
-            simpleDeviceService.modelExport(modelSend);
+            result.setData(simpleDeviceService.modelExport(modelSend));
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {

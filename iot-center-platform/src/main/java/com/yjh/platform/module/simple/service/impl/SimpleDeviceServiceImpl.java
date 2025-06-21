@@ -4,6 +4,7 @@
 
 package com.yjh.platform.module.simple.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
@@ -16,6 +17,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DictConvertUtil;
@@ -39,19 +41,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -70,7 +67,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TStdDevice> implements ISimpleDeviceService {
-    private final RedisTemplate<?, ?> redisTemplate;
     private final TStdRegionService tStdRegionService;
     private final TStdDeviceAttrService tStdDeviceAttrService;
     private final TRobotInfoService robotService;
@@ -133,11 +129,12 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
                 if (MODEL_FILE_XLSX.equals(pathType)) {
                     // 如果是设备模型，则不下发excel，下发xml格式模型文件
                     // 生成xml模型文件
-                    path = pointModel(regionId, true);
+                    path = pointModel(regionId, modelSend.isDevice());
                 } else {
                     path = modelMap.get(pathType);
                 }
-                robotProxy.modelSend(robotInfo.getRobotCode(), modelSend.getCommand(), path);
+                Result ret = robotProxy.modelSend(robotInfo.getRobotCode(), modelSend.getCommand(), path);
+                log.info("模型下发返回结果: {} - {}", modelSend.getCommand(), ret);
             } else {
                 // 模型指令为空，则下发所有模型
                 for (Map.Entry<String, String> entry : COMMAND_MAP.entrySet()) {
@@ -146,15 +143,16 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
                     // 如果是设备模型，则不下发excel，下发xml格式模型文件
                     if (MODEL_FILE_XLSX.equals(pathType)) {
                         // 生成xml模型文件
-                        path = pointModel(regionId, true);
+                        path = pointModel(regionId, modelSend.isDevice());
                     } else {
                         path = modelMap.get(pathType);
                     }
-                    robotProxy.modelSend(robotInfo.getRobotCode(), modelSend.getCommand(), path);
+                    Result ret = robotProxy.modelSend(robotInfo.getRobotCode(), entry.getKey(), path);
+                    log.info("模型循环下发返回结果: {} - {}", entry.getKey(), ret);
                 }
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new BusinessException(ResultCodeEnum.CODE10010, "获取模型文件失败");
         }
@@ -176,13 +174,10 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
             // 根据模型指令找出对应模型，返回给前端
             if (StringUtils.isNotEmpty(modelSend.getCommand())) {
                 String pathType = COMMAND_MAP.get(modelSend.getCommand());
+                path = modelMap.get(pathType);
                 if (MODEL_FILE_XLSX.equals(pathType)) {
                     // 如果是设备模型，则需重新生成 excel 文件
-                    // 生成xml模型文件
-                    // path = pointModel(regionId, true);
-                    path = modelMap.get(pathType);
-                } else {
-                    path = modelMap.get(pathType);
+                    path = generateDeviceExcel(regionId, path);
                 }
 
                 path = StringUtils.replace(path, SysParamConfig.getSysContent("fileAbsPath"), Constant.FILE_REAL_PATH);
@@ -196,6 +191,9 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
                 // modelMap 过滤掉 xml 格式文件，然后转成 File
                 String modelDir = simpleModelDir(regionId);
                 File modelDirFile = new File(modelDir);
+
+                String excelPath = modelMap.get(MODEL_FILE_XLSX);
+                generateDeviceExcel(regionId, excelPath);
 
                 File[] files = modelMap.entrySet()
                     .stream()
@@ -247,11 +245,11 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
         Map<String, String> deviceToBayMap = new HashMap<>(64);
         for (SimpleDeviceExcel excelEntity : excelEntities) {
             stationSet.add(excelEntity.getStationName());
-            regionSet.add(excelEntity.getRegionName());
-            baySet.add(excelEntity.getIntervalName());
-            bayToRegionMap.put(excelEntity.getIntervalName(), excelEntity.getRegionName());
+            regionSet.add(excelEntity.getAreaName());
+            baySet.add(excelEntity.getBayName());
+            bayToRegionMap.put(excelEntity.getBayName(), excelEntity.getAreaName());
             deviceSet.add(excelEntity.getDeviceName());
-            deviceToBayMap.put(excelEntity.getDeviceName(), excelEntity.getIntervalName());
+            deviceToBayMap.put(excelEntity.getDeviceName(), excelEntity.getBayName());
         }
 
         if (stationSet.size() > 1) {
@@ -435,7 +433,7 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
                 excelEntity.getX1() + "," + excelEntity.getY1() + "," + excelEntity.getZ1() + ";" + excelEntity.getX2() + ","
                     + excelEntity.getY2() + "," + excelEntity.getZ2());
             // 设备存在，且区域与导入区域匹配
-            if (Objects.nonNull(device) && device.getUpRegionId().equals(bayByNameMap.get(excelEntity.getIntervalName()).getRegionId())) {
+            if (Objects.nonNull(device) && device.getUpRegionId().equals(bayByNameMap.get(excelEntity.getBayName()).getRegionId())) {
                 deviceAttr.setDeviceId(device.getDeviceId());
                 updateDevices.add(deviceAttr);
             } else {
@@ -491,6 +489,7 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
                 robot.setRobotNum(code);
                 robot.setRobotType(robotType);
                 robot.setRobotPosition(robotPosition);
+                robot.setIsUse(isUse);
                 Date today = DateUtil.beginOfDay(new Date());
                 robot.setMadeDate(today);
                 robot.setCommissionDate(today);
@@ -595,24 +594,84 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
      * @return 设备模型列表
      */
     public String pointModel(Long regionId, boolean isDevice) throws IOException {
-        List<SimpleDeviceModel> list = getBaseMapper().selectDeviceModel(regionId, isDevice);
-
-        TStdRegion station = tStdRegionService.selectUpRegion(regionId);
-        String stationCode = String.valueOf(station.getRegionId());
-        String stationName = station.getRegionName();
-        list.forEach(item -> {
-            item.setStationCode(stationCode);
-            item.setStationName(stationName);
-            // 坐标数据库内以;号分割不同点，模型要求全部以,分割
-            item.setMasterCoordinate(item.getMasterCoordinate().replace(";", ","));
-            // 相应类型全部转成文档标准的值
-            item.setMeterType(getUpDict("meterType", item.getMeterType()));
-            item.setAppearanceType(getUpDict("appearanceType", item.getAppearanceType()));
-            item.setRecognitionTypeList(getUpDict("meteType", item.getRecognitionTypeList()));//
-            item.setDeviceType(getUpDict("deviceType", item.getDeviceType()));
-        });
         String fileName = isDevice ? "simple_device_init_model.xml" : "simple_device_model.xml";
-        return PlatformXmlUtil.createXmlFileT(list, simpleModelDir(regionId), fileName, "Device_Model");
+        try {
+            List<SimpleDeviceModel> list = getBaseMapper().selectDeviceModel(regionId, isDevice);
+
+            // 查询区域的上级作为站所
+            TStdRegion station = tStdRegionService.selectUpRegion(regionId);
+            String stationCode = String.valueOf(station.getRegionId());
+            String stationName = station.getRegionName();
+            list.forEach(item -> {
+                item.setStationCode(stationCode);
+                item.setStationName(stationName);
+                // 坐标数据库内以;号分割不同点，模型要求全部以,分割
+                item.setMasterCoordinate(item.getMasterCoordinate().replace(";", ","));
+                // 相应类型全部转成文档标准的值
+                item.setMeterType(getUpDict("meterType", item.getMeterType()));
+                item.setAppearanceType(getUpDict("appearanceType", item.getAppearanceType()));
+                item.setRecognitionTypeList(getUpDict("meteType", item.getRecognitionTypeList()));//
+                item.setDeviceType(getUpDict("deviceType", item.getDeviceType()));
+                item.setVoltageLevel(DictConvertUtil.DICT.covertToDict("voltageLevel", item.getVoltageLevel()));
+            });
+
+            return PlatformXmlUtil.createXmlFileT(list, simpleModelDir(regionId), fileName, "Device_Model");
+        } catch (IOException e) {
+            log.error("导出数据模型文件失败: {}", fileName, e);
+        }
+        return null;
+    }
+
+    /**
+     * 从数据库导出数据模型文件
+     * @param regionId  区域ID
+     * @param excelPath excel 路径
+     * @return 文件路径
+     */
+    public String generateDeviceExcel(Long regionId, String excelPath) {
+        try {
+            List<SimpleDeviceModel> list = getBaseMapper().selectDeviceModel(regionId, true);
+            List<SimpleDeviceExcel> excelDataList = new ArrayList<>((int)(list.size() * 1.4));
+
+            // 查询区域的上级作为站所
+            TStdRegion station = tStdRegionService.selectUpRegion(regionId);
+            String stationCode = String.valueOf(station.getRegionId());
+            String stationName = station.getRegionName();
+            list.forEach(item -> {
+                item.setStationCode(stationCode);
+                item.setStationName(stationName);
+
+                // 相应类型全部转成文档标准的值
+                item.setVoltageLevel(DictConvertUtil.DICT.covertToDict("voltageLevel", item.getVoltageLevel()));
+
+                // 组装 excel 数据
+                SimpleDeviceExcel excel = new SimpleDeviceExcel();
+                BeanUtil.copyProperties(item, excel);
+                // 坐标数据库内以,;号分割不同点，excel 需要拆分成单个点
+                String[] coordinate = item.getMasterCoordinate().split("[;,]");
+                // 一共4个点，每个点三个坐标，以供12个坐标值
+                if (coordinate.length >= 12) {
+                    excel.setX1(NumberUtils.toDouble(coordinate[0]));
+                    excel.setY1(NumberUtils.toDouble(coordinate[1]));
+                    excel.setZ1(NumberUtils.toDouble(coordinate[2]));
+                    excel.setX2(NumberUtils.toDouble(coordinate[3]));
+                    excel.setY2(NumberUtils.toDouble(coordinate[4]));
+                    excel.setZ2(NumberUtils.toDouble(coordinate[5]));
+                    excel.setX3(NumberUtils.toDouble(coordinate[6]));
+                    excel.setY3(NumberUtils.toDouble(coordinate[7]));
+                    excel.setZ3(NumberUtils.toDouble(coordinate[8]));
+                    excel.setX4(NumberUtils.toDouble(coordinate[9]));
+                    excel.setY4(NumberUtils.toDouble(coordinate[10]));
+                    excel.setZ4(NumberUtils.toDouble(coordinate[11]));
+                }
+                excelDataList.add(excel);
+            });
+            EasyExcelFactory.write(excelPath, SimpleDeviceExcel.class).sheet(stationName).doWrite(excelDataList);
+        } catch (Exception e) {
+            log.error("导出 excel 失败: {}", excelPath, e);
+        }
+
+        return excelPath;
     }
 
     /**

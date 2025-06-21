@@ -19,10 +19,10 @@ public class SimpleDeviceExcel {
     private String voltageLevel;
 
     @ExcelProperty("区域名称")
-    private String regionName;
+    private String areaName;
 
     @ExcelProperty("间隔名称")
-    private String intervalName;
+    private String bayName;
 
     @ExcelProperty("设备名称")
     private String deviceName;

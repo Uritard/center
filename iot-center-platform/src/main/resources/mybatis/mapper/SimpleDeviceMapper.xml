@@ -17,8 +17,8 @@
             "0" AS photo_num,
         </if>
         <if test="isDevice == false">
-            i.inspection_code AS d.device_id,
-            i.inspection_name AS d.device_name,
+            i.inspection_code AS device_id,
+            i.inspection_name AS device_name,
             i.component_id,
             m.custom_name AS component_name,
             m.meter_type,
@@ -50,32 +50,4 @@
             ur.region_id = #{regionId} and d.position_type = 'simple'
     </select>
 
-    <select id="selectDevicePointModel" resultType="com.yjh.platform.module.simple.entity.SimpleDeviceModel">
-        SELECT DISTINCT
-            ur.region_id AS area_id,
-            ur.region_name AS area_name,
-            r.region_id AS bay_id,
-            r.region_name AS bay_name,
-
-            d.device_id AS main_device_id,
-            d.device_name AS main_device_name,
-            da.voltage_level,
-            d.device_type,
-            "7" AS appearance_type,
-            "2" AS save_type_list,
-            "2" AS data_type,
-            "2" AS point_type,
-            CONCAT(da.latitude, ';', da.longitude) AS master_coordinate,
-            d.device_id master_point_id,
-            "0" AS photo_num,
-            "0" AS Args
-        FROM t_std_device d
-        LEFT JOIN t_std_device_attr da ON d.device_id = da.device_id
-        LEFT JOIN t_std_region r ON d.up_region_id = r.region_id
-        LEFT JOIN t_std_region ur ON r.up_region_id = ur.region_id
-        LEFT JOIN t_std_devicemete m ON m.device_id = d.device_id
-        LEFT JOIN t_robot_inspection i ON i.main_device_id = d.device_id
-        WHERE
-            ur.region_id = #{regionId} and d.position_type = 'simple'
-    </select>
 </mapper>

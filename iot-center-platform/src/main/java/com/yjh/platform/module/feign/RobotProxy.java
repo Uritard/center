@@ -21,15 +21,13 @@ import java.util.List;
 @FeignClient(name = "iot-center-accessrobot")
 public interface RobotProxy {
     @PostMapping(value = "robot/v1/deleteTransfer")
-    public Result deleteTransfer(@RequestParam(value = "edgeCode") List<String> edgeCode,
-        @RequestParam(value = "taskId") String taskId,
-        @RequestParam(value = "startTime") String startTime,
-        @RequestParam(value = "source") String source);
+    Result deleteTransfer(@RequestParam(value = "edgeCode") List<String> edgeCode, @RequestParam(value = "taskId") String taskId,
+        @RequestParam(value = "startTime") String startTime, @RequestParam(value = "source") String source);
 
     /**
      * 简易机器人模型下发
      */
     @PostMapping(value = "simpleRobot/v1/modelSend")
-    public Result modelSend(@RequestParam(value = "robotCode") String robotCode, @RequestParam(value = "command") String command,
+    Result modelSend(@RequestParam(value = "robotCode") String robotCode, @RequestParam(value = "command") String command,
         @RequestParam(value = "path") String path);
 }
