@@ -407,7 +407,7 @@ public class SimplePointServiceImpl implements SimplePointService {
             return null;
         }
         String filePath = file.getParent() + File.separator + T_MODEL_JSON;
-        FileUtil.writeUtf8String(JSONUtil.beautifyJson(StrUtil.toUnderlineCase(robotInspection.getDeviceInfo())), filePath);
+        FileUtil.writeUtf8String(JSONUtil.beautifyJson(JSONUtil.toSnakeCase(robotInspection.getDeviceInfo())), filePath);
         CalibrationData data = new CalibrationData();
         data.setTemplateId(String.valueOf(robotInspection.getInspectionId())).setPicPath(picPath).setFilePath(filePath);
         return data;
