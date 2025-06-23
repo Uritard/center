@@ -55,7 +55,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.*;
 
-import static com.yjh.platform.module.patrol.CruiseConstant.INITIAL_PATROL;
+import static com.yjh.platform.module.patrol.CruiseConstant.*;
 
 /**
  * <功能描述>
@@ -284,6 +284,10 @@ public class SimplePointServiceImpl implements SimplePointService {
      */
     @Override
     public Map<String, Object> initTaskAdd(List<Long> devicesId, Long robotId) {
+        InitialTaskStatus initialTaskStatus = initTaskStatus(robotId, null);
+        if ( initialTaskStatus.getInitStatus() == TASK_STATE_EXECUTING || initialTaskStatus.getInitStatus() == TASK_STATE_NOT_START) {
+            throw new BusinessException("当前机器人有未完成的初始任务！");
+        }
         String deviceList = StringUtils.join(devicesId, ",");
         if (StringUtils.isBlank(deviceList)) {
             //当机器人没有绑定屏柜时，默认使用机器人的上级区域下的所有屏柜

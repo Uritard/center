@@ -601,6 +601,9 @@ public class UPatrolTaskService {
         //判断如果是si300任务，则需要根据instanceList查询屏柜id
         if (task.getTaskType() == INITIAL_PATROL) {
             detailList = tStdDeviceDao.selectForTask(instanceList);
+            detailList.forEach(detail -> {
+                detail.setCruiseId(task.getRobotId());
+            });
         }
 
         Date now = new Date();
@@ -661,7 +664,7 @@ public class UPatrolTaskService {
             map.put("deviceType", String.valueOf(item.getDeviceType()));
             map.put("startTime", DateTimeUtil.format3(task.getStartTime()));
             map.put("presetAttribute", String.valueOf(item.getPresetAttribute()));
-            if(ArrayUtils.contains(new int[]{TypeEnum.UAV.getCode(), TypeEnum.ROBOT.getCode()}, item.getCruiseType())){
+            if(ArrayUtils.contains(new int[]{TypeEnum.UAV.getCode(), TypeEnum.ROBOT.getCode()}, item.getCruiseType()) && task.getTaskType() != INITIAL_PATROL){
                 map.put("cameraId","");
                 String rbtId = String.valueOf(item.getRobotId());
                 map.put("robotId", rbtId);
@@ -725,7 +728,7 @@ public class UPatrolTaskService {
      */
     public List<TCruisePointInstanceNameDetail> initializeNextTaskInfo(UPatrolTask task, List<Long> instanceList) {
         UPatrolTask ctask = task;
-        if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
+        if (task.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
             UPatrolTask nextTask = new UPatrolTask();
             String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
             // 周期任务的下一次任务时间和名称在初始化时就通过cron表达式进行计算，不再通过任务执行时再修改名称
@@ -766,7 +769,7 @@ public class UPatrolTaskService {
         mapForAbnormal.put("abnormal", "0");
         mapForAbnormal.put("normal", "0");
         mapForAbnormal.put("taskStart", DateTimeUtil.format(task.getStartTime()));
-        mapForAbnormal.put("taskState", String.valueOf(CruiseConstant.TASK_STATE_NOT_START));
+        mapForAbnormal.put("taskState", String.valueOf(TASK_STATE_NOT_START));
         mapForAbnormal.put("nodes", JSON.toJSONString(nodeSet));
         mapForAbnormal.put("taskId", task.getTaskId());
         mapForAbnormal.put("taskType", CommonUtils.defaultEmpty(task.getTaskType()));
@@ -990,7 +993,7 @@ public class UPatrolTaskService {
             if (subCreateTask) {
                 // 如果下级节点提前上报任务状态，则将任务置为开始
                 if (TASK_STATE_NOT_START == oldState && TASK_STATE_EXECUTING == taskState) {
-                    UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(CruiseConstant.TASK_STATE_EXECUTING)
+                    UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(TASK_STATE_EXECUTING)
                         .setExecuteTime(DateTimeUtil.parse(robotPatrolTaskStatus.getStartTime(), new Date()));
                     log.info("TaskResult start, taskId: {}", taskId);
                     uPatrolResultDao.update(result);
@@ -1169,7 +1172,7 @@ public class UPatrolTaskService {
         int check = checkProcessTime(result, robotCode, robotId, times);
         if (1 == check) {
             //这个点 没有做
-            CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
+            TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
 
             // 下级上报终止状态忽略，上报结束或超时状态遗漏
             int status;
@@ -1195,7 +1198,7 @@ public class UPatrolTaskService {
             result.put("cruiseAbnormal", String.valueOf(cruiseAbnormal));//任务终止
             result.put("cruiseStatus", String.valueOf(status));
             result.put("resultNum", "-1");
-            result.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_UN));//未审核
+            result.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));//未审核
             result.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));//异常
             result.put("cruiseTime",DateTimeUtil.format(new Date()));
             String instanceKey = cruiseResultKey + instanceId;
@@ -1206,8 +1209,8 @@ public class UPatrolTaskService {
             result.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));//已执行
             result.put("resultNum", "-1");
             result.put("resultDesc", AbnormalResDescEnum.ANALYSE_TIMEOUT.getDesc());
-            result.put("cruiseAbnormal", String.valueOf(CruiseConstant.CRUISE_ABNORMAL_TIMEOUT));//超时
-            result.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_UN));//未审核
+            result.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_TIMEOUT));//超时
+            result.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));//未审核
             result.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));//异常
             result.put("cruiseTime",DateTimeUtil.format(new Date()));
 
@@ -1322,6 +1325,9 @@ public class UPatrolTaskService {
             }
 
             List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
+            if (task.getTaskType() == INITIAL_PATROL) {
+                robotCode.add(tRobotInfoDao.selectByPrimaryId(task.getRobotId()).getRobotCode());
+             }
             log.info("robotCode : {}", robotCode);
             if (scheduledByLocal(task.getDateType())) {
                 log.info("这种格式的周期任务走上层任务调度");
@@ -1344,7 +1350,9 @@ public class UPatrolTaskService {
                     List<String> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
                     //如果是si300类型的任务，则根据deviceId查询
                     if (task.getTaskType() == INITIAL_PATROL) {
-                        robotTaskInstanceList = tStdDeviceDao.selectRobotTaskDeviceId(deviceIdList,item);
+                        deviceIdList.forEach(deviceId -> {
+                            robotTaskInstanceList.add(String.valueOf(deviceId));
+                        });
                     }
                     robotTaskInfo.setInstanceList(robotTaskInstanceList);
                     String ifFun = String.valueOf(tCruiseTaskAdd.getIfRun());
@@ -1533,7 +1541,7 @@ public class UPatrolTaskService {
      */
     private void packageTaskProtocolInfo(TCruiseTaskAdd tCruiseTaskAdd, DateFormat format, RobotTaskInstanceInfo taskInfo, String ifFun) {
         try {
-            CruiseConstant.TaskTypeEnum taskType = CruiseConstant.TaskTypeEnum.getEnm(NumberUtils.toInt(ifFun));
+            TaskTypeEnum taskType = TaskTypeEnum.getEnm(NumberUtils.toInt(ifFun));
 
             switch (taskType) {
                 //立即任务
@@ -2388,7 +2396,7 @@ public class UPatrolTaskService {
                 return;
             }
 
-            CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
+            TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
             switch (cruiseTypeEnum) {
                 case VIDEO: // 视频
                 case INFRARED: // 红外
@@ -2726,6 +2734,7 @@ public class UPatrolTaskService {
             int all;
             boolean ended;
             String description;
+            int taskType = 0;
             synchronized (LOCK_FLAG) {
                 String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
                 Map<String, String> resultCountsMap = redisTemplate.opsForHash().entries(strForCountAbnormal);
@@ -2786,7 +2795,7 @@ public class UPatrolTaskService {
                 uPatrolDataResult.setCruiseDeviceName(redisInfoMap.get("cruiseDeviceName"));
                 uPatrolDataResult.setResultNum(redisInfoMap.get("resultNum"));
                 //判断任务状态是否为终止状态 如果是:设置巡视结果为任务的异常原因
-                if ((TASK_STATE_INTERRUPT==taskStatus) && (MapUtils.getIntValue(redisInfoMap, "cruiseResult") == (CruiseConstant.CRUISE_RESULT_ABNORMAL))) {
+                if ((TASK_STATE_INTERRUPT==taskStatus) && (MapUtils.getIntValue(redisInfoMap, "cruiseResult") == (CRUISE_RESULT_ABNORMAL))) {
                     //设置巡视值
                     uPatrolDataResult.setResultDesc(description);
                 }else {
@@ -2836,6 +2845,7 @@ public class UPatrolTaskService {
             UPatrolResult oldResult = uPatrolResultDao.selectByPrimaryId(taskId);
             UPatrolResult uPatrolResult = new UPatrolResult().setTaskId(taskId);
             uPatrolResult.setTaskState(taskStatus).setTaskWait(taskWaitCounts).setEndTime(new Date()).setTaskAbnormal(abnormalCounts);
+            taskType = oldResult.getTaskType();
             // 如果 Redis 状态中总点数为 0，则表示非上级系统下发任务，需更新总点数值
             if ( all == 0) {
                 uPatrolResult.setTaskCount(allCounts);
@@ -2867,6 +2877,16 @@ public class UPatrolTaskService {
                 //低优先任务继续
                 lowTaskGoOn(taskId);
             }
+            //si300初始任务接受，推送websocket消息给前端，显示弹窗
+            if (taskType == INITIAL_PATROL) {
+                Map<String, String> jasonMap = new HashMap<>();
+                jasonMap.put("type", "initTaskFinished");
+                jasonMap.put("result", "初始任务已完成");
+                jasonMap.put("taskId", taskId);
+                log.info("发送给前端的消息：   {}", JSON.toJSONString(jasonMap));
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
+            }
+
             int state = 1;
             switch (taskStatus) {
                 case TASK_STATE_INTERRUPT:
@@ -3607,7 +3627,7 @@ public class UPatrolTaskService {
         log.info("执行完成点 taskId: {}, 进度: {}", taskId, rate);
         Map<String, Object> rateAndTaskInfo = new HashMap<>();
         rateAndTaskInfo.put("rate", rate);
-        String taskState = countResult.getOrDefault("taskState", String.valueOf(CruiseConstant.TASK_STATE_EXECUTING));
+        String taskState = countResult.getOrDefault("taskState", String.valueOf(TASK_STATE_EXECUTING));
         rateAndTaskInfo.put("taskState", taskState);
         rateAndTaskInfo.put("startTime", countResult.get("taskStart"));
         rateAndTaskInfo.put("taskStateName", DictConvertUtil.DICT.covertToDict("taskState", taskState));

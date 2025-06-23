@@ -112,8 +112,11 @@ public class SimpleInspectionResultThread implements Runnable {
                 resultHandler.updateCruiseStatus(tCruiseTaskResultMap);
                 tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
                 tCruiseTaskResultMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
-                tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_ANALYSE_DOING));
-                tCruiseTaskResultMap.put("resultDesc", AbnormalResDescEnum.ANALYSISING.getDesc());
+                //si300初始任务，单独处理结果
+                if (!String.valueOf(INITIAL_PATROL).equals(taskType)) {
+                    tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_ANALYSE_DOING));
+                    tCruiseTaskResultMap.put("resultDesc", AbnormalResDescEnum.ANALYSISING.getDesc());
+                }
                 resultHandler.saveTaskResultAndNotify(tCruiseTaskResultMap, taskId, instanceId, redisKeyName);
                 resultHandler.addCruiseAnalysisScore(taskId, instanceId);
             }
@@ -129,9 +132,13 @@ public class SimpleInspectionResultThread implements Runnable {
             for (int i = 0; i < resultList.size(); i++) {
                 String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceList.get(i);
                 Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
-                if (result || String.valueOf(INITIAL_PATROL).equals(taskType)) {
+                if (String.valueOf(INITIAL_PATROL).equals(taskType)) {
                     TStdDevice tStdDevice = new TStdDevice().setDeviceId(Long.valueOf(instanceList.get(0))).setRegionPath(convertPath);
                     tStdDeviceDao.update(tStdDevice);
+                    CruiseRedisStorage.offer(tCruiseTaskResultMap);
+                    uPatrolTaskService.patrolTaskResultHandler(tCruiseTaskResultMap);
+                }
+                if (result) {
                     resultHandler.callFailedHandle(tCruiseTaskResultMap);
                     CruiseRedisStorage.offer(tCruiseTaskResultMap);
                     uPatrolTaskService.patrolTaskResultHandler(tCruiseTaskResultMap);
