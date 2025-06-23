@@ -75,7 +75,11 @@ public class SimpleRobotServiceImpl implements ISimpleRobotService {
             .setCommand(command)
             .setItems(Collections.singletonList(item));
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-        return RobotServerHandler.send(robotService.generateByteOrder(xmlString, robotCode), robotCode);
+        int ret = RobotServerHandler.send(robotService.generateByteOrder(xmlString, robotCode), robotCode);
+        if (0 != ret) {
+            throw new BusinessException("机器人不在线, 模型同步失败");
+        }
+        return ret;
     }
 
     /**

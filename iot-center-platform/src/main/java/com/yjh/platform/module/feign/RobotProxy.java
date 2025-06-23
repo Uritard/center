@@ -6,6 +6,7 @@ package com.yjh.platform.module.feign;
 
 import com.yjh.platform.common.result.Result;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -27,7 +28,7 @@ public interface RobotProxy {
     /**
      * 简易机器人模型下发
      */
-    @PostMapping(value = "simpleRobot/v1/modelSend")
+    @GetMapping(value = "/simpleRobot/v1/modelSend")
     Result modelSend(@RequestParam(value = "robotCode") String robotCode, @RequestParam(value = "command") String command,
         @RequestParam(value = "path") String path);
 }
