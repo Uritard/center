@@ -1,6 +1,7 @@
 package com.yjh.platform.module.simple.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import com.yjh.platform.common.Constant;
@@ -346,7 +347,7 @@ public class SimplePointServiceImpl implements SimplePointService {
             return null;
         }
         String filePath = file.getParent() + File.separator + T_MODEL_JSON;
-        FileUtil.writeUtf8String(JSONUtil.beautifyJson(JSONUtil.toSnakeCase(robotInspection.getDeviceInfo())), filePath);
+        FileUtil.writeUtf8String(JSONUtil.beautifyJson(StrUtil.toUnderlineCase(robotInspection.getDeviceInfo())), filePath);
         CalibrationData data = new CalibrationData();
         data.setTemplateId(String.valueOf(robotInspection.getInspectionId())).setPicPath(picPath).setFilePath(filePath);
         return data;
