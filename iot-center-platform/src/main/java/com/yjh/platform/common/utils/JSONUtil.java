@@ -80,6 +80,11 @@ public class JSONUtil {
         return null;
     }
 
+    /**
+     * 美化json字符串
+     * @param str str
+     * @return  str
+     */
     public static String beautifyJson(String str) {
         if (StringUtils.isEmpty(str)) {
             return StringUtils.EMPTY;

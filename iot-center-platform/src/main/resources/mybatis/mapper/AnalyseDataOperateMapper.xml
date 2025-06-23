@@ -1136,4 +1136,13 @@
         WHERE task_id = #{taskId, jdbcType=VARCHAR}
         AND instance_id = #{instanceId, jdbcType=BIGINT}
     </select>
+    <select id="selectInstanceIdByDevicePointIdAndCruiseId" resultType="java.lang.String">
+        SELECT
+            instance_id
+        FROM
+            t_cruise_point_instance
+        WHERE
+            device_mete_id = #{deviceMeterId, jdbcType=VARCHAR}
+        AND cruise_id = #{cruiseId, jdbcType=VARCHAR}
+    </select>
 </mapper>

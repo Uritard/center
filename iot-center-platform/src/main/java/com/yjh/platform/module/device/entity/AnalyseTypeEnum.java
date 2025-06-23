@@ -33,7 +33,7 @@ public enum AnalyseTypeEnum {
     DEFECT_RECOGNITION("398", "缺陷识别"),
     OCR_RECOGNITION("15", "ocrAnalyse"),
     TARGET_BOX_RECOGNITION("16", "autoLabelAnalyse"),
-    ANALYSE_NEW_METER_TEST("17", "analyseNewMeterTest");
+    ANALYSE_NEW_METER_TEST("22", "analyseNewMeterTest");
 
     private final String code;
 

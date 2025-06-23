@@ -1,5 +1,7 @@
 package com.yjh.platform.module.simple.entity;
 
+import com.yjh.platform.common.result.BusinessException;
+
 import java.util.Arrays;
 
 /**
@@ -30,7 +32,11 @@ public enum AnalyseMeteTypeEnum {
     /**
      * 新旋钮  识别类型 219-位置状态识别
      */
-    NEW_XN(21, 219, "xuanniu", "新旋钮");
+    NEW_XN(21, 219, "xuanniu", "新旋钮"),
+    /**
+     * 新表计
+     */
+    NEW_METER(0, 0, "new_meter", "新表计");
 
     /**
      * 算法类型 id
@@ -80,7 +86,7 @@ public enum AnalyseMeteTypeEnum {
      */
     public static AnalyseMeteTypeEnum findAny(String name) {
         return Arrays.stream(AnalyseMeteTypeEnum.values()).filter(item -> item.getName().equals(name)).findFirst()
-            .orElse(AnalyseMeteTypeEnum.NEW_ZZ_BJ);
+            .orElseThrow(() -> new BusinessException("表计类型不存在:" + name));
     }
 
     /**

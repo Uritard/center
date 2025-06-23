@@ -32,6 +32,7 @@ import com.yjh.platform.module.patrol.entity.interlanalysis.Point;
 import com.yjh.platform.module.patrol.entity.interlanalysis.*;
 import com.yjh.platform.module.patrol.service.impl.HttpAnalyticsServiceImpl;
 import com.yjh.platform.module.patrol.thread.AlgorithmAnalyseThread;
+import com.yjh.platform.module.simple.entity.AnalyseMeteTypeEnum;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.service.AlarmShieldService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
@@ -653,11 +654,21 @@ public class IntelAnalysisService {
     public List<AnalysePatrolTaskResult> sendAnalysePatrolTaskResult(PicAnalyseResponse response, String taskId){
         // 遍历多个点的分析结果,不同的巡视点
         List<AnalysePatrolTaskResult> resultList = new ArrayList<>();
-        List<String> falseDataCruiseList = new ArrayList<>();
+        //新表计的requestId包含 new_meter前缀
+        boolean isNewMeter = StringUtils.startsWith(response.getRequestId(), AnalyseMeteTypeEnum.NEW_METER.getName());
         try {
             for (AnalyseResult analyseResult : response.getResultList()) {
 
                 String instanceId = analyseResult.getObjectId();
+                if (isNewMeter){
+                    //新表计算法  analyseResult.getObjectId() 是测点id, cruiseId包含在requestId中
+                    //"requestId": "new_meter1000000195_c69814ad-4ec4-462d-84c5-bf8efde02cc5#dff411dd939c4b52b24cc87b367592e1"
+                    String cruiseIdPrefix = StringUtils.substringBeforeLast(response.getRequestId(), "_");
+                    String cruiseId = cruiseIdPrefix.replace(AnalyseMeteTypeEnum.NEW_METER.getName(), "");
+                    instanceId = analyseDataOperateDao.selectInstanceIdByDevicePointIdAndCruiseId(instanceId, cruiseId);
+                    log.info("newMeter analyse : deviceMeterId: {}, cruiseId :{}", instanceId, cruiseId);
+                }
+
                 String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
                 String originPicPath = String.valueOf(redisTemplate.opsForHash().get(redisKeyName, "origpic"));
 
@@ -672,7 +683,6 @@ public class IntelAnalysisService {
                     taskResult.setTaskId(taskId);
                     taskResult.setInstanceId(instanceId);
                     taskResult.setAnalyseType(algorithmType);
-                    falseDataCruiseList.add(instanceId);
                     // json格式："123":"1--正常--坐标--置信度"
                     String jsonValue= String.valueOf(generateMapFormat().get(devicePointId));
                     String[] vals = jsonValue.split("--");

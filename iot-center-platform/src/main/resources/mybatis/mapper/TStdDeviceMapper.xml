@@ -1022,7 +1022,8 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 			r.robot_id AS robotId
 		FROM
 			t_std_device b
-				LEFT JOIN t_std_region d ON b.up_region_id = d.region_id LEFT JOIN t_robot_inspection r ON r.main_device_id = b.device_id
+		LEFT JOIN t_std_region d ON b.up_region_id = d.region_id
+		LEFT JOIN t_robot_info r on r.up_region_id  = d.up_region_id
 		where b.up_region_id =#{upRegionId} and b.position_type = 'simple'
 		GROUP BY b.device_id
 	</select>
@@ -1522,7 +1523,9 @@ group by camera_id
 			b.region_name AS upName,
 			"region" AS infoType,
 			r.robot_id AS robotId
-		FROM t_std_region a LEFT JOIN t_std_region b ON a.up_region_id = b.region_id LEFT JOIN t_robot_info r ON a.region_id = r.up_region_id and r.robot_type = 905
+		FROM t_std_region a
+		LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+		LEFT JOIN t_robot_info r ON (a.region_id = r.up_region_id or a.up_region_id  = r.up_region_id) and r.robot_type = 905
 		WHERE
 		    a.region_id IN
 		( WITH RECURSIVE cte AS (
@@ -1536,8 +1539,8 @@ group by camera_id
 		SELECT
 		up_region_id
 		FROM
-		t_robot_info
-		WHERE up_region_id IS NOT NULL AND robot_type = 905
+		t_std_device
+		WHERE up_region_id IS NOT NULL AND position_type = 'simple'
 		)
 		<if test="name != null and name != ''">and region_name like concat('%', #{name}, '%')</if>
 		UNION ALL
@@ -1555,9 +1558,9 @@ group by camera_id
 		SELECT
 		e.up_region_id
 		FROM
-		t_robot_info e
+		t_std_device e
 		join cte on e.up_region_id = cte.region_id
-		WHERE e.up_region_id IS NOT NULL AND robot_type = 905
+		WHERE e.up_region_id IS NOT NULL AND position_type = 'simple'
 		)
 	</select>
 
