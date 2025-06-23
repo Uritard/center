@@ -1343,6 +1343,7 @@ CREATE TABLE `t_device_maintenance` (
   `coordinate_pixel` varchar(50) NOT NULL COMMENT '设备层级（1 = 间隔 2 = 主设备 3 = 设备点位 4 = 部件）',
   `device_level` varchar(50) NOT NULL COMMENT '设备层级（1 = 间隔 2 = 主设备 3 = 设备点位 4 = 部件）',
   `instance_ids` text COMMENT '巡视点id',
+  `robot_id` bigint(32) COMMENT '机器人id（地图模式）',
   PRIMARY KEY (`maintenance_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='设备区域检修表';
 
@@ -1709,7 +1710,7 @@ CREATE TABLE `t_robot_inspection` (
   `save_type_list` varchar(255) DEFAULT '' COMMENT '采集/保存文件类型列表',
   `recognition_type_list` varchar(255) DEFAULT '' COMMENT '识别类型列表',
   `phase` varchar(255) DEFAULT '' COMMENT '相位，A相B相C相',
-  `device_info` varchar(255) DEFAULT '' COMMENT '备注信息',
+  `device_info` text DEFAULT NULL COMMENT '备注信息',
   `property_pic_path` varchar(255) DEFAULT '' COMMENT '测点属性图',
   `photo_num` INT NULL DEFAULT NULL COMMENT '照片序号 柜面第几张照片的序号',
   PRIMARY KEY (`inspection_id`) USING BTREE
@@ -1881,8 +1882,8 @@ CREATE TABLE `t_std_device_attr` (
   `organization` varchar(32) DEFAULT '' COMMENT '所属单位',
   `department` varchar(32) DEFAULT '' COMMENT '管理部门',
   `responsible_person` varchar(32) DEFAULT '' COMMENT '责任人',
-  `latitude` varchar(32) DEFAULT '' COMMENT '纬度',
-  `longitude` varchar(32) DEFAULT '' COMMENT '经度',
+  `latitude` varchar(128) DEFAULT '' COMMENT '纬度',
+  `longitude` varchar(128) DEFAULT '' COMMENT '经度',
   `ip` varchar(32) DEFAULT '' COMMENT '设备IP地址',
   `port` int(11) DEFAULT '1' COMMENT '端口',
   `voltage_level` varchar(32) DEFAULT '' COMMENT '电压等级',
