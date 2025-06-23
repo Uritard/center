@@ -103,6 +103,28 @@ public class JSONUtil {
     }
 
     /**
+     * 将字符串转换为蛇形命名
+     *
+     * @param str str
+     * @return str
+     */
+    public static String toSnakeCase(String str) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (Character.isUpperCase(c)) {
+                if (i > 0) {
+                    sb.append('_');
+                }
+                sb.append(Character.toLowerCase(c));
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
      * 格式化 json 字符串
      */
     public static String prettyJSONString(Object object) {
