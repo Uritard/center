@@ -1,5 +1,6 @@
 package com.yjh.platform.module.simple.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -83,6 +84,7 @@ public class SimplePointController {
 
     @ApiOperation(value = "插入si300任务")
     @RequestMapping(value = "/initTaskAdd", method = RequestMethod.POST)
+    @Logs(title = "新增si300初始任务", content = "根据用户传递的参数新增初始任务", logType = 2, authority = "1234")
     public Result initTaskAdd(@RequestBody InitialTask initialTask) {
         Result result = new Result();
         try {
