@@ -424,11 +424,11 @@ INSERT INTO `t_dict_business` VALUES ('300065', '172', 'if_run', '周期执行',
 INSERT INTO `t_dict_business` VALUES ('300066', '173', 'if_run', '立刻执行', '0', '执行方式', '1');
 INSERT INTO `t_dict_business` VALUES ('300067', '174', 'if_run', '定期执行', '0', '执行方式', '1');
 INSERT INTO `t_dict_business` VALUES ('300068', '182', 'device_type', '组合电器', '3', '设备类型', '5');
-INSERT INTO `t_dict_business` VALUES ('300069', '183', 'voltage_level', '超高', '0', '电压等级', '5');
-INSERT INTO `t_dict_business` VALUES ('300070', '184', 'voltage_level', '高', '0', '电压等级', '4');
-INSERT INTO `t_dict_business` VALUES ('300071', '185', 'voltage_level', '中', '0', '电压等级', '3');
-INSERT INTO `t_dict_business` VALUES ('300072', '186', 'voltage_level', '低', '0', '电压等级', '2');
-INSERT INTO `t_dict_business` VALUES ('300073', '187', 'voltage_level', '超低', '0', '电压等级', '1');
+INSERT INTO `t_dict_business` VALUES ('300069', '183', 'voltage_level', '500kV', '0', '电压等级', '5');
+INSERT INTO `t_dict_business` VALUES ('300070', '184', 'voltage_level', '220kV', '0', '电压等级', '4');
+INSERT INTO `t_dict_business` VALUES ('300071', '185', 'voltage_level', '110kV', '0', '电压等级', '3');
+INSERT INTO `t_dict_business` VALUES ('300072', '186', 'voltage_level', '35kV', '0', '电压等级', '2');
+INSERT INTO `t_dict_business` VALUES ('300073', '187', 'voltage_level', '10kV', '0', '电压等级', '1');
 INSERT INTO `t_dict_business` VALUES ('300074', '188', 'device_vendor', 'ABB', '0', '设备厂商', '1');
 INSERT INTO `t_dict_business` VALUES ('300075', '189', 'device_vendor', '施耐德', '0', '设备厂商', '1');
 INSERT INTO `t_dict_business` VALUES ('300076', '190', 'device_vendor', '斯图兹', '0', '设备厂商', '1');
@@ -993,6 +993,7 @@ INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, 
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('19', 'analyse_type', '新压板', '0', '算法类型', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('20', 'analyse_type', '新指示灯', '0', '算法类型', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('21', 'analyse_type', '新旋钮', '0', '算法类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('905', 'robot_type', '简易机器人', '0', '机器人类型', '0');
 -- ----------------------------
 -- Records of t_period_model
 -- ----------------------------
@@ -1599,6 +1600,7 @@ INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, 
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'needAnalyseResult', '算法分析的结果值', '已拍照,拍照', '下级系统需要进行算法分析的结果值', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\#-,]+$\",\"msg\":\"请不要输入特殊字符\"}');
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'reportStateFlag', '报告自动生成上传', '0', '0:不生成 1:自动生成不上传 2:自动生成且上传', '{\"rule\":\"^-?[0-9]\",\"msg\":\"请输入0~9的整数\"}');
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'nariUpSystem', '是否南瑞上级', 'false', '南瑞上级可靠性上报字段特殊处理', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'forceAnalysis', '强制使用分析主机', 'false', '忽略下级系统上报的巡视结果，强制必须使用分析主机对图片进行识别', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 -- ----------------------------
 -- Records of t_version
 -- ----------------------------
