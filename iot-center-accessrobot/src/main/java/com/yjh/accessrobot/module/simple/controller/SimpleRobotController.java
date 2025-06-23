@@ -12,10 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <功能描述>
@@ -32,7 +29,7 @@ public class SimpleRobotController {
     private final ISimpleRobotService simpleRobotService;
 
     @ApiOperation(value = "模型同步")
-    @RequestMapping(value = "/modelSend", method = RequestMethod.GET)
+    @GetMapping(value = "/modelSend")
     public Result modelSend(@RequestParam(value = "robotCode") String robotCode, @RequestParam(value = "command") String command,
         @RequestParam(value = "path") String path) {
         Result result = new Result();

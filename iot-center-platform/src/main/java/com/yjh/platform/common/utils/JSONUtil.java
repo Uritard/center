@@ -41,6 +41,10 @@ public class JSONUtil {
     private JSONUtil() {
     }
 
+    public static ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
     public static String toJSONString(Object data) {
         if (ObjectUtils.notEqual(data, null)) {
             try {
