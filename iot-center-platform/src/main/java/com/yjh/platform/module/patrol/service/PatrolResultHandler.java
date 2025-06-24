@@ -242,15 +242,17 @@ public class PatrolResultHandler {
                         new InspectionResultThread(robotPatrolTaskResult, infoMap, instance, redisTemplate, true, eventPublisher, this);
                 ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
                 // 只有当前节点是巡视主机，且非需要分析的点才需要告警处理
-                String value = robotPatrolTaskResult.getValue();
+                // 20250617 告警处理由 InspectionResultThread 的结果处理类调用算法时进行了处理，在此处不再进行处理
+                /*String value = robotPatrolTaskResult.getValue();
                 boolean resultAnalyse = StringUtils.isEmpty(value) || StringUtils.equalsAny(value, Constant.getNeedAnalyseResult());
                 boolean noAlarm = !Constant.isHost() || resultAnalyse;
                 if (noAlarm) {
                     log.info("No alarms need to be handled...");
                 } else if (!Constant.fastTurbo()) {
                     // 告警处理
-                    alarmHandlerAfterCruise(robotPatrolTaskResult, infoMap.get("taskId"), isAlarmMap, String.valueOf(instanceId));
-                }
+                    alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap, instanceId);
+                }*/
+
                 Thread.sleep(500L);
             } catch (Exception e) {
                 log.error("处理下级系统的巡视结果异常:", e);
@@ -1462,9 +1464,9 @@ public class PatrolResultHandler {
         SimpleInspectionResultThread simpleInspectionResultThread = new SimpleInspectionResultThread(redisTemplate, resultList, this);
         ThreadPoolUtil.PATROL_POOL.addThread(simpleInspectionResultThread);
     }
-    
-    public void cruiseTaskResultInitialize(Map<String, String> tCruiseTaskResultMap, 
-                                           Map<String, String> infoMap, 
+
+    public void cruiseTaskResultInitialize(Map<String, String> tCruiseTaskResultMap,
+                                           Map<String, String> infoMap,
                                            RobotPatrolTaskResult robotPatrolTaskResult,
                                            String taskId,
                                            TCruisePointInstance insInfo) {
