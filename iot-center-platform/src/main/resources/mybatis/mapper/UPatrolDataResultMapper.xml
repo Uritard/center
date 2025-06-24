@@ -599,6 +599,7 @@
         SELECT a.device_mete_id,
         a.mete_type,
         a.meter_type,
+        a.analyse_type,
         e.cruise_time,
         e.cruise_type,
         e.instance_name,
@@ -614,6 +615,8 @@
         e.task_id,
         e.instance_id,
         e.device_id,
+        e.cruise_id,
+        e.cruise_name,
         tsd.device_type      AS device_type,
         tsd.up_region_name   AS up_region_name,
         tsd.up_region_id     AS region_id

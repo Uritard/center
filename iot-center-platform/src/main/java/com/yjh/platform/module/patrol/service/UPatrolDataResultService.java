@@ -121,7 +121,7 @@ public class UPatrolDataResultService {
 
         DictConvertUtil.DictOptional optional =
             DictConvertUtil.optional("cruiseType").add("planType", "taskType", "cTypeName").add("identifyResult").add("cruiseResult")
-                .add("meteType").add("meterType").add("deviceType").add("alarmLevel");
+                .add("meteType").add("meterType").add("deviceType").add("alarmLevel").add("analyseType");
         DictConvertUtil.DICT.covertToDict(cruiseResultAnalyzeInfoList, optional);
 
         return cruiseResultAnalyzeInfoList;
