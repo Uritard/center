@@ -129,4 +129,18 @@ public class CruiseResultAnalyzeInfo implements Serializable {
 
     @ApiModelProperty(value = "一个点有多个结果，存储多个结果的文件")
     private String allFilePath;
+
+    @ApiModelProperty(value = "巡检点ID")
+    private Long cruiseId;
+
+    @ApiModelProperty(value = "巡检点名称")
+    private String cruiseName;
+
+    @ApiModelProperty(value = "算法类型")
+    private Integer analyseType;
+
+    @ApiModelProperty(value = "算法类型名称")
+    private String analyseTypeName;
+
+
 }
