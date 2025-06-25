@@ -10,7 +10,10 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -18,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Iterator;
 
 /**
  * <功能描述>
@@ -109,6 +113,64 @@ public class JSONUtil {
      * @return str
      */
     public static String toSnakeCase(String str) {
+        JsonNode jsonNode = JSONUtil.readTree(str);
+        if (jsonNode == null) {
+            return str;
+        }
+        return convertKeys(jsonNode).toString();
+    }
+
+    public static JsonNode readTree(String content) {
+        try {
+            return objectMapper.readTree(content);
+        } catch (Exception var2) {
+            log.error("Jsons.readTree error: ", var2);
+            return null;
+        }
+    }
+
+    /**
+     * 递归处理JsonNode，将所有键转换为蛇形命名
+     * 支持数组和对象
+     * @param jsonNode jsonNode
+     * @return JsonNode
+     */
+    public static JsonNode convertKeys(JsonNode jsonNode) {
+        if (jsonNode.isArray()) {
+            ArrayNode arrayNode = getObjectMapper().createArrayNode();
+            for (int i = 0; i < jsonNode.size(); i++) {
+                JsonNode item = jsonNode.get(i);
+                JsonNode convertedItem = convertKeys(item);
+                arrayNode.add(convertedItem);
+            }
+            return arrayNode;
+        }
+        if (jsonNode.isObject()) {
+            ObjectNode objectNode = (ObjectNode)jsonNode;
+            ObjectNode resultNode = getObjectMapper().createObjectNode();
+
+            Iterator<String> fieldNames = objectNode.fieldNames();
+            while (fieldNames.hasNext()) {
+                String originalKey = fieldNames.next();
+                String newKey = toSnakeCaseStr(originalKey);
+                JsonNode valueNode = objectNode.get(originalKey);
+
+                // 递归处理嵌套结构
+                JsonNode convertedValue = convertKeys(valueNode);
+                resultNode.set(newKey, convertedValue);
+            }
+            return resultNode;
+        } else {
+            return jsonNode;
+        }
+    }
+    /**
+     * 将字符串转换为蛇形命名
+     *
+     * @param str str
+     * @return str
+     */
+    public static String toSnakeCaseStr(String str) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);

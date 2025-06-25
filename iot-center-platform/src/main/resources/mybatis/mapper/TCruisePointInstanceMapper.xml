@@ -612,7 +612,15 @@
         </foreach>
     </delete>
     <delete id="deleteByCruiseId">
-        delete from t_cruise_point_instance where cruise_id = #{inspectionId,jdbcType=BIGINT}
+        delete
+           t_cruise_point_instance,
+	       t_std_devicemete
+        from
+	       t_cruise_point_instance
+        inner join t_std_devicemete on
+	         t_cruise_point_instance.device_mete_id  = t_std_devicemete.device_mete_id
+        where
+	         t_cruise_point_instance.cruise_id = #{inspectionId,jdbcType=BIGINT}
     </delete>
 
     <select id="selectInstanceName" parameterType="java.lang.Long" resultType="java.lang.String">

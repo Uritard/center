@@ -521,10 +521,10 @@
             and e.robot_type is null
         </if>
         <if test="deviceType == 3">
-            and e.robot_type = 901
+            and e.robot_type = 905
         </if>
         <if test="deviceType == 4">
-            and e.robot_type is not null and e.robot_type != 901
+            and e.robot_type is not null and e.robot_type != 905
         </if>
         <if test="userId != null">
             AND e.robot_id IN (

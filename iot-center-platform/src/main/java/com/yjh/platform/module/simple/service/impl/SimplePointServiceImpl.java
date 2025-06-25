@@ -332,7 +332,6 @@ public class SimplePointServiceImpl implements SimplePointService {
         }
         //清理子点位标定数据
         cruisePointInstanceService.deleteByCruiseId(robotInspection.getInspectionId());
-        stdDeviceMeteService.deleteByComponentId(robotInspection.getComponentId());
 
         List<DeviceConfig> deviceConfigList = dataBuild.getDeviceConfig();
         List<TStdDeviceMete> deviceMeteList = new ArrayList<>(deviceConfigList.size());
@@ -354,13 +353,13 @@ public class SimplePointServiceImpl implements SimplePointService {
                     .setDeviceId(deviceMeteList.get(i).getDeviceId()).setCruiseId(robotInspection.getInspectionId())
                     .setCruiseName(deviceMeteList.get(i).getMeteName()).setCruiseType(CruiseConstant.TypeEnum.ROBOT.getCode());
                 cruisePointInstanceList.add(cruisePointInstance);
+                deviceConfigList.get(i).setDevUuid(String.valueOf(deviceMeteList.get(i).getDeviceMeteId()));
                 if (deviceConfigList.get(i).getDevType().equals(AnalyseMeteTypeEnum.NEW_SX_BJ.getName())) {
                     if (CollectionUtils.isEmpty(deviceConfigList.get(i).getParams())) {
                         throw new BusinessException(deviceConfigList.get(i).getDevName() + "的标定参数不能为空！");
                     }
                     deviceConfigList.get(i).getParams().get(0).setDevUuid(deviceConfigList.get(i).getDevUuid());
                 }
-                deviceConfigList.get(i).setDevUuid(String.valueOf(deviceMeteList.get(i).getDeviceMeteId()));
             }
             int resInstance = cruisePointInstanceService.batchInsert(cruisePointInstanceList);
             if (resInstance > 0) {

@@ -110,10 +110,4 @@ public interface TStdDevicemeteDao {
 
     int selectStdDeviceMeteCount();
 
-    /**
-     * 根据部件id 删除标准测点信息
-     * @param componentId 部件id
-     * @return 删除数量
-     */
-    int deleteByComponentId(String componentId);
 }
