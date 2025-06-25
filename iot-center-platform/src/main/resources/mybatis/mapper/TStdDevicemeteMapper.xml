@@ -742,9 +742,6 @@
         #{deviceMeteId,jdbcType=BIGINT}
         </foreach>
     </delete>
-    <delete id="deleteByComponentId">
-        delete from t_std_devicemete where component_id = #{componentId,jdbcType=VARCHAR}
-    </delete>
 
     <select id="selectDeviceMete" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo">
         SELECT DISTINCT

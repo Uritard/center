@@ -630,8 +630,8 @@ public class IntelAnalysisService {
                     OcrAnalyseResponse ocrAnalyseResponse = new OcrAnalyseResponse();
                     ocrAnalyseResponse.setDevUuid(analyseResult.getObjectId());
                     //识别结果使用描述字段
-                    String desc = resultList.get(0).getDesc();
-                    ocrAnalyseResponse.setValue(desc);
+                    String value = resultList.get(0).getValue();
+                    ocrAnalyseResponse.setValue(value);
                     ocrAnalyseResponseList.add(ocrAnalyseResponse);
                 }
                 if (CollectionUtils.isEmpty(ocrAnalyseResponseList)) {
