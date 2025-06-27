@@ -1,6 +1,5 @@
 package com.yjh.accessrobot.module.command.controller;
 
-
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.common.smUtil.Demo;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
@@ -10,10 +9,10 @@ import com.yjh.accessrobot.commons.logs.LogsRecord;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
+import com.yjh.accessrobot.module.command.entity.ChargingAreaInfo;
 import com.yjh.accessrobot.module.command.entity.RobotTaskInstanceInfo;
 import com.yjh.accessrobot.module.command.entity.TCameraPreset;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
-import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.module.command.service.TCameraPresetService;
 import com.yjh.accessrobot.netty.handler.*;
@@ -542,38 +541,6 @@ public class RobotController {
             log.error("失败查询描述：", e);
         }
 
-        return result;
-    }
-
-    @ApiOperation(value = "简易机器人版本升级包上传")
-    @PostMapping(value = "/upgradePackageUpload")
-    public Result upgradePackageUpload(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "robotCode") String robotCode) {
-        Result result = new Result();
-        try {
-            robotService.uploadUpgradeFile(file, robotCode);
-        } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("简易机器人版本升级包上传失败:", e);
-        }
-        return result;
-    }
-
-    @ApiOperation(value = "简易机器人远程升级接口")
-    @GetMapping(value = "/remoteUpgrade")
-    public Result remoteUpgrade(@RequestParam(value = "robotCode") String robotCode, HttpServletRequest request) {
-        Result result = new Result();
-        try {
-            String userId = request.getHeader("userId");
-            log.info("开始下发远程升级指令, 机器人编码: {}", robotCode);
-            robotService.upgradeNotify(robotCode, userId);
-        } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("简易机器人远程升级失败:", e);
-        }
         return result;
     }
 }

@@ -31,4 +31,9 @@ public interface RobotProxy {
     @GetMapping(value = "/simpleRobot/v1/modelSend")
     Result modelSend(@RequestParam(value = "robotCode") String robotCode, @RequestParam(value = "command") String command,
         @RequestParam(value = "path") String path);
+
+    @GetMapping(value = "/simpleRobot/v1/upgradeSend")
+    Result upgradeSend(@RequestParam(value = "robotCode") String robotCode,
+                       @RequestParam(value = "userId") String userId,
+                       @RequestParam(value = "packageFullPath") String packageFullPath);
 }

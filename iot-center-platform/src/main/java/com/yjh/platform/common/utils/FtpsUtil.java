@@ -184,12 +184,10 @@ public class FtpsUtil {
 
                 // Login
                 if (ftpClient.login(username, password)) {
-                    if (FTPReply.isPositiveCompletion(ftpClient.sendCommand(
-                            "OPTS UTF8", "ON"))) {
-                        // 开启服务器对UTF-8的支持，
-                        LOCAL_CHARSET = "UTF-8";
+                    if (!FTPReply.isPositiveCompletion(ftpClient.sendCommand("OPTS UTF8", "ON"))) {
+                        // 如果服务器不支持UTF-8，尝试使用本地编码（如GBK）
+                        LOCAL_CHARSET = "GBK";
                     }
-
                     ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
                     ftpClient.setControlEncoding(LOCAL_CHARSET);
@@ -208,11 +206,17 @@ public class FtpsUtil {
                         ftpClient.enterLocalActiveMode();
                     }
                     ftpClient.setFileTransferMode(FTP.STREAM_TRANSFER_MODE);
-
-                    // 提取绝对地址的目录以及文件名
-                    String[] list = ftpClient.listNames(filePath);
-                    if (ArrayUtils.isNotEmpty(list)) {
-                        return true;
+                    // 获取文件所在目录和文件名
+                    String directory = filePath.substring(0, filePath.lastIndexOf('/') + 1);
+                    String targetFileName = filePath.substring(filePath.lastIndexOf('/') + 1);
+                    // 列出目录下所有文件
+                    FTPFile[] files = ftpClient.listFiles(directory);
+                    if (files != null) {
+                        for (FTPFile file : files) {
+                            if (file.getName().equals(targetFileName)) {
+                                return true;
+                            }
+                        }
                     }
 
                     // Logout

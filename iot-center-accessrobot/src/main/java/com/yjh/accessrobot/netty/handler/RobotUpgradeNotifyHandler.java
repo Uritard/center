@@ -1,6 +1,7 @@
 package com.yjh.accessrobot.netty.handler;
 
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.common.enumeration.UpgradeStatusEnum;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static com.yjh.accessrobot.module.command.service.RobotService.SYNC_MODE_CACHE;
 
@@ -37,14 +40,18 @@ public class RobotUpgradeNotifyHandler implements MessageHandlerStrategy, Initia
     @Resource
     private TRobotInfoDao tRobotInfoDao;
 
+    @Resource
+    private RedisTemplate redisTemplate;
+
     //更新状态: Sucess-成功 fail-失败
     private final static String UPGRADE_STATE = "program_update_state";
 
     //版本号
-    private final static String PROGRAM_VERSION = "Program_version";
+    private final static String PROGRAM_VERSION = "program_version";
 
     private final static String SUCCESS = "Sucess";
 
+    @SuppressWarnings("unchecked")
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         String robotCode = xmlBaseModel.getSendCode();
@@ -69,6 +76,7 @@ public class RobotUpgradeNotifyHandler implements MessageHandlerStrategy, Initia
             } else {
                 Constant.sendProcess(robotCode, title, 0, "远程升级失败");
             }
+            redisTemplate.opsForValue().set("UpgradeStatus:" + robotCode, UpgradeStatusEnum.UPGRADE_COMPLETE.getDesc(), 1, TimeUnit.HOURS);
             flag = true;
         } catch (Exception e) {
             log.error("处理版本更新通知消息异常", e);
