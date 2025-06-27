@@ -988,8 +988,7 @@ public class TStdDeviceService{
         List<AreaInfo> upRegionTree = new ArrayList<>();
         upRegionTree = this.tStdDeviceDao.selectAllRegion();
         List<AreaInfo> upRegionList = new ArrayList<>();
-        for (Iterator<AreaInfo> it = upRegionTree.iterator(); it.hasNext(); ) {
-            AreaInfo areaInfoMap = it.next();
+        for (AreaInfo areaInfoMap : upRegionTree) {
             if (areaInfoMap.getId().equals(UpRegionId)) {
                 AreaInfo upRegion = new AreaInfo();
                 upRegion.setId(areaInfoMap.getId());

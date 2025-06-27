@@ -536,7 +536,7 @@ public class IntelAnalysisService {
                     String objectId = result.getObjectId();
                     List<AnalyseResultItem> resultList = result.getResults();
                     if (CollectionUtils.isNotEmpty(resultList)) {
-                        String value = resultList.get(0).getValue();
+                        String value = resultList.get(0).getDesc();
                         //  保存结果入redis
                         stringMap.put(objectId, value);
                     }
