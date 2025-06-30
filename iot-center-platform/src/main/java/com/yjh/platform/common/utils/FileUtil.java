@@ -121,7 +121,7 @@ public class FileUtil {
     }
 
     public static boolean checkFileName(String fileName, String[] type){
-        String name = StringUtils.substringAfterLast(fileName,".");
+        String name = StringUtils.substringAfterLast(fileName,".").toLowerCase();
         if (Arrays.binarySearch(type, name) >= 0){
             return true;
         }

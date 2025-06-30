@@ -36,10 +36,10 @@ public class SimpleDeviceController {
     @ApiOperation(value = "简易机器人模型导入")
     @Logs(title = "简易机器人模型导入", content = "导入简易机器人模型文件", logType = 8, authority = "1234")
     @PostMapping(value = "/import")
-    public Result importModel(@RequestPart("file") MultipartFile file) {
+    public Result importModel(@RequestPart("file") MultipartFile file, @RequestPart(value = "robotId", required = false) Long robotId) {
         Result result = new Result();
         try {
-            simpleDeviceService.importModel(file);
+            simpleDeviceService.importModel(file, robotId);
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {

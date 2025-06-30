@@ -5,12 +5,13 @@
 package com.yjh.platform.module.simple.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.file.FileNameUtil;
+import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ZipUtil;
+import cn.hutool.extra.compress.CompressUtil;
+import cn.hutool.extra.compress.extractor.Extractor;
 import com.alibaba.excel.EasyExcelFactory;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -41,6 +42,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.io.file.PathUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
@@ -50,12 +52,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * <功能描述>
@@ -88,12 +92,13 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean importModel(MultipartFile file) {
-
-        String outputPathParent = SysParamConfig.getSysContent("simpleModelPath");
-        String outputPath = outputPathParent + File.separator + DateUtil.format(new Date(), DatePattern.PURE_DATETIME_MS_FORMATTER);
+    public boolean importModel(MultipartFile file, Long robotId) {
+        if (!com.yjh.platform.common.utils.FileUtil.checkFileName(file.getOriginalFilename(), new String[] {"zip", "7z"})) {
+            throw new BusinessException(ResultCodeEnum.CODE10015, "请上传正确的zip或7z文件");
+        }
         try {
-            ZipUtil.unzip(file.getInputStream(), FileUtil.mkdir(outputPath), StandardCharsets.UTF_8);
+            // 压缩包解压缩
+            String outputPath = extract(file);
 
             // 遍历文件夹，根据文件后缀名对应解析
             Map<String, String> pathMap = modelFileList(outputPath);
@@ -101,10 +106,16 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
             if (pathMap.containsKey(MODEL_FILE_XLSX)) {
                 List<TStdRegion> regions = importDeviceModel(pathMap.get(MODEL_FILE_XLSX));
                 addRobotInfo(regions, pathMap);
+            } else if (robotId != null) {
+                TRobotInfo robotInfo = robotService.selectByPrimaryId(robotId);
+                migrationFile(robotInfo.getUpRegionId(), pathMap);
             }
+
+            // 删除临时文件
+            FileUtil.del(outputPath);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            throw new BusinessException(ResultCodeEnum.CODE10015, "上传文件格式不正确，请上传正确的zip文件");
+            throw new BusinessException(ResultCodeEnum.CODE10015, "上传文件格式不正确，请上传正确的zip或7z文件");
         }
 
         return false;
@@ -190,9 +201,8 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
                 FileUtil.del(zipFile);
                 // modelMap 过滤掉 xml 格式文件，然后转成 File
                 String modelDir = simpleModelDir(regionId);
-                File modelDirFile = new File(modelDir);
-
-                String excelPath = modelMap.get(MODEL_FILE_XLSX);
+                // 如果excel文件不存在，则默认文件名为 model.xlsx
+                String excelPath = modelMap.getOrDefault(MODEL_FILE_XLSX, CommonUtils.concatPath(modelDir, "model.xlsx"));
                 generateDeviceExcel(regionId, excelPath);
 
                 File[] files = modelMap.entrySet()
@@ -201,8 +211,6 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
                     .map(entry -> new File(entry.getValue()))
                     .toArray(File[]::new);
 
-                // ZipUtil.zip(zipFile, StandardCharsets.UTF_8, false,
-                //     pathname -> !FilenameUtils.isExtension(pathname.getAbsolutePath(), MODEL_FILE_XML), modelDirFile);
                 ZipUtil.zip(zipFile, false, files);
             }
             return path;
@@ -210,6 +218,30 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
             log.error(e.getMessage(), e);
             throw new BusinessException(ResultCodeEnum.CODE10010, "获取模型文件失败");
         }
+    }
+
+    /**
+     * 压缩包解压缩
+     * 文件名有中文会导致上传失败，捕捉到后再次使用 GBK 编码解压缩一次
+     */
+    private String extract(MultipartFile file) throws IOException {
+        String outputPath = simpleModelDir(System.currentTimeMillis());
+
+        // 临时文件暂存，直接用流无法二次操作，如果文件名有中文会导致解压失败
+        File outTmpZip = new File(CommonUtils.concatPath(outputPath, file.getOriginalFilename()));
+        FileUtil.mkdir(outputPath);
+        file.transferTo(outTmpZip.getAbsoluteFile());
+        // 解压缩，自适应压缩包
+        try (Extractor extractor = CompressUtil.createExtractor(StandardCharsets.UTF_8, outTmpZip)) {
+            extractor.extract(FileUtil.mkdir(outputPath));
+        } catch (IORuntimeException e) {
+            log.error("解压失败，可能是编码问题，切换 GB18030 再试一次: {}", e.getMessage());
+            try (Extractor extractor = CompressUtil.createExtractor(Charset.forName("GB18030"), outTmpZip)) {
+                extractor.extract(FileUtil.mkdir(outputPath));
+            }
+        }
+        log.info("临时上传文件包: {}", outputPath);
+        return outputPath;
     }
 
     /**
@@ -505,8 +537,6 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
             }
         }
 
-        // 删除临时文件
-        pathMap.values().stream().findFirst().map(m -> FileUtil.del(FileUtil.getParent(m, 1)));
     }
 
     /**
@@ -514,12 +544,19 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
      * 将临时文件迁移至区域ID对应的文件夹下，并返回SVG的路径
      */
     public String migrationFile(Long regionId, Map<String, String> pathMap) {
-
         String outputPath = simpleModelDir(regionId);
-        File out = FileUtil.mkdir(outputPath);
-        // 清空文件夹
-        log.info("清空文件夹: {}", outputPath);
-        FileUtil.clean(out);
+        // 遍历文件夹，根据文件后缀名删除对应文件
+        try (Stream<Path> pathStream = Files.walk(Paths.get(outputPath))) {
+            pathStream.filter(path -> pathMap.containsKey(PathUtils.getExtension(path).toLowerCase())).forEach(p -> {
+                try {
+                    Files.delete(p);
+                } catch (IOException e) {
+                    log.error("删除失败: {}", p);
+                }
+            });
+        } catch (IOException e) {
+            log.error("删除文件夹内文件失败: {}", outputPath, e);
+        }
 
         String svgPath = null;
         for (Map.Entry<String, String> entry : pathMap.entrySet()) {
@@ -556,14 +593,14 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
             //遍历文件
             @Override
             @NotNull
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            public FileVisitResult visitFile(Path file, @NotNull BasicFileAttributes attrs) throws IOException {
                 // 获取文件后缀名，根据后缀名做不同处理。后缀名包括las，xlsx，txt，svg
-                String suffix = FileNameUtil.getSuffix(file.toFile()).toLowerCase();
+                String suffix = PathUtils.getExtension(file).toLowerCase();
                 String filePath = file.normalize().toAbsolutePath().toString();
                 // 匹配 excel 文件，后缀为 xls xlsx
                 if (StringUtils.equalsAny(suffix, "xls", "xlsx")) {
                     pathMap.put(MODEL_FILE_XLSX, filePath);
-                } else {
+                } else if (StringUtils.equalsAny(suffix, MODEL_FILE_LAS, MODEL_FILE_TXT, MODEL_FILE_SVG, MODEL_FILE_XML)) {
                     pathMap.put(suffix, filePath);
                 }
 
