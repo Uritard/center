@@ -716,7 +716,13 @@ public class TRobotInfoService{
      */
     public TRobotChargingAreaInfo selectChargingAreaById(Long robotId) {
         TRobotInfo tRobotInfo = this.selectByPrimaryId(robotId);
+        if (tRobotInfo == null) {
+            return null;
+        }
         String chargingAreaStr = tRobotInfo.getChargingArea();
+        if (StringUtils.isBlank(chargingAreaStr)) {
+            return null;
+        }
         String[] split = chargingAreaStr.split(",");
         List<Double> xList = new ArrayList<>();
         List<Double> yList = new ArrayList<>();
