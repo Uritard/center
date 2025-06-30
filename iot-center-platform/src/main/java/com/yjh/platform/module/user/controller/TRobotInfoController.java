@@ -254,7 +254,7 @@ public class TRobotInfoController {
             TRobotChargingAreaInfo tRobotInfo = tRobotInfoService.selectChargingAreaById(robotId);
             result.setData(tRobotInfo);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
             log.error("失败描述：", e);
         }
         return result;
