@@ -35,7 +35,7 @@
             da.voltage_level,
             d.device_type,
             "2" AS data_type,
-            CONCAT(da.latitude, ';', da.longitude) AS master_coordinate,
+            CONCAT(da.longitude, ';', da.latitude) AS master_coordinate,
             d.device_id master_point_id,
             "0" AS Args
         FROM t_std_device d

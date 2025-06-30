@@ -22,7 +22,7 @@ public interface ISimpleDeviceService extends IService<TStdDevice> {
      * @param file
      * @return
      */
-    boolean importModel(MultipartFile file);
+    boolean importModel(MultipartFile file, Long robotId);
 
     /**
      * 模型下发
