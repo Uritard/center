@@ -41,6 +41,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -309,6 +310,10 @@ public class SimplePointServiceImpl implements SimplePointService {
         }
 
         InitialTaskStatus initialTaskStatus = uPatrolResultDao.initialTaskStatusQueryByRobotId(robotId);
+        if (ObjectUtils.isEmpty(initialTaskStatus)) {
+            initialTaskStatus = new InitialTaskStatus();
+            initialTaskStatus.setInitStatus(TASK_STATE_FINISHED);
+        }
         initialTaskStatus.setInitStatusName(DictConvertUtil.DICT.covertToDict("taskState", initialTaskStatus.getInitStatus()));
         return initialTaskStatus;
     }
