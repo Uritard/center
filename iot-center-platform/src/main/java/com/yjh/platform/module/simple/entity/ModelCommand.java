@@ -40,5 +40,5 @@ public class ModelCommand {
      * 是否是设备
      */
     @ApiModelProperty(value = "是否仅设备，初始化前下发仅设备模型")
-    private boolean isDevice = true;
+    private boolean device = true;
 }

@@ -2,6 +2,7 @@ package com.yjh.platform.module.simple.entity;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * <功能描述>
@@ -10,6 +11,7 @@ import lombok.Data;
  * @since [产品/模块版本] （可选）
  */
 @Data
+@EqualsAndHashCode
 public class SimpleDeviceExcel {
 
     @ExcelProperty("变电站名称")

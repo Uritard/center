@@ -135,31 +135,11 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
 
             // 模型指令固定，则下发固定模型
             if (StringUtils.isNotEmpty(modelSend.getCommand())) {
-                String path;
-                String pathType = COMMAND_MAP.get(modelSend.getCommand());
-                if (MODEL_FILE_XLSX.equals(pathType)) {
-                    // 如果是设备模型，则不下发excel，下发xml格式模型文件
-                    // 生成xml模型文件
-                    path = pointModel(regionId, modelSend.isDevice());
-                } else {
-                    path = modelMap.get(pathType);
-                }
-                Result ret = robotProxy.modelSend(robotInfo.getRobotCode(), modelSend.getCommand(), path);
-                log.info("模型下发返回结果: {} - {}", modelSend.getCommand(), ret);
+                sendToRobot(modelSend.getCommand(), regionId, robotInfo.getRobotCode(), modelMap);
             } else {
                 // 模型指令为空，则下发所有模型
-                for (Map.Entry<String, String> entry : COMMAND_MAP.entrySet()) {
-                    String path;
-                    String pathType = entry.getValue();
-                    // 如果是设备模型，则不下发excel，下发xml格式模型文件
-                    if (MODEL_FILE_XLSX.equals(pathType)) {
-                        // 生成xml模型文件
-                        path = pointModel(regionId, modelSend.isDevice());
-                    } else {
-                        path = modelMap.get(pathType);
-                    }
-                    Result ret = robotProxy.modelSend(robotInfo.getRobotCode(), entry.getKey(), path);
-                    log.info("模型循环下发返回结果: {} - {}", entry.getKey(), ret);
+                for (String command : COMMAND_MAP.keySet()) {
+                    sendToRobot(command, regionId, robotInfo.getRobotCode(), modelMap);
                 }
             }
 
@@ -167,6 +147,23 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
             log.error(e.getMessage(), e);
             throw new BusinessException(ResultCodeEnum.CODE10010, "获取模型文件失败");
         }
+    }
+
+    /**
+     * 下发模型指令给机器人
+     */
+    private void sendToRobot(String command, long regionId, String robotCode, Map<String, String> modelMap) {
+        String path;
+        String pathType = COMMAND_MAP.get(command);
+        if (MODEL_FILE_XLSX.equals(pathType)) {
+            // 如果是设备模型，则不下发excel，下发xml格式模型文件
+            // 生成xml模型文件
+            path = pointModel(regionId);
+        } else {
+            path = modelMap.get(pathType);
+        }
+        Result ret = robotProxy.modelSend(robotCode, command, path);
+        log.info("模型下发返回结果: {} - {}", command, ret);
     }
 
     /**
@@ -588,25 +585,29 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
     private Map<String, String> modelFileList(String modelDir) throws IOException {
         Map<String, String> pathMap = new HashMap<>(8);
 
-        // 遍历文件夹，根据文件后缀名对应解析
-        Files.walkFileTree(Paths.get(modelDir), new SimpleFileVisitor<Path>() {
-            //遍历文件
-            @Override
-            @NotNull
-            public FileVisitResult visitFile(Path file, @NotNull BasicFileAttributes attrs) throws IOException {
-                // 获取文件后缀名，根据后缀名做不同处理。后缀名包括las，xlsx，txt，svg
-                String suffix = PathUtils.getExtension(file).toLowerCase();
-                String filePath = file.normalize().toAbsolutePath().toString();
-                // 匹配 excel 文件，后缀为 xls xlsx
-                if (StringUtils.equalsAny(suffix, "xls", "xlsx")) {
-                    pathMap.put(MODEL_FILE_XLSX, filePath);
-                } else if (StringUtils.equalsAny(suffix, MODEL_FILE_LAS, MODEL_FILE_TXT, MODEL_FILE_SVG, MODEL_FILE_XML)) {
-                    pathMap.put(suffix, filePath);
-                }
+        try {
+            // 遍历文件夹，根据文件后缀名对应解析
+            Files.walkFileTree(Paths.get(modelDir), new SimpleFileVisitor<Path>() {
+                //遍历文件
+                @Override
+                @NotNull
+                public FileVisitResult visitFile(Path file, @NotNull BasicFileAttributes attrs) throws IOException {
+                    // 获取文件后缀名，根据后缀名做不同处理。后缀名包括las，xlsx，txt，svg
+                    String suffix = PathUtils.getExtension(file).toLowerCase();
+                    String filePath = file.normalize().toAbsolutePath().toString();
+                    // 匹配 excel 文件，后缀为 xls xlsx
+                    if (StringUtils.equalsAny(suffix, "xls", "xlsx")) {
+                        pathMap.put(MODEL_FILE_XLSX, filePath);
+                    } else if (StringUtils.equalsAny(suffix, MODEL_FILE_LAS, MODEL_FILE_TXT, MODEL_FILE_SVG, MODEL_FILE_XML)) {
+                        pathMap.put(suffix, filePath);
+                    }
 
-                return super.visitFile(file, attrs);
-            }
-        });
+                    return super.visitFile(file, attrs);
+                }
+            });
+        } catch (IOException e) {
+            log.error("遍历文件失败 {}", e.getMessage());
+        }
 
         return pathMap;
     }
@@ -630,10 +631,10 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
      * @param regionId 区域ID
      * @return 设备模型列表
      */
-    public String pointModel(Long regionId, boolean isDevice) throws IOException {
-        String fileName = isDevice ? "simple_device_init_model.xml" : "simple_device_model.xml";
+    public String pointModel(Long regionId) {
+        String fileName = "simple_device_model.xml";
         try {
-            List<SimpleDeviceModel> list = getBaseMapper().selectDeviceModel(regionId, isDevice);
+            List<SimpleDeviceModel> list = getBaseMapper().selectDeviceModel(regionId);
 
             // 查询区域的上级作为站所
             TStdRegion station = tStdRegionService.selectUpRegion(regionId);
@@ -666,47 +667,51 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
      * @return 文件路径
      */
     public String generateDeviceExcel(Long regionId, String excelPath) {
-        try {
-            List<SimpleDeviceModel> list = getBaseMapper().selectDeviceModel(regionId, true);
-            List<SimpleDeviceExcel> excelDataList = new ArrayList<>((int)(list.size() * 1.4));
+        List<SimpleDeviceModel> list = getBaseMapper().selectDeviceModel(regionId);
+        List<SimpleDeviceExcel> excelDataList = new ArrayList<>((int)(list.size() * 1.4));
 
-            // 查询区域的上级作为站所
-            TStdRegion station = tStdRegionService.selectUpRegion(regionId);
-            String stationCode = String.valueOf(station.getRegionId());
-            String stationName = station.getRegionName();
-            list.forEach(item -> {
-                item.setStationCode(stationCode);
-                item.setStationName(stationName);
+        // 查询区域的上级作为站所
+        TStdRegion station = tStdRegionService.selectUpRegion(regionId);
+        String stationCode = String.valueOf(station.getRegionId());
+        String stationName = station.getRegionName();
+        // 已存在元素集合
+        Set<String> existId = new HashSet<>(list.size());
+        list.forEach(item -> {
+            item.setStationCode(stationCode);
+            item.setStationName(stationName);
 
-                // 相应类型全部转成文档标准的值
-                item.setVoltageLevel(DictConvertUtil.DICT.covertToDict("voltageLevel", item.getVoltageLevel()));
+            // 相应类型全部转成文档标准的值
+            item.setVoltageLevel(DictConvertUtil.DICT.covertToDict("voltageLevel", item.getVoltageLevel()));
 
-                // 组装 excel 数据
-                SimpleDeviceExcel excel = new SimpleDeviceExcel();
-                BeanUtil.copyProperties(item, excel);
-                // 坐标数据库内以,;号分割不同点，excel 需要拆分成单个点
-                String[] coordinate = item.getMasterCoordinate().split("[;,]");
-                // 一共4个点，每个点三个坐标，以供12个坐标值
-                if (coordinate.length >= 12) {
-                    excel.setX1(NumberUtils.toDouble(coordinate[0]));
-                    excel.setY1(NumberUtils.toDouble(coordinate[1]));
-                    excel.setZ1(NumberUtils.toDouble(coordinate[2]));
-                    excel.setX2(NumberUtils.toDouble(coordinate[3]));
-                    excel.setY2(NumberUtils.toDouble(coordinate[4]));
-                    excel.setZ2(NumberUtils.toDouble(coordinate[5]));
-                    excel.setX3(NumberUtils.toDouble(coordinate[6]));
-                    excel.setY3(NumberUtils.toDouble(coordinate[7]));
-                    excel.setZ3(NumberUtils.toDouble(coordinate[8]));
-                    excel.setX4(NumberUtils.toDouble(coordinate[9]));
-                    excel.setY4(NumberUtils.toDouble(coordinate[10]));
-                    excel.setZ4(NumberUtils.toDouble(coordinate[11]));
-                }
-                excelDataList.add(excel);
-            });
-            EasyExcelFactory.write(excelPath, SimpleDeviceExcel.class).sheet(stationName).doWrite(excelDataList);
-        } catch (Exception e) {
-            log.error("导出 excel 失败: {}", excelPath, e);
-        }
+            // 若元素已存在，则跳过这条数据
+            if (!existId.add(item.getMainDeviceId())) {
+                return;
+            }
+            // 组装 excel 数据
+            SimpleDeviceExcel excel = new SimpleDeviceExcel();
+            BeanUtil.copyProperties(item, excel);
+            excel.setDeviceName(item.getMainDeviceName());
+            // 坐标数据库内以,;号分割不同点，excel 需要拆分成单个点
+            String[] coordinate = item.getMasterCoordinate().split("[;,]");
+            // 一共4个点，每个点三个坐标，以供12个坐标值
+            if (coordinate.length >= 12) {
+                excel.setX1(NumberUtils.toDouble(coordinate[0]));
+                excel.setY1(NumberUtils.toDouble(coordinate[1]));
+                excel.setZ1(NumberUtils.toDouble(coordinate[2]));
+                excel.setX2(NumberUtils.toDouble(coordinate[3]));
+                excel.setY2(NumberUtils.toDouble(coordinate[4]));
+                excel.setZ2(NumberUtils.toDouble(coordinate[5]));
+                excel.setX3(NumberUtils.toDouble(coordinate[6]));
+                excel.setY3(NumberUtils.toDouble(coordinate[7]));
+                excel.setZ3(NumberUtils.toDouble(coordinate[8]));
+                excel.setX4(NumberUtils.toDouble(coordinate[9]));
+                excel.setY4(NumberUtils.toDouble(coordinate[10]));
+                excel.setZ4(NumberUtils.toDouble(coordinate[11]));
+            }
+            excelDataList.add(excel);
+        });
+        FileUtil.mkParentDirs(excelPath);
+        EasyExcelFactory.write(excelPath, SimpleDeviceExcel.class).sheet(stationName).doWrite(excelDataList);
 
         return excelPath;
     }

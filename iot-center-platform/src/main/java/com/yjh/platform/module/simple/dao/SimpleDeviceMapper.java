@@ -19,11 +19,10 @@ import java.util.List;
 public interface SimpleDeviceMapper extends BaseMapper<TStdDevice> {
 
     /**
-     * 查询简易设备模型
+     * 查询简易设备模型，若点位已标定，使用点位ID做deviceId，若未标定，使用设备ID做deviceId
      * @param regionId 区域ID
-     * @param isDevice 是否初始设备任务，true 表示初始化设备任务， false 表示标定完成，设备测点模型
      * @return 模型
      */
-    List<SimpleDeviceModel> selectDeviceModel(Long regionId, boolean isDevice);
+    List<SimpleDeviceModel> selectDeviceModel(Long regionId);
 
 }
