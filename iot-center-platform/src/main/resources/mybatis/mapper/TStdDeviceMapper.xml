@@ -1628,4 +1628,17 @@ group by camera_id
 		</foreach>
 	</select>
 
+	<select id="selectByRegionList" parameterType="java.lang.Long" resultType="java.lang.Long">
+		SELECT
+		device_id
+		FROM
+		t_std_device
+		WHERE
+		up_region_id IN
+
+		<foreach collection="regionList" open="(" close=")" separator="," item="regionId">
+			#{regionId,jdbcType=BIGINT}
+		</foreach>
+	</select>
+
 </mapper>

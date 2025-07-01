@@ -4,6 +4,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
+import com.yjh.commons.CollectionUtil;
 import com.yjh.commons.DateFormat;
 import com.yjh.commons.DateUtils;
 import com.yjh.platform.common.Constant;
@@ -14,11 +15,9 @@ import com.yjh.platform.common.utils.ImageSplitUtil;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.configuration.SysParamConfig;
+import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.*;
-import com.yjh.platform.module.device.service.TCruisePointInstanceService;
-import com.yjh.platform.module.device.service.TRobotInspectionService;
-import com.yjh.platform.module.device.service.TStdDeviceService;
-import com.yjh.platform.module.device.service.TStdDevicemeteService;
+import com.yjh.platform.module.device.service.*;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.CalibrationData;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
@@ -105,6 +104,7 @@ public class SimplePointServiceImpl implements SimplePointService {
     private final TCruisePointInstanceService cruisePointInstanceService;
     private final IntelAnalysisService analysisService;
     private final RedisTemplate redisTemplate;
+    private final TStdRegionService tStdRegionService;
 
     /**
      * 获取底图
@@ -295,8 +295,9 @@ public class SimplePointServiceImpl implements SimplePointService {
         if (StringUtils.isBlank(deviceList)) {
             //当机器人没有绑定屏柜时，默认使用机器人的上级区域下的所有屏柜
             Long upRegionId = trobotInfoService.selectByPrimaryId(robotId).getUpRegionId();
-            List<TStdDevice> stdDevices = stdDeviceService.select(null, null, null, null, null, null, null, null, upRegionId, null, null, null, null, null);
-            deviceList = stdDevices.stream().map(TStdDevice::getDeviceId).map(String::valueOf).collect(Collectors.joining(","));
+            List<Long> regionList = tStdRegionService.selectDownId(upRegionId);
+            List<Long> stdDevices = stdDeviceService.selectByRegionList(regionList);
+            deviceList = StringUtils.join(stdDevices, ",");
         }
         TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
         //初始任务均为立即任务
