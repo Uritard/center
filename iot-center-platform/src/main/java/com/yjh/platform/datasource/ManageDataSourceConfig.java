@@ -177,6 +177,7 @@ public class ManageDataSourceConfig {
         WallConfig config =new WallConfig();
         config.setMultiStatementAllow(true);//允许一次执行多条语句
         config.setNoneBaseStatementAllow(true);//允许非基本语句的其他语句
+        config.setCommentAllow(true);
         return config;
 
     }
