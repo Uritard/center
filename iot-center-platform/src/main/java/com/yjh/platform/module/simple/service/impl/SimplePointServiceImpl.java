@@ -255,6 +255,8 @@ public class SimplePointServiceImpl implements SimplePointService {
                     for (TRobotInspection inspection : inspections) {
                         FileUtil.del(ImageSplitUtil.convertPath(inspection.getPropertyPicPath(), Constant.SIMPLE_PIC, simplePicPath));
                         tRobotInspectionService.deleteByPrimaryId(inspection.getInspectionId());
+                        //清理子点位标定数据
+                        cruisePointInstanceService.deleteByCruiseId(inspection.getInspectionId());
                     }
                 }
                 //更新设备名称 + 偏移量
