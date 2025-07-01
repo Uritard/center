@@ -308,4 +308,8 @@ public class TRobotInfo implements Serializable {
     @ApiModelProperty(value = "充电区域")
     @TableField(value = "charging_area", updateStrategy = FieldStrategy.IGNORED)
     private String chargingArea;
+
+    @ApiModelProperty(value = "机器人系统版本号")
+    @TableField(value = "system_version",updateStrategy = FieldStrategy.IGNORED)
+    private String systemVersion;
 }

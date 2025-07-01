@@ -1,6 +1,5 @@
 package com.yjh.accessrobot.module.command.service;
 
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -62,9 +61,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -3561,55 +3557,6 @@ public class RobotService {
      */
     public void updateUnionTask(String taskId,Integer isFinish){
         tRobotInfoDao.updateUnionTask(isFinish,taskId);
-    }
-
-    /**
-     * 上传版本升级包到文件服务器
-     */
-    @SuppressWarnings("unchecked")
-    public void uploadUpgradeFile(MultipartFile file, String robotCode) throws IOException {
-        //版本升级包只支持zip格式或者tar格式
-        if (!FileUtil.isZipFile(file) && !FileUtil.isTarFile(file))
-            throw new BusinessException(ResultCodeEnum.UNSUPPORTFILETYPE.getName());
-        //机器人版本更新包存储路径: ftp根目录/upgrade/站所编码/机器人编码
-        String ftpRootPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
-        Path path = Paths.get(ftpRootPath, Constant.UPGRADE_PACKAGE_PATH, Constant.stationCode(), robotCode);
-        if (Files.notExists(path)) Files.createDirectories(path);
-        Path packageFullPath = path.resolve(Objects.requireNonNull(file.getOriginalFilename()));
-        file.transferTo(packageFullPath.toFile());
-        log.info("机器人: {} 系统版本升级包上传成功, 本地路径: {}", robotCode, packageFullPath);
-        redisTemplate.opsForValue().set("UpgradePackage:" + robotCode, packageFullPath);
-    }
-
-    /**
-     * 远程升级通知
-     */
-    @SuppressWarnings("unchecked")
-    public void upgradeNotify(String robotCode, String userId) {
-        Map<String, String> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":41");
-        if (StringUtils.equalsAny(mapForRobotState.get("value"), "2", "4"))
-            throw new BusinessException("机器人: " + robotCode + " 处于巡视/检修状态, 远程升级失败!");
-        String packageFullPath = String.valueOf(redisTemplate.opsForValue().get("UpgradePackage:" + robotCode));
-        Path path = Paths.get(packageFullPath);
-        if (Files.notExists(path))
-            throw new BusinessException("版本升级包: " + path.getFileName() + "不存在!");
-        Map<String, Object> item = new HashMap<>(1);
-        item.put("program_update_file_path", packageFullPath);
-        XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode(Constant.sendCode())
-                .setReceiveCode(robotCode)
-                .setCode(Constant.stationCode())
-                .setTime(DateTimeUtil.format(new Date()))
-                .setType("42004")
-                .setCommand("1")
-                .setItems(Collections.singletonList(item));
-        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-        int result = RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
-        if (result == 1)
-            throw new BusinessException("远程升级指令下发失败!");
-        SYNC_MODE_CACHE.put(robotCode, userId);
-        TRobotInfo robotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
-        Constant.sendProcess(robotCode, robotInfo.getRobotName() + "远程升级", 1, "远程升级开始");
     }
 
     /**

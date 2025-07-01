@@ -791,5 +791,9 @@ public class Constant {
      */
     public static final String SIMPLE_PIC = "/imgs/simplePic/";
 
+    /**
+     * 机器人版本更新包存储目录
+     */
+    public static final String UPGRADE_PACKAGE_PATH = "/upgrade";
 }
 

@@ -61,6 +61,7 @@ public class CoordinateUtil {
     public void loadMapInfo(String robotCode) {
         try {
             TRobotInfo robotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
+            if (Objects.isNull(robotInfo)) return;
             Integer robotType = robotInfo.getRobotType();
             if (ObjectUtils.notEqual(robotType, 905)) return;
             String mapPath = robotInfo.getPhotePath();

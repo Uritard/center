@@ -102,4 +102,14 @@ public class FtpsService {
         }
     }
 
+    public boolean notExists(String filepath){
+        return !FtpsUtil.isFTPFileExist(
+                filepath,
+                applicationProperties.getIntelAnalysisFtps().getIp(),
+                applicationProperties.getIntelAnalysisFtps().getPort(),
+                applicationProperties.getIntelAnalysisFtps().getUserName(),
+                applicationProperties.getIntelAnalysisFtps().getPassword(),
+                applicationProperties.getIntelAnalysisFtps().isResolveLocal()
+        );
+    }
 }

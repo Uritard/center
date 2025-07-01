@@ -20,4 +20,12 @@ public interface ISimpleRobotService {
      * @return 成功
      */
     int modelSend(String robotCode, String command, String path);
+
+    /**
+     * 简易机器人远程升级
+     * @param robotCode 机器人编码
+     * @param userId 操作用户id
+     * @param packageFullPath 版本升级包全路径
+     */
+    void upgradeSend(String robotCode, String userId, String packageFullPath);
 }

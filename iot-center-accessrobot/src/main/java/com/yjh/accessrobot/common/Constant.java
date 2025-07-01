@@ -10,7 +10,6 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -23,11 +22,13 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.IOException;
-import java.net.*;
-import java.nio.charset.Charset;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -427,10 +428,4 @@ public class Constant {
      * 相机抓图存储相对路径
      */
     public static final String RESULT_IMG_REAL_PATH = "/imgs/resultImg/";
-
-    /**
-     * 机器人版本更新包存储目录
-     */
-    public static final String UPGRADE_PACKAGE_PATH = "/upgrade";
-
 }

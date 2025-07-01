@@ -1,6 +1,6 @@
 package com.yjh.platform.configuration;
 
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import cn.hutool.core.util.StrUtil;
 import com.yjh.platform.common.utils.JSONUtil;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
@@ -13,8 +13,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -49,10 +51,19 @@ public class FeignConfiguration implements RequestInterceptor {
     @Bean
     public Decoder feignDecoder() {
         return (response, type) -> {
-            try (InputStream is = response.body().asInputStream();
-                GZIPInputStream gzipIs = new GZIPInputStream(is)) {
-                TypeFactory typeFactory = JSONUtil.getObjectMapper().getTypeFactory();
-                return JSONUtil.getObjectMapper().readValue(gzipIs, typeFactory.constructType(type));
+            try (InputStream is = response.body().asInputStream()) {
+                //判断响应内容是否经过GZIP压缩
+                boolean isGzip = Optional.ofNullable(response.headers().get("content-encoding"))
+                        .orElse(Collections.emptyList())
+                        .stream()
+                        .anyMatch(header -> StrUtil.containsIgnoreCase(header, "gzip"));
+                //如果响应是GZIP压缩的,创建 GZIPInputStream解压,否则直接使用原始输入流
+                try (InputStream inputStream = isGzip ? new GZIPInputStream(is) : is) {
+                    return JSONUtil.getObjectMapper().readValue(
+                            inputStream,
+                            JSONUtil.getObjectMapper().getTypeFactory().constructType(type)
+                    );
+                }
             }
         };
     }

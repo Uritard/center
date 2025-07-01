@@ -5,9 +5,12 @@
 package com.yjh.accessrobot.module.simple.service.impl;
 
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.common.enumeration.UpgradeStatusEnum;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.commons.result.BusinessException;
+import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
+import com.yjh.accessrobot.module.command.entity.TRobotInfo;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.module.simple.service.ISimpleRobotService;
@@ -22,8 +25,12 @@ import org.springframework.stereotype.Service;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static com.yjh.accessrobot.module.command.service.RobotService.SYNC_MODE_CACHE;
 
 /**
  * <功能描述>
@@ -80,6 +87,31 @@ public class SimpleRobotServiceImpl implements ISimpleRobotService {
             throw new BusinessException("机器人不在线, 模型同步失败");
         }
         return ret;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void upgradeSend(String robotCode, String userId, String packageFullPath) {
+        checkRobotStatus(robotCode);
+        Map<String, Object> item = new HashMap<>(1);
+        item.put("program_update_file_path", packageFullPath);
+        XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                .setSendCode(Constant.sendCode())
+                .setReceiveCode(robotCode)
+                .setCode(Constant.stationCode())
+                .setTime(DateTimeUtil.format(new Date()))
+                .setType("42004")
+                .setCommand("1")
+                .setItems(Collections.singletonList(item));
+        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+        int result = RobotServerHandler.send(robotService.generateByteOrder(xmlString, robotCode), robotCode);
+        if (0 != result) {
+            throw new BusinessException("机器人不在线, 远程升级失败!");
+        }
+        redisTemplate.opsForValue().set("UpgradeStatus:" + robotCode, UpgradeStatusEnum.COMMAND_ISSUED.getDesc(), 1, TimeUnit.HOURS);
+        SYNC_MODE_CACHE.put(robotCode, userId);
+        TRobotInfo robotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
+        Constant.sendProcess(robotCode, robotInfo.getRobotName() + "远程升级", 1, "远程升级开始");
     }
 
     /**

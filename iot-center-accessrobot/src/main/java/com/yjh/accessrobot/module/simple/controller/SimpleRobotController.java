@@ -12,7 +12,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <功能描述>
@@ -26,7 +30,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/simpleRobot/v1")
 @Api(value = "/simpleRobot", tags = "简易机器人接口")
 public class SimpleRobotController {
+
     private final ISimpleRobotService simpleRobotService;
+
+    private final RedisTemplate redisTemplate;
 
     @ApiOperation(value = "模型同步")
     @GetMapping(value = "/modelSend")
@@ -40,6 +47,26 @@ public class SimpleRobotController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("失败查询描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "远程升级")
+    @GetMapping(value = "/upgradeSend")
+    public Result upgradeSend(@RequestParam(value = "robotCode") String robotCode,
+                              @RequestParam(value = "userId") String userId,
+                              @RequestParam(value = "packageFullPath") String packageFullPath) {
+        Result result = new Result();
+        try {
+            log.info("开始下发远程升级指令, 机器人编码: {}, 版本升级包地址: {}", robotCode, packageFullPath);
+            simpleRobotService.upgradeSend(robotCode, userId, packageFullPath);
+        } catch (BusinessException b) {
+            //重置机器人升级状态
+            redisTemplate.delete("UpgradeStatus:" + robotCode);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("简易机器人远程升级失败:", e);
         }
         return result;
     }

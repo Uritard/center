@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.simple.dao.SimpleUpgradeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.simple.entity.PatrolDeviceVersion">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="text" jdbcType="VARCHAR" property="text" />
+        <result column="file_path" jdbcType="VARCHAR" property="filePath" />
+        <result column="robot_type" jdbcType="INTEGER" property="robotType" />
+        <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+        <result column="update_user" jdbcType="VARCHAR" property="updateUser" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, `name`, remark, text, file_path, robot_type, create_user, update_user, create_time, update_time
+    </sql>
+
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.yjh.platform.module.simple.entity.PatrolDeviceVersion" useGeneratedKeys="true">
+        INSERT INTO t_patrol_device_version
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">`name`,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="text != null and text != ''">text,</if>
+            <if test="filePath != null and filePath != ''">file_path,</if>
+            <if test="robotType != null">robot_type,</if>
+            <if test="createUser != null and createUser != ''">create_user,</if>
+            <if test="updateUser != null and updateUser != ''">update_user,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name,jdbcType=VARCHAR},</if>
+            <if test="remark != null and remark != ''">#{remark,jdbcType=VARCHAR},</if>
+            <if test="text != null and text != ''">#{text,jdbcType=VARCHAR},</if>
+            <if test="filePath != null and filePath != ''">#{filePath,jdbcType=VARCHAR},</if>
+            <if test="robotType != null">#{robotType,jdbcType=INTEGER},</if>
+            <if test="createUser != null and createUser != ''">#{createUser,jdbcType=VARCHAR},</if>
+            <if test="updateUser != null and updateUser != ''">#{updateUser,jdbcType=VARCHAR},</if>
+            <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateTime != null">#{updateTime,jdbcType=TIMESTAMP},</if>
+        </trim>
+    </insert>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM t_patrol_device_version
+        WHERE id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.simple.entity.PatrolDeviceVersion" resultType="com.yjh.platform.module.simple.entity.PatrolDeviceVersion">
+        SELECT
+        tpdv.id, tpdv.name, tpdv.text, tpdv.file_path, tpdv.robot_type AS robotType, tpdv.create_user AS createUser, tpdv.create_time AS createTime
+        FROM
+        t_patrol_device_version tpdv
+        <where>
+            <if test="name != null and name != '' "> AND tpdv.`name` like concat("%",#{name,jdbcType=VARCHAR},"%")</if>
+            <if test="robotType != null">AND tpdv.robot_type = #{robotType,jdbcType=INTEGER}</if>
+        </where>
+        ORDER BY tpdv.create_time DESC
+    </select>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        DELETE FROM t_patrol_device_version WHERE id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="batchDelete">
+        DELETE FROM t_patrol_device_version
+        WHERE id IN
+        <foreach collection="list" item="id"  separator="," open="(" close=")" >
+            #{id,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+</mapper>
