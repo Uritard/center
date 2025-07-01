@@ -243,7 +243,7 @@ public class SimplePointServiceImpl implements SimplePointService {
                 FileUtil.copyFile(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
                 TRobotInspection robotInspection = new TRobotInspection();
                 robotInspection.setInspectionType(1).setInspectionCode(inspectionCode).setRobotId(photoBuild.getRobotId())
-                    .setSaveTypeList("jpg").setInspectionName(photoBuild.getDeviceName() + "/" + build.getPhotoName())
+                    .setSaveTypeList("2").setInspectionName(photoBuild.getDeviceName() + "/" + build.getPhotoName())
                     .setPhotoNum(build.getPhotoNum()).setMainDeviceId(String.valueOf(photoBuild.getDeviceId())).setComponentId(componentId)
                     .setPropertyPicPath(ImageSplitUtil.convertPath(targetPath, simplePicPath, Constant.SIMPLE_PIC));
                 robotInspections.add(robotInspection);
