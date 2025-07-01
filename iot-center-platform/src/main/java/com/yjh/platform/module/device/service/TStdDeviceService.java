@@ -438,6 +438,12 @@ public class TStdDeviceService{
         return tStdDeviceList;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public List<Long> selectByRegionList(List<Long> regionList) {
+        List<Long> tStdDeviceList = tStdDeviceDao.selectByRegionList(regionList);
+        return tStdDeviceList;
+    }
+
 
     @Transactional(rollbackFor = Exception.class)
     public List<TStdDeviceDetail> selectAll(Long deviceId, String deviceCode, String deviceName, String aliasName, Integer deviceType, String positionType, Long modelId, String regionPath, Long upRegionId, String upRegionName, Integer customType, Integer status, Date updateTime, Date createTime,Integer deviceModel, String pmsType, String pmsId, String deviceVendor, Date productionDate, Date usedTime, Date disableDate, Date lastMaintenance, String maintenanceCount, String organization, String department, String responsiblePerson, String latitude, String longitude, String ip, Integer port, String voltageLevel, String sequencePoint, String realCode,String address) {

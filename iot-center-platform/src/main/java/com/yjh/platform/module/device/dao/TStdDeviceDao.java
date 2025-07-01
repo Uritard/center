@@ -184,4 +184,5 @@ public interface TStdDeviceDao {
 
     List<String> selectRobotTaskDeviceId(@Param(value = "list") List<Long> list,
                                            @Param(value = "robotCode") String robotCode);
+    List<Long> selectByRegionList(@Param(value = "regionList") List<Long> regionList);
 }
