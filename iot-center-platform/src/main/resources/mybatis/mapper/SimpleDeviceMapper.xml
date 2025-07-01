@@ -8,28 +8,18 @@
             ur.region_name AS area_name,
             r.region_id AS bay_id,
             r.region_name AS bay_name,
-        <if test="isDevice == true">
-            d.device_id,
-            d.device_name,
-            "7" AS appearance_type,
-            "2" AS save_type_list,
-            "2" AS point_type,
-            "0" AS photo_num,
-        </if>
-        <if test="isDevice == false">
-            i.inspection_code AS device_id,
-            i.inspection_name AS device_name,
+            IFNULL(i.inspection_code, d.device_id) AS device_id,
+            IFNULL(i.inspection_name, d.device_name) AS device_name,
             i.component_id,
             m.custom_name AS component_name,
             m.meter_type,
-            m.appearance_type,
-            i.save_type_list,
+            IFNULL(m.appearance_type, "7") AS appearance_type,
+            IFNULL(i.save_type_list, "2") AS save_type_list,
             m.mete_type AS recognition_type_list,
-            m.redundant_type AS point_type,
-            i.photo_num,
+            IFNULL(m.redundant_type, "2") AS point_type,
+            IFNULL(i.photo_num, "0") AS photo_num,
             i.phase,
             m.label_attri,
-        </if>
             d.device_id AS main_device_id,
             d.device_name AS main_device_name,
             da.voltage_level,
@@ -42,12 +32,11 @@
         LEFT JOIN t_std_device_attr da ON d.device_id = da.device_id
         LEFT JOIN t_std_region r ON d.up_region_id = r.region_id
         LEFT JOIN t_std_region ur ON r.up_region_id = ur.region_id
-      <if test="isDevice == false">
-        LEFT JOIN t_std_devicemete m ON m.device_id = d.device_id
         LEFT JOIN t_robot_inspection i ON i.main_device_id = d.device_id
-      </if>
+        LEFT JOIN t_std_devicemete m ON m.device_id = i.main_device_id
         WHERE
             ur.region_id = #{regionId} and d.position_type = 'simple'
+        ORDER BY d.device_id
     </select>
 
 </mapper>
