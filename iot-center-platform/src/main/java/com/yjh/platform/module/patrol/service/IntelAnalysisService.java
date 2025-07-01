@@ -562,51 +562,50 @@ public class IntelAnalysisService {
      * @param response 返回结果
      */
     private void targetBoxHandle(PicAnalyseResponse response, String flagId) {
+        String objectId = StringUtils.substringAfter(flagId, "_");
         try {
-            String objectId = StringUtils.substringAfter(flagId, "_");
-            if (CollectionUtils.isNotEmpty(response.getResultList())) {
-                List<TargetBoxResult> targetBoxResultList = new ArrayList<>();
-                AtomicBoolean atomicBoolean = new AtomicBoolean(true);
-                for (AnalyseResult analyseResult : response.getResultList()) {
-                    // objectId 唯一标识
-                    List<AnalyseResultItem> resultList = analyseResult.getResults();
-                    if (CollectionUtils.isEmpty(resultList)) {
-                        CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
-                        return;
+            List<TargetBoxResult> targetBoxResultList = new ArrayList<>();
+            if (CollectionUtils.isEmpty(response.getResultList())) {
+                CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.success(targetBoxResultList));
+                log.error("targetBoxHandle resultList is empty !");
+            }
+            AtomicBoolean atomicBoolean = new AtomicBoolean(true);
+            for (AnalyseResult analyseResult : response.getResultList()) {
+                // objectId 唯一标识
+                List<AnalyseResultItem> resultList = analyseResult.getResults();
+                if (CollectionUtils.isEmpty(resultList)) {
+                    CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
+                    return;
+                }
+                //对返回框重新构建返回数据
+                for (AnalyseResultItem item : resultList) {
+                    List<Area> pos = item.getPos();
+                    if (CollectionUtils.isEmpty(pos)) {
+                        atomicBoolean.set(false);
+                        break;
                     }
-                    //对返回框重新构建返回数据
-                    for (AnalyseResultItem item : resultList) {
-                        List<Area> pos = item.getPos();
-                        if (CollectionUtils.isEmpty(pos)) {
+                    for (Area area : pos) {
+                        List<Point> points = area.getAreas();
+                        if (CollectionUtils.isEmpty(points) || points.size() != 2) {
                             atomicBoolean.set(false);
                             break;
                         }
-                        for (Area area : pos) {
-                            List<Point> points = area.getAreas();
-                            if (CollectionUtils.isEmpty(points) || points.size() != 2) {
-                                atomicBoolean.set(false);
-                                break;
-                            }
-                            TargetBoxResult targetBoxResult = new TargetBoxResult();
-                            targetBoxResult.setX1(points.get(0).getX());
-                            targetBoxResult.setY1(points.get(0).getY());
-                            targetBoxResult.setX2(points.get(1).getX());
-                            targetBoxResult.setY2(points.get(1).getY());
-                            targetBoxResultList.add(targetBoxResult);
-                        }
+                        TargetBoxResult targetBoxResult = new TargetBoxResult();
+                        targetBoxResult.setX1(points.get(0).getX());
+                        targetBoxResult.setY1(points.get(0).getY());
+                        targetBoxResult.setX2(points.get(1).getX());
+                        targetBoxResult.setY2(points.get(1).getY());
+                        targetBoxResultList.add(targetBoxResult);
                     }
                 }
-                if (atomicBoolean.get()) {
-                    CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.success(targetBoxResultList));
-                } else {
-                    CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
-                }
+            }
+            if (atomicBoolean.get()) {
+                CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.success(targetBoxResultList));
             } else {
-                CommonFutureUtil.futureComplete(id, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
-                log.error("targetBoxHandle resultList is empty !");
+                CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
             }
         } catch (Exception e) {
-            CommonFutureUtil.futureComplete(id, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
+            CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
             log.error("targetBoxHandle error", e);
         }
     }
@@ -616,29 +615,31 @@ public class IntelAnalysisService {
      * @param response 返回结果
      */
     private void ocrHandle(PicAnalyseResponse response, String flagId) {
+        //唯一标识
         String objectId = StringUtils.substringAfter(flagId, "_");
         try {
-            if (CollectionUtils.isNotEmpty(response.getResultList())) {
-                //唯一标识
-                List<OcrAnalyseResponse> ocrAnalyseResponseList = new ArrayList<>();
-                for (AnalyseResult analyseResult : response.getResultList()) {
-                    List<AnalyseResultItem> resultList = analyseResult.getResults();
-                    if (CollectionUtils.isEmpty(resultList)) {
-                        CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
-                        return;
-                    }
-                    OcrAnalyseResponse ocrAnalyseResponse = new OcrAnalyseResponse();
-                    ocrAnalyseResponse.setDevUuid(analyseResult.getObjectId());
-                    //识别结果使用描述字段
-                    String value = resultList.get(0).getValue();
-                    ocrAnalyseResponse.setValue(value);
-                    ocrAnalyseResponseList.add(ocrAnalyseResponse);
-                }
-                if (CollectionUtils.isEmpty(ocrAnalyseResponseList)) {
+            List<OcrAnalyseResponse> ocrAnalyseResponseList = new ArrayList<>();
+            if (CollectionUtils.isEmpty(response.getResultList())) {
+                CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.success(ocrAnalyseResponseList));
+                log.error("ocrHandle resultList is empty !");
+            }
+            for (AnalyseResult analyseResult : response.getResultList()) {
+                List<AnalyseResultItem> resultList = analyseResult.getResults();
+                if (CollectionUtils.isEmpty(resultList)) {
                     CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
-                } else {
-                    CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.success(ocrAnalyseResponseList));
+                    return;
                 }
+                OcrAnalyseResponse ocrAnalyseResponse = new OcrAnalyseResponse();
+                ocrAnalyseResponse.setDevUuid(analyseResult.getObjectId());
+                //识别结果使用描述字段
+                String value = resultList.get(0).getValue();
+                ocrAnalyseResponse.setValue(value);
+                ocrAnalyseResponseList.add(ocrAnalyseResponse);
+            }
+            if (CollectionUtils.isEmpty(ocrAnalyseResponseList)) {
+                CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
+            } else {
+                CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.success(ocrAnalyseResponseList));
             }
         } catch (Exception e) {
             CommonFutureUtil.futureComplete(objectId, com.yjh.video.api.result.Result.error(ResultCodeEnum.ERROR500));
