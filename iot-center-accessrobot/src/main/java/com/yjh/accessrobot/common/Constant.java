@@ -428,4 +428,9 @@ public class Constant {
      * 相机抓图存储相对路径
      */
     public static final String RESULT_IMG_REAL_PATH = "/imgs/resultImg/";
+
+    /**
+     * 简易机器人模型文件存储相对路径
+     */
+    public static final String SIMPLE_MODEL_REAL_PATH = "/files/simpleModel";
 }

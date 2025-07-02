@@ -66,26 +66,41 @@ public class CoordinateUtil {
             if (ObjectUtils.notEqual(robotType, 905)) return;
             String mapPath = robotInfo.getPhotePath();
             if (StringUtils.isEmpty(mapPath)) throw new BusinessException("地图存储路径为空!");
-            String fileFtpPathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute").get("content"));
-            mapPath = mapPath.replace(Constant.FTP_IMAGE_RELATIVE, fileFtpPathMap);
+            String simpleModelPath = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:simpleModelPath").get("content"));
+            mapPath = mapPath.replace(Constant.SIMPLE_MODEL_REAL_PATH, simpleModelPath);
             Path mapFullPath = Paths.get(mapPath);
             if (Files.notExists(mapFullPath)) throw new BusinessException("地图文件不存在!");
             MapInfo mapInfo = new MapInfo();
+            int width, height;
             if (mapPath.endsWith(SVG_SUFFIX)) {
-                //示例: robotLoc="58.9196 -2.15953 -2.05774"
+                //示例: viewBox="0 0 922 745" 第三个值为地图像素宽,第四个值为地图像素高
+                String viewBox = getAttributeValueOfRoot(mapFullPath, "viewBox");
+                String[] viewBoxArray = viewBox.split(" ");
+                width = Integer.parseInt(viewBoxArray[2]);
+                height = Integer.parseInt(viewBoxArray[3]);
+                //示例: robotLoc="58.9196 -2.15953 -2.05774"  第一个值代表缩放比例,第二个值为原点坐标X值,第三个值为原点坐标Y值
                 String robotLoc = getAttributeValueOfRoot(mapFullPath, "robotLoc");
-                mapInfo.setRobotType(robotType).setMapPath(mapPath).setProportion(Double.parseDouble(robotLoc.split(" ")[0]));
+                String[] robotLocArray = robotLoc.split(" ");
+                double proportion = Double.parseDouble(robotLocArray[0]);
+                double left = Double.parseDouble(robotLocArray[1]);
+                double bottom = Double.parseDouble(robotLocArray[2]);
+                mapInfo.setRobotType(robotType).setMapPath(mapPath)
+                        .setProportion(proportion)
+                        .setLeft(left)
+                        .setBottom(bottom)
+                        .setRight(width / proportion + left)
+                        .setTop(height / proportion + bottom);
             } else {
                 BufferedImage imageRead = ImageIO.read(mapFullPath.toFile());
-                int height = imageRead.getHeight();
-                int width = imageRead.getWidth();
+                width = imageRead.getWidth();
+                height = imageRead.getHeight();
                 String yamlPath = FilenameUtils.removeExtension(mapPath) + ".yaml";
                 Path yamlFullPath = Paths.get(yamlPath);
                 if (Files.notExists(yamlFullPath)) throw new BusinessException("地图yaml文件不存在!");
                 Map<String, Object> mapInfoData = readYamlInfo(yamlPath);
                 if (MapUtils.isNotEmpty(mapInfoData)) {
                     mapInfo.setRobotType(robotType).setMapPath(mapPath).setYamlPath(yamlPath)
-                            .setResolution(ValueUtil.object2Double(mapInfoData.get("resolution"), null))
+                            .setProportion(ValueUtil.object2Double(mapInfoData.get("resolution"), null))
                             .setTop(ValueUtil.object2Double(mapInfoData.get("top"), null))
                             .setBottom(ValueUtil.object2Double(mapInfoData.get("bottom"), null))
                             .setLeft(ValueUtil.object2Double(mapInfoData.get("left"), null))
@@ -93,6 +108,8 @@ public class CoordinateUtil {
                             .setHeight(height).setWidth(width);
                 }
             }
+            robotInfo.setImageSize(String.format("%dx%d", width, height));
+            tRobotInfoDao.update(robotInfo);
             log.info("简易机器人: {}地图信息加载成功!", robotCode);
             robotReMapData.put(robotCode, mapInfo);
         } catch (Exception e) {
@@ -156,14 +173,9 @@ public class CoordinateUtil {
         private String yamlPath;
 
         /**
-         * 使用svg文件时像素坐标和真实坐标的比例值
+         * 缩放比例
          */
         private double proportion;
-
-        /**
-         * 地图分辨率
-         */
-        private double resolution;
 
         /**
          * 地图左边框X值
@@ -208,11 +220,11 @@ public class CoordinateUtil {
         try {
             String[] coordinates = pixelCoordinates.split(",");
             if (mapInfo.getMapPath().endsWith(SVG_SUFFIX)) {
-                actualX = Double.parseDouble(coordinates[0]) / mapInfo.getProportion();
-                actualY = Double.parseDouble(coordinates[1]) / mapInfo.getProportion();
+                actualX = Double.parseDouble(coordinates[0]) / mapInfo.getProportion() + mapInfo.getLeft();
+                actualY = mapInfo.getTop() - Double.parseDouble(coordinates[1]) / mapInfo.getProportion();
             } else {
-                actualX = Double.parseDouble(coordinates[0]) * mapInfo.getResolution() + mapInfo.getLeft();
-                actualY = mapInfo.getTop() - Double.parseDouble(coordinates[1]) * mapInfo.getResolution();
+                actualX = Double.parseDouble(coordinates[0]) * mapInfo.getProportion() + mapInfo.getLeft();
+                actualY = mapInfo.getTop() - Double.parseDouble(coordinates[1]) * mapInfo.getProportion();
             }
         } catch (Exception e) {
             return pixelCoordinates; //任何异常统一返回
@@ -233,11 +245,11 @@ public class CoordinateUtil {
             if (Objects.isNull(mapInfo) || ObjectUtils.notEqual(mapInfo.getRobotType(), 905)) return actualCoordinate;
             String[] coordinates = actualCoordinate.split(",");
             if (mapInfo.getMapPath().endsWith(SVG_SUFFIX)) {
-                pixelX = Double.parseDouble(coordinates[0]) * mapInfo.getProportion();
-                pixelY = Double.parseDouble(coordinates[1]) * mapInfo.getProportion();
+                pixelX = (Double.parseDouble(coordinates[0]) - mapInfo.getLeft()) * mapInfo.getProportion();
+                pixelY = (mapInfo.getTop() - Double.parseDouble(coordinates[1])) * mapInfo.getProportion();
             } else {
-                pixelX = (Double.parseDouble(coordinates[0]) - mapInfo.getLeft()) / mapInfo.getResolution();
-                pixelY = (mapInfo.getTop() - Double.parseDouble(coordinates[1])) / mapInfo.getResolution();
+                pixelX = (Double.parseDouble(coordinates[0]) - mapInfo.getLeft()) / mapInfo.getProportion();
+                pixelY = (mapInfo.getTop() - Double.parseDouble(coordinates[1])) / mapInfo.getProportion();
             }
         } catch (Exception e) {
             return actualCoordinate; //任何异常统一返回
