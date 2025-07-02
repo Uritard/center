@@ -5,7 +5,9 @@ import com.yjh.platform.module.task.service.ReportManageService;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.name.Rename;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -116,7 +118,7 @@ public class FileUtil {
 
     public static boolean checkFileName(String fileName, String[] type){
         String name = StringUtils.substringAfterLast(fileName,".").toLowerCase();
-        if (Arrays.binarySearch(type, name) >= 0){
+        if (ArrayUtils.contains(type, name)){
             return true;
         }
         return false;
