@@ -359,7 +359,7 @@ public class SimplePointServiceImpl implements SimplePointService {
                 TCruisePointInstance cruisePointInstance = new TCruisePointInstance();
                 cruisePointInstance.setDeviceMeteId(deviceMeteList.get(i).getDeviceMeteId())
                     .setDeviceId(deviceMeteList.get(i).getDeviceId()).setCruiseId(robotInspection.getInspectionId())
-                    .setCruiseName(deviceMeteList.get(i).getMeteName()).setCruiseType(CruiseConstant.TypeEnum.ROBOT.getCode());
+                    .setCruiseName(robotInspection.getInspectionName()).setCruiseType(CruiseConstant.TypeEnum.ROBOT.getCode());
                 cruisePointInstanceList.add(cruisePointInstance);
                 deviceConfigList.get(i).setDevUuid(String.valueOf(deviceMeteList.get(i).getDeviceMeteId()));
                 if (deviceConfigList.get(i).getDevType().equals(AnalyseMeteTypeEnum.NEW_SX_BJ.getName())) {
