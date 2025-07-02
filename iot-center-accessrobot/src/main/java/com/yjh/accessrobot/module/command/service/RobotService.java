@@ -299,7 +299,6 @@ public class RobotService {
                     .setCommand(command)
                     .setItems(item);
             String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-            log.info("生成的控制指令xml是<start>{}<end>", xmlString);
 
             Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + originCode + ":61");
             Map<String, String> robotTaskStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + originCode + ":41");
@@ -431,7 +430,6 @@ public class RobotService {
                 .setType("61")
                 .setCommand("1");
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-        log.info("生成的模型文件同步指令xml是<start>{}<end>", xmlString);
         RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
         SYNC_MODE_CACHE.put(robotCode, userId);
         Constant.sendProcess(robotCode, tRobotInfo.getRobotName() + "模型同步", 1, "模型同步开始");
@@ -461,7 +459,6 @@ public class RobotService {
                     .setType("61")
                     .setCommand(command);
             String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-            log.info("生成的模型文件同步指令xml是<start>{}<end>", xmlString);
             RobotServerHandler.send(generateByteOrder(xmlString, edgeCode), edgeCode);
             SYNC_MODE_CACHE.put(edgeCode, userId);
             Constant.sendProcess(edgeCode, stdRegionList.get(0).getRegionName() + "模型同步", 1, "模型同步开始");
@@ -503,7 +500,6 @@ public class RobotService {
                         .setCommand(command)
                         .setItems(mapList);
                 String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-                log.info("生成的联动文件下发指令xml是<start>{}<end>", xmlString);
                 RobotServerHandler.send(generateByteOrder(xmlString, edgeCode), edgeCode);
                 return true;
             } catch (Exception e) {
@@ -544,14 +540,14 @@ public class RobotService {
     public Pair<Long, byte[]> generateByteOrderAndSession(String xmlString, String robotCode) {
         long sendSessionId = Constant.AtomicSessionId.incrementAndGet();
         ChannelHandlerContext context = RobotServerHandler.getChannelHandlerContextByRobot(robotCode);
-        log.info("context是<start>{}<end>", context);
+        log.info("下发的xml报文是<start>{}<end>\nsendSessionId:{}    context是【{}】", xmlString, sendSessionId, context);
         if (context != null) {
             Constant.sendSessionId = sendSessionId;
         } else {
             Constant.sendSessionId = 0L;
             Constant.AtomicSessionId.set(0);
         }
-        log.info("-------------这是刚发命令的请求{}-------------", sendSessionId);
+
         return Pair.of(sendSessionId, PlatformPacketUtil.createPacket(sendSessionId, 0, true, xmlString));
     }
 
@@ -1280,7 +1276,6 @@ public class RobotService {
                 .setCommand("4")
                 .setItems(itemList);
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-        log.info("生成的检修区域指令xml是<start>{}<end>", xmlString);
         RobotServerHandler.send(generateByteOrder(xmlString, onlineCode), onlineCode);
         return "true";
     }
@@ -1514,7 +1509,6 @@ public class RobotService {
                 .setCommand("1")
                 .setItems((List<Map<String, Object>>) resMap.get("mapList"));
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-        log.info("生成的任务的xml是<start>{}<end>", xmlString);
         Pair<Long, byte[]> pkg = generateByteOrderAndSession(xmlString, uniqueFlag);
 
         if (LINKAGE_TASK.getType().equals(MapUtils.getString(resMap, "type"))) {
@@ -1589,7 +1583,6 @@ public class RobotService {
                         .setCommand(commandValue)
                         .setTime(DateTimeUtil.format(new Date()));
                 String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-                log.info("生成的任务控制xml是<start>{}<end>", xmlString);
 
                 RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
             }
@@ -1756,7 +1749,6 @@ public class RobotService {
                         .setTime(DateTimeUtil.format(new Date()))
                         .setItems(cfmList);
                 String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-                log.info("生成的任务控制xml是<start>" + xmlString + "<end>");
                 Map<String, String> robotControlModelMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":61");
                 String robotPattern = robotControlModelMap.get("value");
                 if ("5".equals(robotPattern)) {
@@ -1947,7 +1939,6 @@ public class RobotService {
         xmlBaseModel.setReceiveCode(receiveCode);
         log.info("xmlBaseModel {} ", xmlBaseModel);
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-        log.info("生成的机器人控制xml是<start>{}<end>", xmlString);
         RobotServerHandler.send(generateByteOrder(xmlString, receiveCode), receiveCode);
         return "success";
     }
@@ -2450,7 +2441,6 @@ public class RobotService {
                 .setTime(DateTimeUtil.format(new Date())).setType(type).setCommand(command).setItems(item);
         }
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-        log.info("生成的机器人控制xml是<start>{}<end>", xmlString);
         RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
         TimeUnit.MILLISECONDS.sleep(2000);
 
@@ -2481,7 +2471,6 @@ public class RobotService {
                         XMLBaseModel xmlBaseModel = new XMLBaseModel().setSendCode(Constant.sendCode()).setReceiveCode(code)
                             .setTime(DateTimeUtil.format(new Date())).setType("101").setCommand("102").setItems(item);
                         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-                        log.info("生成的机器人控制xml是<start>{}<end>", xmlString);
                         RobotServerHandler.send(generateByteOrder(xmlString, code), code);
                     }
                 });
@@ -2808,7 +2797,6 @@ public class RobotService {
                             .setCommand(cmd)
                             .setItems(Item);
                     String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-                    log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
                     RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
                     result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
                 }
@@ -3593,7 +3581,6 @@ public class RobotService {
                 .setCommand("4")
                 .setItems(itemList);
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-        log.info("生成的充电区域指令xml是<start>{}<end>", xmlString);
         RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
         return "true";
     }

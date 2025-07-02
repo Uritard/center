@@ -80,7 +80,6 @@ public class TCameraPresetService {
             .setCommand("5")
             .setItems(item);
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-        log.info("生成的同步预置位信息xml是<start>{}<end>", xmlString);
         RobotServerHandler.send(robotService.generateByteOrder(xmlString, tCameraPreset.getEdgeCode()), tCameraPreset.getEdgeCode());
     }
 
