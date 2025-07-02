@@ -96,9 +96,11 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
         if (!com.yjh.platform.common.utils.FileUtil.checkFileName(file.getOriginalFilename(), new String[] {"zip", "7z"})) {
             throw new BusinessException(ResultCodeEnum.CODE10015, "请上传正确的zip或7z文件");
         }
+        // 临时解压地址
+        String outputPath = simpleModelDir(System.currentTimeMillis());
         try {
             // 压缩包解压缩
-            String outputPath = extract(file);
+            extract(file, outputPath);
 
             // 遍历文件夹，根据文件后缀名对应解析
             Map<String, String> pathMap = modelFileList(outputPath);
@@ -111,11 +113,12 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
                 migrationFile(robotInfo.getUpRegionId(), pathMap);
             }
 
-            // 删除临时文件
-            FileUtil.del(outputPath);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new BusinessException(ResultCodeEnum.CODE10015, "上传文件格式不正确，请上传正确的zip或7z文件");
+        } finally {
+            // 删除临时文件
+            FileUtil.del(outputPath);
         }
 
         return false;
@@ -221,8 +224,7 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
      * 压缩包解压缩
      * 文件名有中文会导致上传失败，捕捉到后再次使用 GBK 编码解压缩一次
      */
-    private String extract(MultipartFile file) throws IOException {
-        String outputPath = simpleModelDir(System.currentTimeMillis());
+    private String extract(MultipartFile file, String outputPath) throws IOException {
 
         // 临时文件暂存，直接用流无法二次操作，如果文件名有中文会导致解压失败
         File outTmpZip = new File(CommonUtils.concatPath(outputPath, file.getOriginalFilename()));
