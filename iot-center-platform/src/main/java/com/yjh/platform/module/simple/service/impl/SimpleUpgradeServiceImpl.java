@@ -84,6 +84,11 @@ public class SimpleUpgradeServiceImpl extends ServiceImpl<SimpleUpgradeMapper, P
     @SuppressWarnings("unchecked")
     @Override
     public void upgradeNotify(Long id, String robotList, String userId) {
+        PatrolDeviceVersion patrolDeviceVersion = getBaseMapper().selectByPrimaryId(id);
+        String packageFullPath = patrolDeviceVersion.getFilePath();
+        Path path = Paths.get(packageFullPath);
+        if (Files.notExists(path))
+            throw new BusinessException("本地版本升级包: " + path.getFileName() + "不存在!");
         List<String> list = Arrays.stream(robotList.split(",")).collect(Collectors.toList());
         list.removeIf(robotCode -> {
             String upgradeStatus = Convert.toStr(redisTemplate.opsForValue().get("UpgradeStatus:" + robotCode), "");
@@ -96,11 +101,6 @@ public class SimpleUpgradeServiceImpl extends ServiceImpl<SimpleUpgradeMapper, P
             }
         });
         if (CollectionUtil.isNotEmpty(list)) {
-            PatrolDeviceVersion patrolDeviceVersion = getBaseMapper().selectByPrimaryId(id);
-            String packageFullPath = patrolDeviceVersion.getFilePath();
-            Path path = Paths.get(packageFullPath);
-            if (Files.notExists(path))
-                throw new BusinessException("本地版本升级包: " + path.getFileName() + "不存在!");
             ThreadPoolUtil.COMMON_POOL.addThread(() -> {
                 String remoteFilePath = Constant.UPGRADE_PACKAGE_PATH + File.separator + DateUtil.format(new Date(), DatePattern.PURE_DATE_PATTERN)
                         + File.separator + FilenameUtils.getName(packageFullPath);
@@ -131,13 +131,10 @@ public class SimpleUpgradeServiceImpl extends ServiceImpl<SimpleUpgradeMapper, P
             String filePath = patrolDeviceVersion.getFilePath();
             Path path = Paths.get(filePath);
             try {
-                boolean isDeleted = Files.deleteIfExists(path);
-                if (isDeleted) {
-                    getBaseMapper().deleteByPrimaryId(id);
-                } else {
-                    log.error("文件: {}删除失败, 保留id为: {}的数据", filePath, id);
-                }
-            } catch (IOException ignored) {
+                Files.deleteIfExists(path);
+                getBaseMapper().deleteByPrimaryId(id);
+            } catch (IOException ioe) {
+                log.error("文件: {}删除失败, 保留id为: {}的数据", filePath, id, ioe);
             }
         });
     }
