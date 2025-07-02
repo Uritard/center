@@ -234,10 +234,8 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
         try (Extractor extractor = CompressUtil.createExtractor(StandardCharsets.UTF_8, outTmpZip)) {
             extractor.extract(FileUtil.mkdir(outputPath));
         } catch (IORuntimeException e) {
-            log.error("解压失败，可能是编码问题，切换 GB18030 再试一次: {}", e.getMessage());
-            try (Extractor extractor = CompressUtil.createExtractor(Charset.forName("GB18030"), outTmpZip)) {
-                extractor.extract(FileUtil.mkdir(outputPath));
-            }
+            log.error("解压失败，可能是编码问题，压缩包内的文件名请不要使用中文命名，或使用UTF-8编码的zip文件或使用7z格式压缩包", e);
+            throw new BusinessException(ResultCodeEnum.CODE10015, "压缩包解压失败，请使用7z格式或UTF-8编码的zip格式，压缩包内的文件路径不要使用中文字符");
         }
         log.info("临时上传文件包: {}", outputPath);
         return outputPath;
@@ -508,7 +506,7 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
             // 判断简易机器人设备是否存在，根据 upRegionId 判断
             List<TRobotInfo> robots =
                 robotService.select(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-                    null, null, null, null, null, null, null, isUse, null, region.getRegionId(), null, null, null, null, null, null, null,
+                    null, null, null, null, null, null, null, null, null, region.getRegionId(), null, null, null, null, null, null, null,
                     null, null);
 
             if (robots.isEmpty()) {
