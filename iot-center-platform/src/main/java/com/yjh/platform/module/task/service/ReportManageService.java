@@ -470,17 +470,13 @@ public class ReportManageService {
                 && (CommonUtils.equals(detail.getEvaluationState(), CruiseConstant.EVALUATION_STATE_UN)
                 || CommonUtils.equals(detail.getEvaluationState(), CruiseConstant.EVALUATION_STATE_IGNORE)
                 || CommonUtils.equals(detail.getIdentifyResult(), CruiseConstant.IDENTIFY_RESULT_NORMAL))).count();
-        // 待人工确认，未审核，且巡视结果异常
-        long unReviewCount = tCruiseDataResultDetailList.stream().filter(detail -> CommonUtils.equals(detail.getEvaluationState(), CruiseConstant.EVALUATION_STATE_UN)
-                && CommonUtils.equals(detail.getCruiseResult(), CruiseConstant.CRUISE_RESULT_ABNORMAL)).count();
-        // 已检点数
-        long alreadyCount = tCruiseDataResultDetailList.stream().filter(detail -> CommonUtils.equals(detail.getCruiseState(), CruiseConstant.CRUISE_STATE_DONE)).count();
         //缺陷点数
         long defectCount = tCruiseDataResultDetailList.stream().filter(datail -> CommonUtils.equals(datail.getIsWarn(), 1)).count();
-        //未检点数
-        long waitCount= allCount - alreadyCount;
         //误报点数
         long abnormalCount = tCruiseDataResultDetailList.stream().filter(datail->CommonUtils.equals(datail.getIdentifyState(),259)).count();
+        //漏报点数
+        long waitCount=allCount-normalCount-defectCount-abnormalCount;
+
         //构建格式化对象
         DecimalFormat df = new DecimalFormat("#");
         //漏检率
