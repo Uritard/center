@@ -1204,12 +1204,15 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		t_std_device
 		where 1 = 1
 		<if test="name != null and name != ''"> and device_name like concat('%',#{name, jdbcType=VARCHAR},'%')</if>
+		<if test="deviceShow == 'simpleRobot'"> and position_type = 'simple'</if>
 	</select>
 
 	<select id="selectDevTreeDeviceByNameTree" resultType="com.yjh.platform.module.device.entity.AreaInfo">
-		SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType, "" AS deviceTypeId
+		SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName,
+		"region" AS infoType, "" AS deviceTypeId, r.robot_id AS robotId
 		FROM t_std_region a
 		LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+		LEFT JOIN t_robot_info r ON (a.region_id = r.up_region_id or a.up_region_id = r.up_region_id)
 		where a.region_id in (
 		<foreach collection="regionList" item="regionId" separator=",">
 			#{regionId}
@@ -1217,9 +1220,11 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		)
 		UNION ALL (
 		SELECT DISTINCT b.device_id AS Id, b.device_name AS label, b.up_region_id AS upId, d.region_name AS upName,
-		"device" AS infoType, b.device_type AS deviceTypeId
+		(case when 'simpleRobot' = #{deviceShow} then "simpleRobot" else "device" END) AS infoType,
+		b.device_type AS deviceTypeId, r.robot_id AS robotId
 		FROM t_std_device b
 		LEFT JOIN t_std_region d ON b.up_region_id = d.region_id
+		LEFT JOIN t_robot_info r on r.up_region_id = d.up_region_id
 		where b.device_id in (
 		<foreach collection="list" item="item" separator=",">
 			#{item.deviceId}
@@ -1639,6 +1644,51 @@ group by camera_id
 		<foreach collection="regionList" open="(" close=")" separator="," item="regionId">
 			#{regionId,jdbcType=BIGINT}
 		</foreach>
+	</select>
+	<select id="selectSimpleInsTreeByName"
+			resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">
+		select distinct
+			tri.main_device_id as device_id,
+		    tri.inspection_id  as cruiseId
+		from
+			t_robot_inspection tri left join t_robot_info tri2 on tri.robot_id = tri2.robot_id
+		where  tri2.robot_type = 905
+		<if test="name != null and name != ''"> and tri.inspection_name like concat('%',#{name, jdbcType=VARCHAR},'%')</if>
+	</select>
+	<select id="selectSimpleInsTreeByNameTree" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+		SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName,
+		       "region" AS infoType,r.robot_id as robotId
+		FROM t_std_region a
+		LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+		LEFT JOIN t_robot_info r ON (a.region_id = r.up_region_id or a.up_region_id = r.up_region_id)
+		where a.region_id in (
+		<foreach collection="regionList" item="regionId" separator=",">
+			#{regionId}
+		</foreach>
+		)
+		UNION ALL (
+		SELECT DISTINCT b.device_id AS Id, b.device_name AS label, b.up_region_id AS upId, d.region_name AS upName,
+		                "simpleRobot" AS infoType, r.robot_id as robotId
+		FROM t_std_device b
+		LEFT JOIN t_std_region d ON b.up_region_id = d.region_id
+		LEFT JOIN t_robot_info r ON (d.region_id = r.up_region_id or d.up_region_id = r.up_region_id)
+		where b.device_id in (
+		<foreach collection="simpleInsList" item="item" separator=",">
+			#{item.deviceId}
+		</foreach>
+		)
+		)
+		UNION ALL (
+		SELECT DISTINCT tri.inspection_id AS Id, tri.inspection_name  AS label, sd.device_id  AS upId,	sd.device_name AS upName,
+		                "simpleComponent" AS infoType,tri.robot_id as robotId
+		FROM t_robot_inspection  tri
+		LEFT JOIN t_std_device sd ON sd.device_id = tri.main_device_id
+		where tri.inspection_id  in (
+		<foreach collection="simpleInsList" item="item" separator=",">
+			#{item.cruiseId}
+		</foreach>
+		)
+		)
 	</select>
 
 </mapper>

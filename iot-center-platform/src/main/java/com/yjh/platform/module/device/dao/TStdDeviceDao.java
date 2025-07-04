@@ -143,7 +143,8 @@ public interface TStdDeviceDao {
     List<TCruisePointInstance> selectAllMeteCruiseTreeByName(@Param(value = "name")String name,
                                                              @Param(value = "deviceType")String deviceType,
                                                              @Param(value = "analyseType")String analyseType);
-    List<TCruisePointInstance> selectDevTreeDeviceByName(@Param(value = "name")String name);
+    List<TCruisePointInstance> selectDevTreeDeviceByName(@Param(value = "name")String name,
+                                                         @Param(value = "deviceShow")String deviceShow);
     List<TCruisePointInstance> selectCameraTreeDeviceByName(@Param(value = "name")String name);
     List<Long> selectRegionByDeviceList(@Param(value = "list")List<TCruisePointInstance> list);
     List<Long> selectUpIdByRegionList(@Param(value = "list")List<Long> list);
@@ -153,7 +154,8 @@ public interface TStdDeviceDao {
     List<AreaInfo> selectAllMeteCruiseTreeByDeviceNameTree(@Param(value = "list")List<TCruisePointInstance> list,
                                                                  @Param(value = "regionList")List<Long> regionList);
     List<AreaInfo> selectDevTreeDeviceByNameTree(@Param(value = "list")List<TCruisePointInstance> list,
-                                                                 @Param(value = "regionList")List<Long> regionList);
+                                                 @Param(value = "regionList")List<Long> regionList,
+                                                 @Param(value = "deviceShow")String deviceShow);
     TCruisePointInstanceDetail selectDevTreeDeviceByInstacneId(@Param(value = "instanceId")Long instanceId);
 
     List<Map<String,Long>> selectFirstPresetIdByCameraIdList(@Param("list")List<String> cameraIdList);
@@ -185,4 +187,9 @@ public interface TStdDeviceDao {
     List<String> selectRobotTaskDeviceId(@Param(value = "list") List<Long> list,
                                            @Param(value = "robotCode") String robotCode);
     List<Long> selectByRegionList(@Param(value = "regionList") List<Long> regionList);
+
+    List<TCruisePointInstance> selectSimpleInsTreeByName(@Param(value = "name") String name);
+
+    List<AreaInfo> selectSimpleInsTreeByNameTree(@Param(value = "simpleInsList") List<TCruisePointInstance> simpleInsList,
+                                                 @Param(value = "regionList") List<Long> regionList);
 }
