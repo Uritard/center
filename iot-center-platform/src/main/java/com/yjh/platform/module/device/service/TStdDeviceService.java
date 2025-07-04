@@ -656,6 +656,9 @@ public class TStdDeviceService{
                         case "iot":
                             allTree = tStdDeviceDao.selectIotDevTreeRegion(name);
                             break;
+                        case "simpleRobot":
+                            allTree = tStdDeviceDao.selectSimpleRobotDevTreeRegion(name);
+                            break;
                         default:
                             allTree = tStdDeviceDao.selectAreaTree();
                     }
@@ -682,10 +685,10 @@ public class TStdDeviceService{
 //                        regionList.addAll(tStdDeviceDao.selectUpIdByRegionList(regionList));
                         regionList = getRegionIdByLeafNode(new HashSet<>(regionList));
                         if (CollectionUtils.isNotEmpty(regionList)){
-                            devTreeByName = tStdDeviceDao.selectDevTreeDeviceByNameTree(cameraList,regionList);
+                            devTreeByName = tStdDeviceDao.selectDevTreeDeviceByNameTree(cameraList,regionList,deviceShow);
                         }
                     }
-                }else if ("allDevice".equals(deviceShow)){
+                }else if ("allDevice".equals(deviceShow)) {
                     List<TCameraInfo> cameraList = tStdDeviceDao.selectAllPatrolDeviceByName(name);
                     if (CollectionUtils.isNotEmpty(cameraList)) {
                         List<Long> regionList = cameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
@@ -696,14 +699,14 @@ public class TStdDeviceService{
                     }
                 }else {
                     //查设备
-                    List<TCruisePointInstance> deviceList = tStdDeviceDao.selectDevTreeDeviceByName(name);
+                    List<TCruisePointInstance> deviceList = tStdDeviceDao.selectDevTreeDeviceByName(name, deviceShow);
                     if (CollectionUtils.isNotEmpty(deviceList)){
                         List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(deviceList);
                         //  MySQL 8.0
 //                        regionList.addAll(tStdDeviceDao.selectUpIdByRegionList(regionList));
                         regionList = getRegionIdByLeafNode(new HashSet<>(regionList));
                         if (CollectionUtils.isNotEmpty(regionList)){
-                            devTreeByName = tStdDeviceDao.selectDevTreeDeviceByNameTree(deviceList,regionList);
+                            devTreeByName = tStdDeviceDao.selectDevTreeDeviceByNameTree(deviceList,regionList,deviceShow);
                         }
                     }
                 }
@@ -722,6 +725,21 @@ public class TStdDeviceService{
                     if (CollectionUtils.isNotEmpty(regionList)){
 
                         devTreeByName = tStdDeviceDao.selectAllMeteCruiseTreeByNameTree(insList,regionList);
+                    }
+                }
+                break;
+            case "simpleRobot":
+                //查简易机器人点位
+                List<TCruisePointInstance> simpleInsList = tStdDeviceDao.selectSimpleInsTreeByName(name);
+                if (CollectionUtils.isNotEmpty(simpleInsList)){
+                    List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(simpleInsList);
+                    if (regionList.isEmpty()){
+                        break;
+                    }
+                    regionList = getRegionIdByLeafNode(new HashSet<>(regionList));
+                    if (CollectionUtils.isNotEmpty(regionList)){
+
+                        devTreeByName = tStdDeviceDao.selectSimpleInsTreeByNameTree(simpleInsList,regionList);
                     }
                 }
                 break;
