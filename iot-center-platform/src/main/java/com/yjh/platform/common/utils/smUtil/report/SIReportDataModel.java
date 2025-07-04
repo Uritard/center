@@ -238,15 +238,13 @@ public class SIReportDataModel {
                 cbsInspectionResultVo.setIdentifyResultName("正常");
                 // 正常，巡视结果正常且无告警，且未审核 或 无需审核 或 审核结果正常
                 normalList.add(cbsInspectionResultVo);
-            } else if (CommonUtils.equals(cbsInspectionResultVo.getEvaluationState(), CruiseConstant.EVALUATION_STATE_UN)
-                && CommonUtils.equals(cbsInspectionResultVo.getCruiseResult(), CruiseConstant.CRUISE_RESULT_ABNORMAL)) {
-                // 待人工确认，未审核，且巡视结果异常
-                cbsInspectionResultVo.setIdentifyResultName("漏报");
-                unReviewList.add(cbsInspectionResultVo);
             } else if (CommonUtils.equals(cbsInspectionResultVo.getIsWarn(), 1)) {
                 //缺陷
                 cbsInspectionResultVo.setIdentifyResultName("缺陷");
                 defectList.add(cbsInspectionResultVo);
+            }else {
+                cbsInspectionResultVo.setIdentifyResultName("漏报");
+                unReviewList.add(cbsInspectionResultVo);
             }
         }
         //根据要求 识别出来是异常 放在异常里
