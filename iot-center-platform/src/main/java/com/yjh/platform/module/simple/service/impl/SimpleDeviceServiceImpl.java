@@ -42,6 +42,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.file.PathUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -542,8 +543,9 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
      */
     public String migrationFile(Long regionId, Map<String, String> pathMap) {
         String outputPath = simpleModelDir(regionId);
+        File out = FileUtil.mkdir(outputPath);
         // 遍历文件夹，根据文件后缀名删除对应文件
-        try (Stream<Path> pathStream = Files.walk(Paths.get(outputPath))) {
+        try (Stream<Path> pathStream = Files.walk(out.toPath())) {
             pathStream.filter(path -> pathMap.containsKey(PathUtils.getExtension(path).toLowerCase())).forEach(p -> {
                 try {
                     Files.delete(p);
@@ -552,13 +554,13 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
                 }
             });
         } catch (IOException e) {
-            log.error("删除文件夹内文件失败: {}", outputPath, e);
+            log.error("删除文件夹内文件失败: {}", out.getAbsolutePath(), e);
         }
 
         String svgPath = null;
         for (Map.Entry<String, String> entry : pathMap.entrySet()) {
             log.info("迁移文件: {}", entry.getValue());
-            File outFile = FileUtil.copy(entry.getValue(), outputPath, true);
+            File outFile = FileUtil.copy(new File(entry.getValue()), out, true);
             if (MODEL_FILE_SVG.equals(entry.getKey())) {
                 svgPath = outFile.getAbsolutePath();
                 // svg 绝对路径转为网络相对路径

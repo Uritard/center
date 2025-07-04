@@ -16,6 +16,7 @@ import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -113,14 +114,17 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
                     .setTime(DateTimeUtil.getDateTimeString(false))
                     .setItems(itemsList);
 
-            if (Constant.robotChannels.containsKey(robotCode)) {
-                log.info("-----同一连接有多个通道,关闭多余的-----");
+            String currentChannelId = ctx.channel().id().toString();
+            String oldChannelId = Constant.robotChannels.get(robotCode);
+            boolean notExist = !StringUtils.equals(currentChannelId, oldChannelId);
+            if (StringUtils.isNotEmpty(oldChannelId) && notExist) {
+                log.info("-----同一连接有多个通道,关闭多余的-----current: {}, older: {}", currentChannelId, oldChannelId);
                 ChannelHandlerContext channelHandlerContext = RobotServerHandler.getChannelHandlerContextByRobot(robotCode);
                 if (Objects.nonNull(channelHandlerContext)) {
                     channelHandlerContext.channel().close();
                 }
             }
-            Constant.robotChannels.put(robotCode, ctx.channel().id().toString());
+            Constant.robotChannels.put(robotCode, currentChannelId);
             log.info("++++++之后的Constant.robotChannels:{}", Constant.robotChannels);
             Constant.robotThreadFlag.put(robotCode, true);
             //加载简易机器人地图信息
