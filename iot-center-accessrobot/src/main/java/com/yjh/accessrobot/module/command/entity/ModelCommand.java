@@ -2,12 +2,13 @@
  * Copyright (c) 2025 Yijiahe Technology Co., Ltd. All rights reserved.
  */
 
-package com.yjh.platform.module.simple.entity;
+package com.yjh.accessrobot.module.command.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
 
@@ -18,6 +19,7 @@ import javax.validation.constraints.NotNull;
  * @since [产品/模块版本] （可选）
  */
 @Data
+@Accessors(chain = true)
 @ApiModel(value = "ModelSend对象", description = "机器人模型命令")
 @NoArgsConstructor
 public class ModelCommand {

@@ -1,4 +1,8 @@
-package com.yjh.accessrobot.netty.handler;
+/*
+ * Copyright (c) 2025 Yijiahe Technology Co., Ltd. All rights reserved.
+ */
+
+package com.yjh.accessrobot.netty.handler.simple;
 
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.enumeration.UpgradeStatusEnum;
@@ -9,6 +13,8 @@ import com.yjh.accessrobot.module.command.entity.TRobotInfo;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.entiy.UpgradeResult;
+import com.yjh.accessrobot.netty.handler.MessageHandlerStrategy;
+import com.yjh.accessrobot.netty.handler.MessageHandlerStrategyFactory;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
