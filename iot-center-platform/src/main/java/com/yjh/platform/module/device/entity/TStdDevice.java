@@ -67,7 +67,7 @@ public class TStdDevice implements Serializable {
 
     @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "模版ID")
-     @TableField(value = "model_id",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "model_id", insertStrategy = FieldStrategy.IGNORED, updateStrategy = FieldStrategy.IGNORED)
     private Long modelId;
 
     @Length(max = 255, message = "regionPath长度必须小于等于255")

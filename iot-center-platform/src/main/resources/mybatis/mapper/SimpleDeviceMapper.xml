@@ -3,21 +3,49 @@
 <mapper namespace="com.yjh.platform.module.simple.dao.SimpleDeviceMapper" >
 
     <select id="selectDeviceModel" resultType="com.yjh.platform.module.simple.entity.SimpleDeviceModel">
-        SELECT DISTINCT
+        SELECT
             ur.region_id AS area_id,
             ur.region_name AS area_name,
             r.region_id AS bay_id,
             r.region_name AS bay_name,
-            IFNULL(i.inspection_code, d.device_id) AS device_id,
-            IFNULL(i.inspection_name, d.device_name) AS device_name,
+            d.device_id,
+            d.device_name,
+            "7" AS appearance_type,
+            "2" AS save_type_list,
+            "2" AS point_type,
+            "0" AS photo_num,
+            d.device_id AS main_device_id,
+            d.device_name AS main_device_name,
+            da.voltage_level,
+            d.device_type,
+            "2" AS data_type,
+            CONCAT(da.longitude, ';', da.latitude) AS master_coordinate,
+            d.device_id master_point_id,
+            "0" AS Args
+        FROM t_std_device d
+        LEFT JOIN t_std_device_attr da ON d.device_id = da.device_id
+        LEFT JOIN t_std_region r ON d.up_region_id = r.region_id
+        LEFT JOIN t_std_region ur ON r.up_region_id = ur.region_id
+        WHERE
+            ur.region_id = #{regionId, jdbcType=BIGINT} and d.position_type = 'simple'
+    </select>
+
+    <select id="selectDevicePointModel" resultType="com.yjh.platform.module.simple.entity.SimpleDeviceModel">
+        SELECT
+            ur.region_id AS area_id,
+            ur.region_name AS area_name,
+            r.region_id AS bay_id,
+            r.region_name AS bay_name,
+            i.inspection_code AS device_id,
+            i.inspection_name AS device_name,
             i.component_id,
             m.custom_name AS component_name,
             m.meter_type,
-            IFNULL(m.appearance_type, "7") AS appearance_type,
-            IFNULL(i.save_type_list, "2") AS save_type_list,
+            m.appearance_type,
+            i.save_type_list,
             m.mete_type AS recognition_type_list,
-            IFNULL(m.redundant_type, "2") AS point_type,
-            IFNULL(i.photo_num, "0") AS photo_num,
+            m.redundant_type AS point_type,
+            i.photo_num,
             i.phase,
             m.label_attri,
             d.device_id AS main_device_id,
@@ -32,11 +60,13 @@
         LEFT JOIN t_std_device_attr da ON d.device_id = da.device_id
         LEFT JOIN t_std_region r ON d.up_region_id = r.region_id
         LEFT JOIN t_std_region ur ON r.up_region_id = ur.region_id
-        LEFT JOIN t_robot_inspection i ON i.main_device_id = d.device_id
-        LEFT JOIN t_std_devicemete m ON m.device_id = i.main_device_id
+        LEFT JOIN t_std_devicemete m ON m.device_id = d.device_id
+        RIGHT JOIN t_robot_inspection i ON i.main_device_id = d.device_id
         WHERE
-            ur.region_id = #{regionId} and d.position_type = 'simple'
-        ORDER BY d.device_id
+            ur.region_id = #{regionId, jdbcType=BIGINT} and d.position_type = 'simple'
+        <if test="robotId != null and robotId != 0">
+            and i.robot_id = #{robotId, jdbcType=BIGINT}
+        </if>
+            group by device_id
     </select>
-
 </mapper>

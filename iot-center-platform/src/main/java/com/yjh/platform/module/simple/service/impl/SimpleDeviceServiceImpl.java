@@ -52,7 +52,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -138,11 +137,12 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
 
             // 模型指令固定，则下发固定模型
             if (StringUtils.isNotEmpty(modelSend.getCommand())) {
-                sendToRobot(modelSend.getCommand(), regionId, robotInfo.getRobotCode(), modelMap);
+                sendToRobot(modelSend, regionId, robotInfo.getRobotCode(), modelMap);
             } else {
                 // 模型指令为空，则下发所有模型
                 for (String command : COMMAND_MAP.keySet()) {
-                    sendToRobot(command, regionId, robotInfo.getRobotCode(), modelMap);
+                    modelSend.setCommand(command);
+                    sendToRobot(modelSend, regionId, robotInfo.getRobotCode(), modelMap);
                 }
             }
 
@@ -155,13 +155,15 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
     /**
      * 下发模型指令给机器人
      */
-    private void sendToRobot(String command, long regionId, String robotCode, Map<String, String> modelMap) {
+    private void sendToRobot(ModelCommand modelSend, long regionId, String robotCode, Map<String, String> modelMap) {
         String path;
+        String command = modelSend.getCommand();
+        int scope = modelSend.getScope();
         String pathType = COMMAND_MAP.get(command);
         if (MODEL_FILE_XLSX.equals(pathType)) {
             // 如果是设备模型，则不下发excel，下发xml格式模型文件
             // 生成xml模型文件
-            path = pointModel(regionId);
+            path = pointModel(regionId, modelSend.getRobotId(), scope);
         } else {
             path = modelMap.get(pathType);
         }
@@ -542,8 +544,9 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
      */
     public String migrationFile(Long regionId, Map<String, String> pathMap) {
         String outputPath = simpleModelDir(regionId);
+        File out = FileUtil.mkdir(outputPath);
         // 遍历文件夹，根据文件后缀名删除对应文件
-        try (Stream<Path> pathStream = Files.walk(Paths.get(outputPath))) {
+        try (Stream<Path> pathStream = Files.walk(out.toPath())) {
             pathStream.filter(path -> pathMap.containsKey(PathUtils.getExtension(path).toLowerCase())).forEach(p -> {
                 try {
                     Files.delete(p);
@@ -552,13 +555,13 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
                 }
             });
         } catch (IOException e) {
-            log.error("删除文件夹内文件失败: {}", outputPath, e);
+            log.error("删除文件夹内文件失败: {}", out.getAbsolutePath(), e);
         }
 
         String svgPath = null;
         for (Map.Entry<String, String> entry : pathMap.entrySet()) {
             log.info("迁移文件: {}", entry.getValue());
-            File outFile = FileUtil.copy(entry.getValue(), outputPath, true);
+            File outFile = FileUtil.copy(new File(entry.getValue()), out, true);
             if (MODEL_FILE_SVG.equals(entry.getKey())) {
                 svgPath = outFile.getAbsolutePath();
                 // svg 绝对路径转为网络相对路径
@@ -631,10 +634,18 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
      * @param regionId 区域ID
      * @return 设备模型列表
      */
-    public String pointModel(Long regionId) {
+    public String pointModel(Long regionId, Long robotId, int scope) {
         String fileName = "simple_device_model.xml";
         try {
-            List<SimpleDeviceModel> list = getBaseMapper().selectDeviceModel(regionId);
+            List<SimpleDeviceModel> list = new ArrayList<>(256);
+            // 点位模型范围，0-全部 1-设备模型
+            if (scope == 0 || scope == 1) {
+                list.addAll(getBaseMapper().selectDeviceModel(regionId));
+            }
+            // 点位模型范围，0-全部 2-点位模型
+            if (scope == 0 || scope == 2) {
+                list.addAll(getBaseMapper().selectDevicePointModel(regionId, robotId));
+            }
 
             // 查询区域的上级作为站所
             TStdRegion station = tStdRegionService.selectUpRegion(regionId);
@@ -674,8 +685,6 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
         TStdRegion station = tStdRegionService.selectUpRegion(regionId);
         String stationCode = String.valueOf(station.getRegionId());
         String stationName = station.getRegionName();
-        // 已存在元素集合
-        Set<String> existId = new HashSet<>(list.size());
         list.forEach(item -> {
             item.setStationCode(stationCode);
             item.setStationName(stationName);
@@ -683,10 +692,6 @@ public class SimpleDeviceServiceImpl extends ServiceImpl<SimpleDeviceMapper, TSt
             // 相应类型全部转成文档标准的值
             item.setVoltageLevel(DictConvertUtil.DICT.covertToDict("voltageLevel", item.getVoltageLevel()));
 
-            // 若元素已存在，则跳过这条数据
-            if (!existId.add(item.getMainDeviceId())) {
-                return;
-            }
             // 组装 excel 数据
             SimpleDeviceExcel excel = new SimpleDeviceExcel();
             BeanUtil.copyProperties(item, excel);

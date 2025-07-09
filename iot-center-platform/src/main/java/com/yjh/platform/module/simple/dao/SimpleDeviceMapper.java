@@ -7,6 +7,7 @@ package com.yjh.platform.module.simple.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.simple.entity.SimpleDeviceModel;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -19,10 +20,17 @@ import java.util.List;
 public interface SimpleDeviceMapper extends BaseMapper<TStdDevice> {
 
     /**
-     * 查询简易设备模型，若点位已标定，使用点位ID做deviceId，若未标定，使用设备ID做deviceId
+     * 查询简易设备模型，初始设备
      * @param regionId 区域ID
      * @return 模型
      */
-    List<SimpleDeviceModel> selectDeviceModel(Long regionId);
+    List<SimpleDeviceModel> selectDeviceModel(@Param("regionId") Long regionId);
 
+    /**
+     * 查询简易设备点位模型
+     * @param regionId 区域ID
+     * @param robotId 机器人ID
+     * @return 模型
+     */
+    List<SimpleDeviceModel> selectDevicePointModel(@Param("regionId") Long regionId, @Param("robotId") Long robotId);
 }
