@@ -254,7 +254,7 @@
             distinct
             result.task_id
         from u_patrol_result result
-        where result.task_state = 239 and result.task_type not in (508,509,456)
+        where result.task_state = 239 and result.task_type not in (508,509,456,906)
         <if test="lowerLevel != null and lowerLevel != ''"> and result.task_level <![CDATA[ < ]]> #{lowerLevel}</if>
         <if test="highLevel != null and highLevel != ''"> and result.task_level <![CDATA[ > ]]> #{highLevel}</if>
 
@@ -348,7 +348,7 @@
                  LEFT JOIN t_dict_business c ON a.execute_type = c.dict_code AND c.col_name = "if_run"
                  LEFT JOIN u_patrol_result d ON a.task_id = d.task_id
                  LEFT JOIN t_dict_business e ON e.dict_code = d.task_state AND e.col_name = "task_state"
-        where a.execute_type = 173 and a.task_type not in (508,509,456) AND a.start_time &gt;= #{startTime, jdbcType=TIMESTAMP} AND a.start_time &lt;= #{endTime, jdbcType=TIMESTAMP}
+        where a.execute_type = 173 and a.task_type not in (508,509,456,906) AND a.start_time &gt;= #{startTime, jdbcType=TIMESTAMP} AND a.start_time &lt;= #{endTime, jdbcType=TIMESTAMP}
         UNION ALL (
             select
                 a.task_id,
@@ -384,7 +384,7 @@
                      LEFT JOIN t_dict_business c ON a.execute_type = c.dict_code AND c.col_name = "if_run"
                      LEFT JOIN u_patrol_result d ON a.task_id = d.task_id
                      LEFT JOIN t_dict_business e ON e.dict_code = d.task_state AND e.col_name = "task_state"
-            where a.execute_type = 174 and a.task_type not in (508,509,456) AND a.start_time &gt;= #{startTime, jdbcType=TIMESTAMP} AND a.start_time &lt;= #{endTime, jdbcType=TIMESTAMP}
+            where a.execute_type = 174 and a.task_type not in (508,509,456,906) AND a.start_time &gt;= #{startTime, jdbcType=TIMESTAMP} AND a.start_time &lt;= #{endTime, jdbcType=TIMESTAMP}
         )
         UNION ALL (
             select
@@ -421,7 +421,7 @@
                      LEFT JOIN t_dict_business c ON a.execute_type = c.dict_code AND c.col_name = "if_run"
                      LEFT JOIN u_patrol_result d ON a.task_id = d.task_id
                      LEFT JOIN t_dict_business e ON e.dict_code = d.task_state AND e.col_name = "task_state"
-            where a.execute_type = 172 and a.task_type not in (508,509,456)
+            where a.execute_type = 172 and a.task_type not in (508,509,456,906)
         );
     </select>
 
@@ -479,7 +479,7 @@
         LEFT JOIN t_dict_business c ON a.execute_type = c.dict_code AND c.col_name = "if_run"
         LEFT JOIN u_patrol_result d ON a.task_id = d.task_id
         LEFT JOIN t_dict_business e ON e.dict_code = d.task_state AND e.col_name = "task_state"
-        where a.execute_type = 173 and a.task_type not in (508,509,456)
+        where a.execute_type = 173 and a.task_type not in (508,509,456,906)
         <if test="startTime != null and endTime != null"> and a.start_time &gt;= #{startTime, jdbcType=TIMESTAMP} &lt;= #{endTime, jdbcType=TIMESTAMP}</if>
         <if test="taskName != null and taskName != ''"> and a.task_name like CONCAT('%',#{taskName, jdbcType=VARCHAR}, '%') </if>
         UNION ALL (
@@ -517,7 +517,7 @@
         LEFT JOIN t_dict_business c ON a.execute_type = c.dict_code AND c.col_name = "if_run"
         LEFT JOIN u_patrol_result d ON a.task_id = d.task_id
         LEFT JOIN t_dict_business e ON e.dict_code = d.task_state AND e.col_name = "task_state"
-        where a.execute_type = 174 and a.task_type not in (508,509,456)
+        where a.execute_type = 174 and a.task_type not in (508,509,456,906)
         <if test="startTime != null and endTime != null"> and a.start_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
         <if test="taskName != null and taskName != ''"> and a.task_name like CONCAT('%',#{taskName, jdbcType=VARCHAR}, '%') </if>
         )
@@ -556,7 +556,7 @@
         LEFT JOIN t_dict_business c ON a.execute_type = c.dict_code AND c.col_name = "if_run"
         LEFT JOIN u_patrol_result d ON a.task_id = d.task_id
         LEFT JOIN t_dict_business e ON e.dict_code = d.task_state AND e.col_name = "task_state"
-        where a.execute_type = 172 and a.task_type not in (508,509,456)
+        where a.execute_type = 172 and a.task_type not in (508,509,456,906)
         <if test="taskName != null and taskName != ''"> and a.task_name like CONCAT('%',#{taskName, jdbcType=VARCHAR}, '%') </if>
         ) ) h order by h.start_time desc;
     </select>

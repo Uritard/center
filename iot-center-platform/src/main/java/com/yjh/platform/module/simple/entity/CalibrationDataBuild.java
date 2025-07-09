@@ -25,7 +25,6 @@ public class CalibrationDataBuild {
     /**
      * 标定数据
      */
-    @NotEmpty(message = "子点位标定数据不能为空")
     private List<DeviceConfig> deviceConfig;
 
 }
