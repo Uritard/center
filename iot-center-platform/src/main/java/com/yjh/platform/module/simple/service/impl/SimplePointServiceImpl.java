@@ -256,7 +256,7 @@ public class SimplePointServiceImpl implements SimplePointService {
                         FileUtil.del(ImageSplitUtil.convertPath(inspection.getPropertyPicPath(), Constant.SIMPLE_PIC, simplePicPath));
                         tRobotInspectionService.deleteByPrimaryId(inspection.getInspectionId());
                         //清理子点位标定数据
-                        cruisePointInstanceService.deleteByCruiseId(inspection.getInspectionId());
+                        cleanCalibrationData(inspection.getInspectionId(), false);
                     }
                 }
                 //更新设备名称 + 偏移量
@@ -332,14 +332,15 @@ public class SimplePointServiceImpl implements SimplePointService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean calibrationDataBuild(CalibrationDataBuild dataBuild) {
         if (CollectionUtils.isEmpty(dataBuild.getDeviceConfig())) {
-            throw new BusinessException("子点位标定数据不能为空！");
+            cleanCalibrationData(dataBuild.getInspectionId(), true);
+            return true;
         }
         TRobotInspection robotInspection = tRobotInspectionService.selectByPrimaryId(dataBuild.getInspectionId());
         if (robotInspection == null) {
             throw new BusinessException("外观点位信息不存在！");
         }
         //清理子点位标定数据
-        cruisePointInstanceService.deleteByCruiseId(robotInspection.getInspectionId());
+        cleanCalibrationData(dataBuild.getInspectionId(), true);
 
         List<DeviceConfig> deviceConfigList = dataBuild.getDeviceConfig();
         List<TStdDeviceMete> deviceMeteList = new ArrayList<>(deviceConfigList.size());
@@ -384,6 +385,23 @@ public class SimplePointServiceImpl implements SimplePointService {
             }
         }
         return false;
+    }
+
+    /**
+     * 清理子点位标定数据
+     *
+     * @param inspectionId 巡检信息
+     * @param flag 是否需要更新标定信息
+     */
+    private void cleanCalibrationData(Long inspectionId, Boolean flag) {
+        cruisePointInstanceService.deleteByCruiseId(inspectionId);
+        if (flag) {
+            TRobotInspection deviceInfo = new TRobotInspection();
+            deviceInfo.setInspectionId(inspectionId).setDeviceInfo("");
+            tRobotInspectionService.update(deviceInfo);
+        }
+        String key = AnalyseTypeEnum.ANALYSE_NEW_METER_TEST.getName() + ":" + inspectionId;
+        redisTemplate.delete(key);
     }
 
     /**
