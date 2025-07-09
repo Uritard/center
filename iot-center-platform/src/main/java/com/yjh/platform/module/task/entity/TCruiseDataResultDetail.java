@@ -226,4 +226,8 @@ public class TCruiseDataResultDetail implements Serializable {
 
      private Integer identifyState;
 
+     private Long cruiseId;
+
+     private String cruiseName;
+
 }

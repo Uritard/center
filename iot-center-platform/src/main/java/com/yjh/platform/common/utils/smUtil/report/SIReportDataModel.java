@@ -10,6 +10,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 巡视报告模板
@@ -312,7 +313,13 @@ public class SIReportDataModel {
         List<TCruiseDataResultDetail> tCDRDList, boolean downResultPic) {
         Map<String, Integer> map = new HashMap<>(16);
         int index = 0;
-
+        //间隔合并起始位
+        int intervalIndex = 0;
+        //设备合并起始位
+        int deviceIndex = 0;
+        //点位合并起始位
+        int cruiseIndex = 0;
+        Map<String, List<TCruiseDataResultDetail>> intervalMap = tCDRDList.stream().collect(Collectors.groupingBy(TCruiseDataResultDetail::getIntervalName));
         for (TCruiseDataResultDetail detail : tCDRDList) {
             int colorIndex = IndexedColors.BLACK.index;
             boolean bold = false;
@@ -324,43 +331,61 @@ public class SIReportDataModel {
             elements.add(new TableCellElement(rowIndex, rowIndex + mergeCount, 0, 0, new String[] {String.valueOf(index + 1)},
                 TableCellElement.TYPE_TEXT_STRING, (short)10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex)
                 .setBold(bold));
-            // 间隔
-            elements.add(new TableCellElement(rowIndex, rowIndex + mergeCount, 1, 1,
-                new String[] {Optional.ofNullable(detail.getIntervalName()).orElse("")}, TableCellElement.TYPE_TEXT_STRING, (short)10, 20,
-                -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
+
+            //间隔  重要等级  数据来源为一组  合并
+            List<TCruiseDataResultDetail> intervalList = intervalMap.get(detail.getIntervalName());
+            if (intervalIndex == 0) {
+                // 间隔
+                int intervalCount = intervalList.size() - 1 ;
+                elements.add(new TableCellElement(rowIndex, rowIndex + intervalCount, 1, 1,
+                    new String[] {Optional.ofNullable(detail.getIntervalName()).orElse("")}, TableCellElement.TYPE_TEXT_STRING, (short)10, 20,
+                    -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
+                // 重要等级确认
+                elements.add(new TableCellElement(rowIndex, rowIndex + intervalCount, 6, 6,
+                    new String[] {Optional.ofNullable(detail.getRedundantTypeName()).orElse("")},
+                    TableCellElement.TYPE_TEXT_STRING, (short)10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex)
+                    .setBold(bold));
+                // 数据来源
+                elements.add(
+                    new TableCellElement(rowIndex, rowIndex+ intervalCount, 12, 12, new String[] {Optional.ofNullable(detail.getDataType()).orElse("")},
+                        TableCellElement.TYPE_TEXT_STRING, (short)10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex)
+                        .setBold(bold));
+            }
+            intervalIndex++;
+            if (intervalIndex == intervalList.size()){
+                intervalIndex = 0;
+            }
             // 设备名称
-            elements.add(new TableCellElement(rowIndex, rowIndex + mergeCount, 2, 2,
-                new String[] {Optional.ofNullable(detail.getDeviceName()).orElse("")}, TableCellElement.TYPE_TEXT_STRING, (short)10, 20, -1,
-                TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
-            // 部位
-            elements.add(new TableCellElement(rowIndex, rowIndex + mergeCount, 3, 3,
-                new String[] {Optional.ofNullable(detail.getComponentName()).orElse("本体")}, TableCellElement.TYPE_TEXT_STRING, (short)10,
-                20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
-            // 点位
-            elements.add(new TableCellElement(rowIndex, rowIndex + mergeCount, 4, 4,
-                new String[] {Optional.ofNullable(detail.getInstanceName()).orElse("")}, TableCellElement.TYPE_TEXT_STRING, (short)10, 20,
-                -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
+            Map<String, List<TCruiseDataResultDetail>> deviceMap = intervalList.stream().collect(Collectors.groupingBy(TCruiseDataResultDetail::getDeviceName));
+            List<TCruiseDataResultDetail> deviceList = deviceMap.get(detail.getDeviceName());
+            if (deviceIndex == 0) {
+                int deviceCount = deviceList.size() - 1 ;
+                elements.add(new TableCellElement(rowIndex, rowIndex + deviceCount, 2, 2, new String[] {Optional.ofNullable(detail.getDeviceName()).orElse("")}, TableCellElement.TYPE_TEXT_STRING, (short)10, 20,
+                    -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
+                // 部位
+                elements.add(new TableCellElement(rowIndex, rowIndex + deviceCount, 3, 3,
+                    new String[] {Optional.ofNullable(detail.getComponentName()).orElse("本体")}, TableCellElement.TYPE_TEXT_STRING, (short)10,
+                    20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
+            }
+            deviceIndex++;
+            if (deviceIndex == deviceList.size()){
+                deviceIndex = 0;
+            }
             // 点位类别
             elements.add(new TableCellElement(rowIndex, rowIndex + mergeCount, 5, 5,
-                new String[] {Optional.ofNullable(detail.getMeteTypeName()).orElse("")},
-                TableCellElement.TYPE_TEXT_STRING, (short)10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex)
-                .setBold(bold));
-            // 重要等级确认
-            elements.add(new TableCellElement(rowIndex, rowIndex + mergeCount, 6, 6,
+                new String[] {Optional.ofNullable(detail.getMeteTypeName()).orElse("")}, TableCellElement.TYPE_TEXT_STRING, (short)10, 20,
+                -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
 
-                new String[] {Optional.ofNullable(detail.getRedundantTypeName()).orElse("")},
+            // 识别结果
+            elements.add(new TableCellElement(rowIndex, rowIndex, 7, 7,
+                new String[] {Optional.of(detail.getInstanceName() + ":" + detail.getResultDesc()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short)10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex)
                 .setBold(bold));
-            // 识别结果
-            elements.add(
-                new TableCellElement(rowIndex, rowIndex, 7, 7, new String[] {Optional.ofNullable(detail.getResultDesc()).orElse("")},
-                    TableCellElement.TYPE_TEXT_STRING, (short)10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex)
-                    .setBold(bold));
             // 人工远程复核结果
-            elements.add(
-                new TableCellElement(rowIndex, rowIndex, 8, 8, new String[] {Optional.ofNullable(detail.getPersonCheck()).orElse("")},
-                    TableCellElement.TYPE_TEXT_STRING, (short)10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex)
-                    .setBold(bold));
+            elements.add(new TableCellElement(rowIndex, rowIndex, 8, 8,
+                new String[] {Optional.of(detail.getInstanceName() + ":" + detail.getPersonCheck()).orElse("")},
+                TableCellElement.TYPE_TEXT_STRING, (short)10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex)
+                .setBold(bold));
             // 告警等级
             elements.add(new TableCellElement(rowIndex, rowIndex, 9, 9,
                 new String[] {Optional.ofNullable(detail.getAlarmLevelName()).orElse("")},
@@ -372,21 +397,37 @@ public class SIReportDataModel {
                 new String[] {Optional.ofNullable(detail.getTaskVO().getReviewer()).orElse("")}, TableCellElement.TYPE_TEXT_STRING,
                 (short)10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
 
+            //点位 照片 一一对应
+            Map<String, List<TCruiseDataResultDetail>> cruiseMap = deviceList.stream().collect(Collectors.groupingBy(TCruiseDataResultDetail::getCruiseName));
+            List<TCruiseDataResultDetail> cruiseList = cruiseMap.get(detail.getCruiseName());
+            //合并小于5列单独设置行高 用于正常显示图片
+            int cellHeight = 20;
+            if (cruiseList.size() < 5) {
+                cellHeight = 100 / cruiseList.size();
+            }
             // 识别时间
             elements.add(new TableCellElement(rowIndex, rowIndex, 11, 11,
-                new String[] {Optional.ofNullable(dataFormat(detail.getCruiseTime())).orElse("")}, TableCellElement.TYPE_TEXT_STRING,
-                (short)10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
-            // 数据来源
-            elements.add(
-                new TableCellElement(rowIndex, rowIndex, 12, 12, new String[] {Optional.ofNullable(detail.getDataType()).orElse("")},
-                    TableCellElement.TYPE_TEXT_STRING, (short)10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex)
-                    .setBold(bold));
-            // 巡视照片
-            String file = StringUtils.isEmpty(detail.getPicPath()) ? "" : detail.getPicPath();
-            String oriFile = downResultPic ? detail.getPicPath() : detail.getOriImg();
-            oriFile = CommonUtils.isEmptyOrNullstr(oriFile) ? "" : oriFile;
-            elements.add(new TableCellElement(rowIndex, rowIndex, 13, 13, new String[] {FileUtil.picCompression(file), oriFile},
-                TableCellElement.TYPE_PICTURE));
+                new String[] {Optional.of(dataFormat(detail.getCruiseTime())).orElse("")}, TableCellElement.TYPE_TEXT_STRING,
+                (short)10, cellHeight, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
+            if (cruiseIndex == 0) {
+                // 点位
+                int cruiseCount = cruiseList.size() - 1;
+                elements.add(new TableCellElement(rowIndex, rowIndex + cruiseCount, 4, 4,
+                    new String[] {Optional.ofNullable(detail.getCruiseName()).orElse("")}, TableCellElement.TYPE_TEXT_STRING, (short)10,
+                    cellHeight, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
+                // 巡视照片
+                String file = StringUtils.isEmpty(detail.getPicPath()) ? "" : detail.getPicPath();
+                String oriFile = downResultPic ? detail.getPicPath() : detail.getOriImg();
+                oriFile = CommonUtils.isEmptyOrNullstr(oriFile) ? "" : oriFile;
+                elements.add(
+                    new TableCellElement(rowIndex, rowIndex + cruiseCount, 13, 13, new String[] {FileUtil.picCompression(file), oriFile},
+                        TableCellElement.TYPE_PICTURE));
+            }
+            cruiseIndex++;
+            if (cruiseIndex == cruiseList.size()){
+                cruiseIndex = 0;
+            }
+
             index = index - mergeCount;
             rowIndex++;
             rowCount++;
