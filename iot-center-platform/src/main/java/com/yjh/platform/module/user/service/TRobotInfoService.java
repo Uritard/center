@@ -404,7 +404,7 @@ public class TRobotInfoService{
             }
             robotInspectionTree.put("infoType", "tree");
             robotInspectionTree.put("id", "-1");
-            if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(robotList)) {
+            if (CollectionUtils.isNotEmpty(robotList)) {
                 robotList.forEach(o -> {
                     o.put("children",multimap.get((Long)o.get("id")));
                 });
@@ -702,7 +702,7 @@ public class TRobotInfoService{
             }
             //根据输入的名称
             if (infoType.equals(areaInfo.getInfoType())) {
-                if (org.apache.commons.lang3.StringUtils.isNotEmpty(name) && !areaInfo.getLabel().contains(name)) {
+                if (StringUtils.isNotEmpty(name) && !areaInfo.getLabel().contains(name)) {
                     it.remove();
                 }
             }
@@ -720,32 +720,33 @@ public class TRobotInfoService{
             return null;
         }
         String chargingAreaStr = tRobotInfo.getChargingArea();
-        if (StringUtils.isBlank(chargingAreaStr)) {
-            return null;
+        double minX = 0, minY = 0, width = 0, height = 0;
+        if (StringUtils.isNotBlank(chargingAreaStr)) {
+            String[] split = chargingAreaStr.split(",");
+            List<Double> xList = new ArrayList<>();
+            List<Double> yList = new ArrayList<>();
+
+            for (int i = 0; i < split.length; i+=3) {
+                double x = Double.parseDouble(split[i]);
+                double y = Double.parseDouble(split[i + 1]);
+
+                xList.add(x);
+                yList.add(y);
+            }
+
+            // 找最小 x 和 y
+            minX = Collections.min(xList);
+            minY = Collections.min(yList);
+
+            // 找最大 x 和 y
+            double maxX = Collections.max(xList);
+            double maxY = Collections.max(yList);
+
+            // 计算宽高
+            width = maxX - minX;
+            height = maxY - minY;
         }
-        String[] split = chargingAreaStr.split(",");
-        List<Double> xList = new ArrayList<>();
-        List<Double> yList = new ArrayList<>();
 
-        for (int i = 0; i < split.length; i+=3) {
-            double x = Double.parseDouble(split[i]);
-            double y = Double.parseDouble(split[i + 1]);
-
-            xList.add(x);
-            yList.add(y);
-        }
-
-        // 找最小 x 和 y
-        double minX = Collections.min(xList);
-        double minY = Collections.min(yList);
-
-        // 找最大 x 和 y
-        double maxX = Collections.max(xList);
-        double maxY = Collections.max(yList);
-
-        // 计算宽高
-        double width = maxX - minX;
-        double height = maxY - minY;
         TRobotChargingAreaInfo tRobotChargingAreaInfo = new TRobotChargingAreaInfo();
         tRobotChargingAreaInfo.setX(minX);
         tRobotChargingAreaInfo.setY(minY);
