@@ -235,10 +235,11 @@ public class ReportHelper {
             }
 
             int rowIndex = element.getRowStart();
+            int rowEnd = element.getRowEnd();
             int colStart = element.getColumnStart();
             int cellType = element.getType();
             boolean crossColumn = colStart != element.getColumnEnd();
-            boolean crossRow = rowIndex != element.getRowEnd();
+            boolean crossRow = rowIndex != rowEnd;
             Row row = sheet.getRow(rowIndex);
             if (isEmptyRow(row)){
                 row = sheet.createRow(rowIndex);
@@ -254,7 +255,14 @@ public class ReportHelper {
                 Constant.sendProcess(taskName, userId, 1, step);
                 logger.info("正在生成excel, taskId: {}, row: {}, progress: {}", taskId, prog, step);
             }
-
+            // 合并单元格
+            if (crossColumn || crossRow) {
+                mergeCell(sheet, rowIndex, rowEnd, colStart, element.getColumnEnd());
+            }
+            final int cellHeight = element.getCellHeight();
+            if (cellHeight > 0) {
+                row.setHeightInPoints(cellHeight);
+            }
             Cell cell = row.getCell(colStart);
             if (cellType == TableCellElement.TYPE_TEXT_STRING ||
                     cellType == TableCellElement.TYPE_NUMBER_STRING) {
@@ -342,10 +350,13 @@ public class ReportHelper {
                             ANCHOR_DX1, ANCHOR_DY1,
                             ANCHOR_DX2, ANCHOR_DY2,
                             colStart, rowIndex,
-                            colStart, rowIndex);
+                            colStart, rowEnd);
                     clientAnchor.setAnchorType(ClientAnchor.AnchorType.MOVE_DONT_RESIZE);
                     patriarch.createPicture(clientAnchor, pictureIdx);
-                    row.setHeightInPoints(ROW_HEIGHT);
+                    //合并后的行高使用cellHeight
+                    if (!crossRow) {
+                        row.setHeightInPoints(ROW_HEIGHT);
+                    }
                     if (!imageColumnWidthSet[colStart]) {
                         sheet.setColumnWidth(colStart, COLUMN_WIDTH);
                         imageColumnWidthSet[colStart] = true;
@@ -365,14 +376,6 @@ public class ReportHelper {
                 } catch (Exception e) {
                     logger.info("createDocument, error to insert img.", e);
                 }
-            }
-            if (crossColumn || crossRow) {
-                mergeCell(sheet, rowIndex, element.getRowEnd(), colStart, element.getColumnEnd());
-            }
-
-            final int cellHeight = element.getCellHeight();
-            if (cellHeight > 0) {
-                row.setHeightInPoints(cellHeight);
             }
         }
 

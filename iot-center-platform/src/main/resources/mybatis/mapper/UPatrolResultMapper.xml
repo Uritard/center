@@ -1253,6 +1253,8 @@
         b.device_mete_id,
         f.instance_id,
         f.instance_name,
+        f.cruise_id,
+        f.cruise_name,
         b.mete_type,
         f.evaluation_state,
         f.result_num,
@@ -1285,6 +1287,7 @@
         conf.db_value as dbValue,
         conf.f_value as fValue,
         b.redundant_type,
+        (case when b.redundant_type = 1 then 'Ⅰ类'  when b.redundant_type =2 then 'Ⅱ类' else 'Ⅲ类' end) as redundantTypeName,
         a.up_region_id as regionId,
         a.up_region_name as intervalName,
         m.region_name as regionName,
@@ -1300,7 +1303,7 @@
         LEFT JOIN t_voice_config conf on voice.config_id = conf.config_id
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and f.task_id = #{taskId, jdbcType=VARCHAR}</if>
-        ORDER by cruise_time
+        ORDER by m.region_name ,a.up_region_id ,f.device_id ,f.cruise_id ,b.mete_type , f.cruise_time
     </select>
 
     <select id="selectMeteNumByTask" resultType="java.lang.Integer">

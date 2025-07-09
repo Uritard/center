@@ -26,6 +26,10 @@ public class CalibrationParams extends CalibrationBaseParams{
      */
     private int dialInt;
     /**
+     * 指针读法：0：单指针; 1：双指针读单; 2：双指针读小; 3：双指针读大; 4：双指针组合;
+     */
+    private int ptrStyle;
+    /**
      * 每级刻度级数的数量，这里就是一共有6个一级刻度，每两个一级之间有1个二级刻度，每两个二级刻度间有4个三级刻度；
      */
     private List<Integer> tier;

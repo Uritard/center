@@ -151,7 +151,7 @@ public class FileUtil {
      * @param path 压缩到那个路径下
      *                    此方法保留空白文件
      */
-    public static void zip(List<String> fileList, String zipFileName,String basePath,String path, String taskName, String userId)throws Exception{
+    public static void zip(Set<String> fileList, String zipFileName,String basePath,String path, String taskName, String userId)throws Exception{
         if(fileList ==null || fileList.size() ==0){
             return;
         }

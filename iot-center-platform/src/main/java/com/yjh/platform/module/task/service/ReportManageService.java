@@ -5,6 +5,7 @@ import cn.hutool.cache.CacheUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.net.URLEncodeUtil;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
@@ -219,11 +220,11 @@ public class ReportManageService {
         try {
             // 明细
             List<TCruiseDataResultDetail> cruiseDataResultDetailList =  uPatrolResultDao.selectTaskResult(taskId);
-            DictConvertUtil.optional("alarmLevel").add("alarmRuleType").add("meteType").add("redundantType").covertToDict(cruiseDataResultDetailList);
+            DictConvertUtil.optional("alarmLevel").add("alarmRuleType").add("meteType").covertToDict(cruiseDataResultDetailList);
             // 更新任务进度
             REPORT_CACHE.put(taskId, 15);
             log.info("查询任务结果完成，{}", taskId);
-            List<String>  originalImgList = new ArrayList<>();
+            Set<String>  originalImgList = Sets.newHashSet();
             boolean downResultPic = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:downResultPic", "content"));
             Map<KeyValue<Long, String>, List<TCruiseDataResultDetail>> listMap = cruiseDataGroup(cruiseDataResultDetailList, originalImgList, downResultPic);
             REPORT_CACHE.put(taskId, 18);
@@ -532,7 +533,7 @@ public class ReportManageService {
     }
 
     private Map<KeyValue<Long, String>, List<TCruiseDataResultDetail>> cruiseDataGroup(
-        List<TCruiseDataResultDetail> tCruiseDataResultDetailList, List<String> originalImgList, boolean downResultPic) {
+        List<TCruiseDataResultDetail> tCruiseDataResultDetailList, Set<String> originalImgList, boolean downResultPic) {
         Map<Long, KeyValue<Long, String>> stationDownMap = stdRegionService.stationDownId();
         Map<KeyValue<Long, String>, List<TCruiseDataResultDetail>> listMap = new TreeMap<>(Comparator.comparing(KeyValue::getKey));
 
