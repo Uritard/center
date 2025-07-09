@@ -3,6 +3,7 @@ package com.yjh.accessrobot.netty.handler;
 import com.google.common.collect.Maps;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.CommonUtils;
+import com.yjh.accessrobot.common.utils.CoordinateUtil;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
@@ -109,7 +110,8 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
             StringBuilder stringBuilderPixel = new StringBuilder();
             StringBuilder stringBuilderGeography = new StringBuilder();
             xmlBaseModel.getItems().forEach(item -> {
-                stringBuilderPixel.append((item.get("coordinate_pixel"))).append(";");
+                stringBuilderPixel.append(CoordinateUtil.actualToPixel(robotCode, String.valueOf(item.get("coordinate_pixel"))))
+                    .append(";");
                 stringBuilderGeography.append((item.get("coordinate_geography"))).append(";");
             });
             robotRoadMap.put("coordinatePixel", stringBuilderPixel.toString());
