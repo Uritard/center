@@ -42,6 +42,7 @@ import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -1488,10 +1489,10 @@ public class RobotService {
      * @param str        点位id
      */
     private void packageXMLBaseModel(RobotTaskInstanceInfo item, String uniqueFlag, String taskId, Set<String> str) {
-        // 简易机器人只支持 102任务
-        TRobotInfo robotInfo = tRobotInfoDao.selectRobotInfoByCode(uniqueFlag);
-        if (905 == robotInfo.getRobotType()){
-            item.setUnionTaskStatus("1");
+        // 判断简易机器人是否下发102任务，简易支持立即任务下发102
+        String unionFlag = simpleRobotTask(item, uniqueFlag);
+        if (StringUtils.isNotEmpty(unionFlag)) {
+            item.setUnionTaskStatus(unionFlag);
         }
         Map<String, Object> resMap = packageItem(str, item, taskId);
         String code = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
@@ -1522,6 +1523,28 @@ public class RobotService {
             //通道为空 设置为离线
             this.updateRobotInfo(uniqueFlag, "离线");
         }
+    }
+
+    /**
+     * 判断简易机器人是否立即任务下发102
+     * @return 1 下发 102 任务，空则不变
+     */
+    private String simpleRobotTask(RobotTaskInstanceInfo item, String uniqueFlag) {
+        // 简易机器人是否使用联合任务开关
+        boolean simpleUseUnion = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:simpleUseUnion", "content"));
+        if (!simpleUseUnion) {
+            return StringUtils.EMPTY;
+        }
+        Date date = DateTimeUtil.parse(item.getFixedStartTime());
+        // 任务执行时间和当前时间相差在3分钟内认为是立即执行任务
+        boolean isNow = Math.abs(date.getTime() - System.currentTimeMillis()) < 3 * 60 * 1000;
+        // 简易机器人支持立即 102任务
+        TRobotInfo robotInfo = tRobotInfoDao.selectRobotInfoByCode(uniqueFlag);
+        // 如果是简易机器人，且是立即任务，下发102任务，此处开关必定打开
+        if (905 == robotInfo.getRobotType() && isNow) {
+            return "1";
+        }
+        return StringUtils.EMPTY;
     }
 
     /**
