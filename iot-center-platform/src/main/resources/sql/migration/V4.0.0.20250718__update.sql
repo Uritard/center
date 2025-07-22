@@ -1,0 +1,2 @@
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`)
+VALUES ('404', 'simpleUseUnion', '使用联动任务下发立即任务', 'false', '对于简易机器人，是否使用联动任务来下发立即任务，兼容老的逻辑，旧版本机器人不支持101只支持102', '{"rule":"^(true|false)$", "msg":"只能填 true 或 false"}');

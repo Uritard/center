@@ -61,15 +61,25 @@ public class CoordinateUtil {
     public void loadMapInfo(String robotCode) {
         try {
             TRobotInfo robotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
-            if (Objects.isNull(robotInfo)) return;
+            if (Objects.isNull(robotInfo)) {
+                return;
+            }
             Integer robotType = robotInfo.getRobotType();
-            if (ObjectUtils.notEqual(robotType, 905)) return;
+            if (ObjectUtils.notEqual(robotType, 905)) {
+                return;
+            }
             String mapPath = robotInfo.getPhotePath();
-            if (StringUtils.isEmpty(mapPath)) throw new BusinessException("地图存储路径为空!");
+            if (StringUtils.isEmpty(mapPath)) {
+                log.warn("{} 地图存储路径为空!", robotCode);
+                return;
+            }
             String simpleModelPath = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:simpleModelPath").get("content"));
             mapPath = mapPath.replace(Constant.SIMPLE_MODEL_REAL_PATH, simpleModelPath);
             Path mapFullPath = Paths.get(mapPath);
-            if (Files.notExists(mapFullPath)) throw new BusinessException("地图文件不存在!");
+            if (Files.notExists(mapFullPath)) {
+                log.warn("{} 地图文件不存在!", robotCode);
+                return;
+            }
             MapInfo mapInfo = new MapInfo();
             int width, height;
             if (mapPath.endsWith(SVG_SUFFIX)) {
@@ -84,28 +94,34 @@ public class CoordinateUtil {
                 double proportion = Double.parseDouble(robotLocArray[0]);
                 double left = Double.parseDouble(robotLocArray[1]);
                 double bottom = Double.parseDouble(robotLocArray[2]);
-                mapInfo.setRobotType(robotType).setMapPath(mapPath)
-                        .setProportion(proportion)
-                        .setLeft(left)
-                        .setBottom(bottom)
-                        .setRight(width / proportion + left)
-                        .setTop(height / proportion + bottom);
+                mapInfo.setRobotType(robotType)
+                    .setMapPath(mapPath)
+                    .setProportion(proportion)
+                    .setLeft(left)
+                    .setBottom(bottom)
+                    .setRight(width / proportion + left)
+                    .setTop(height / proportion + bottom);
             } else {
                 BufferedImage imageRead = ImageIO.read(mapFullPath.toFile());
                 width = imageRead.getWidth();
                 height = imageRead.getHeight();
                 String yamlPath = FilenameUtils.removeExtension(mapPath) + ".yaml";
                 Path yamlFullPath = Paths.get(yamlPath);
-                if (Files.notExists(yamlFullPath)) throw new BusinessException("地图yaml文件不存在!");
+                if (Files.notExists(yamlFullPath)) {
+                    throw new BusinessException("地图yaml文件不存在!");
+                }
                 Map<String, Object> mapInfoData = readYamlInfo(yamlPath);
                 if (MapUtils.isNotEmpty(mapInfoData)) {
-                    mapInfo.setRobotType(robotType).setMapPath(mapPath).setYamlPath(yamlPath)
-                            .setProportion(ValueUtil.object2Double(mapInfoData.get("resolution"), null))
-                            .setTop(ValueUtil.object2Double(mapInfoData.get("top"), null))
-                            .setBottom(ValueUtil.object2Double(mapInfoData.get("bottom"), null))
-                            .setLeft(ValueUtil.object2Double(mapInfoData.get("left"), null))
-                            .setRight(ValueUtil.object2Double(mapInfoData.get("right"), null))
-                            .setHeight(height).setWidth(width);
+                    mapInfo.setRobotType(robotType)
+                        .setMapPath(mapPath)
+                        .setYamlPath(yamlPath)
+                        .setProportion(ValueUtil.object2Double(mapInfoData.get("resolution"), null))
+                        .setTop(ValueUtil.object2Double(mapInfoData.get("top"), null))
+                        .setBottom(ValueUtil.object2Double(mapInfoData.get("bottom"), null))
+                        .setLeft(ValueUtil.object2Double(mapInfoData.get("left"), null))
+                        .setRight(ValueUtil.object2Double(mapInfoData.get("right"), null))
+                        .setHeight(height)
+                        .setWidth(width);
                 }
             }
             robotInfo.setImageSize(String.format("%dx%d", width, height));

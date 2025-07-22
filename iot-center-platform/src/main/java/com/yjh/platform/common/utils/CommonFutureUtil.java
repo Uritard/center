@@ -1,6 +1,7 @@
 package com.yjh.platform.common.utils;
 
 import com.yjh.video.api.result.Result;
+import com.yjh.video.api.result.ResultCodeEnum;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -28,19 +29,19 @@ public class CommonFutureUtil {
      */
     public static <R> CompletableFuture<Result<R>> registerFuture(String messageId) {
         CompletableFuture<?> future = COMPLETABLE_FUTURE_MAP.computeIfAbsent(messageId, k -> {
-            CompletableFuture<com.yjh.video.api.result.Result<?>> f = new CompletableFuture<>();
+            CompletableFuture<Result<?>> f = new CompletableFuture<>();
             return f.exceptionally(ex -> {
                 COMPLETABLE_FUTURE_MAP.remove(messageId);
                 log.error(ex.getMessage(), ex);
                 if (ex instanceof TimeoutException) {
-                    return com.yjh.video.api.result.Result.error(com.yjh.video.api.result.ResultCodeEnum.ERROR504);
+                    return Result.error(ResultCodeEnum.ERROR505);
                 }
-                return com.yjh.video.api.result.Result.error(com.yjh.video.api.result.ResultCodeEnum.ERROR500);
+                return Result.error(ResultCodeEnum.ERROR500);
             });
         });
         // 确保我们返回的是正确的类型
-        @SuppressWarnings("unchecked") CompletableFuture<com.yjh.video.api.result.Result<R>> typedFuture =
-            (CompletableFuture<com.yjh.video.api.result.Result<R>>)future;
+        @SuppressWarnings("unchecked") CompletableFuture<Result<R>> typedFuture =
+            (CompletableFuture<Result<R>>)future;
         return typedFuture;
     }
 
