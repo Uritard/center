@@ -1,7 +1,7 @@
 package com.yjh.platform.module.patrol.service;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.file.PathUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -9,8 +9,8 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.collect.Maps;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.algorithm.AlgorithmService;
-import com.yjh.platform.common.Constant;
 import com.yjh.platform.algorithm.FtpsService;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
@@ -28,8 +28,8 @@ import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdDevicemeteService;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.*;
-import com.yjh.platform.module.patrol.entity.interlanalysis.Point;
 import com.yjh.platform.module.patrol.entity.interlanalysis.*;
+import com.yjh.platform.module.patrol.entity.interlanalysis.Point;
 import com.yjh.platform.module.patrol.service.impl.HttpAnalyticsServiceImpl;
 import com.yjh.platform.module.patrol.thread.AlgorithmAnalyseThread;
 import com.yjh.platform.module.simple.entity.AnalyseMeteTypeEnum;
@@ -44,15 +44,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -70,12 +66,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -83,7 +77,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
-import static org.bouncycastle.asn1.x509.X509ObjectIdentifiers.id;
 
 /**
  * @author 丫C
@@ -667,7 +660,7 @@ public class IntelAnalysisService {
                     String cruiseIdPrefix = StringUtils.substringBeforeLast(response.getRequestId(), "_");
                     String cruiseId = cruiseIdPrefix.replace(AnalyseMeteTypeEnum.NEW_METER.getName(), "");
                     instanceId = analyseDataOperateDao.selectInstanceIdByDevicePointIdAndCruiseId(instanceId, cruiseId);
-                    log.info("newMeter analyse : deviceMeterId: {}, cruiseId :{}", instanceId, cruiseId);
+                    log.info("newMeter analyse : instanceId: {}, cruiseId :{}", instanceId, cruiseId);
                 }
 
                 String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
@@ -705,7 +698,7 @@ public class IntelAnalysisService {
                     for (File direFile : listFiles) {
                         if (direFile.getName().contains(devicePointId)) {
                             direFile.getAbsolutePath();
-                            FileUtil.copyFileUsingStream(direFile.getAbsolutePath(), resultImagePath + direFile.getName());
+                            FileUtil.copyFile(direFile.getAbsolutePath(), resultImagePath + direFile.getName());
                             taskResult.setAnalyseResultImg(resultImagePath + direFile.getName());
                         }
                     }
@@ -1460,7 +1453,7 @@ public class IntelAnalysisService {
                     SysParamConfig.getSysContent("defectResultImg"));
                 String targetNamePath = imgPath.replace(SysParamConfig.getSysContent("defectResultImg"), "").substring(1);
                 String edgeId = SysParamConfig.getSysContent("edgeId");
-                targetNamePath = cn.hutool.core.io.FileUtil.normalize(edgeId + "/jm/" + targetNamePath);
+                targetNamePath = FileUtil.normalize(edgeId + "/jm/" + targetNamePath);
                 log.info("imgPath:{},targetNamePath:{}",imgPath,targetNamePath);
                 uploadFileToUpFtps(imgPath, targetNamePath, applicationProperties.getUpSystemFtps());
 
@@ -1543,7 +1536,10 @@ public class IntelAnalysisService {
                     targetPath = SysParamConfig.getSysContent("defectResultImg") + timePath +sourcePath;
                 }
             }
-            ftpsService.downloadAnalysisFile(sourcePath, targetPath);
+            if (FileUtil.isNotEmpty(new File(targetPath))) {
+                // 文件不存在则下载文件，存在则不再下载
+                ftpsService.downloadAnalysisFile(sourcePath, targetPath);
+            }
 //            // 图片在ftps上的全路径
 //            String resultAbsolutePath = SysParamConfig.getSysContent("ftpsFilePath") + "/" +sourcePath;
 //            FileUtil.copyFileUsingStream(resultAbsolutePath, targetPath);
