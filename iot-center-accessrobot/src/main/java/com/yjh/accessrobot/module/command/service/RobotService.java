@@ -1255,17 +1255,17 @@ public class RobotService {
         // 地图模式下发的 像素坐标转换地图坐标
         if (StringUtils.isNotEmpty(coordinatePixel) && StringUtils.isBlank(deviceListStr)) {
             String[] coordinates = coordinatePixel.split(";");
-            StringBuffer chargingArea = new StringBuffer();
+            StringBuffer maintenanceArea = new StringBuffer();
             for (int i = 0; i < coordinates.length; i++) {
                 String coordinate = coordinates[i];
                 String actualCoordinate = CoordinateUtil.pixelToActual(onlineCode, coordinate);
-                if (chargingArea.length() == 0) {
-                    chargingArea.append(actualCoordinate);
+                if (maintenanceArea.length() == 0) {
+                    maintenanceArea.append(actualCoordinate);
                 } else {
-                    chargingArea.append(";" + actualCoordinate);
+                    maintenanceArea.append(";" + actualCoordinate);
                 }
             }
-            resMap.put("coordinate_pixel", chargingArea.toString());
+            resMap.put("coordinate_pixel", maintenanceArea.toString());
         }
         itemList.add(resMap);
         XMLBaseModel xmlBaseModel =
@@ -3586,9 +3586,14 @@ public class RobotService {
         String[] coordinates = areaCoordinates.split(",");
         StringBuffer chargingArea = new StringBuffer();
         for (int i = 0; i < coordinates.length; i+=3) {
-            String coordinate = coordinates[i] + ',' + coordinates[i+1];
+            String coordinate = coordinates[i] + ',' + coordinates[i+1] + ',' + coordinates[i+2];
             String actualCoordinate = CoordinateUtil.pixelToActual(robotInfo.getRobotCode(), coordinate);
-            chargingArea.append(actualCoordinate);
+            if (i < coordinates.length - 3) {
+                chargingArea.append(actualCoordinate);
+                chargingArea.append(",");
+            } else {
+                chargingArea.append(actualCoordinate);
+            }
         }
         String robotCode = robotInfo.getRobotCode();
         List<Map<String, Object>> itemList = new ArrayList<>();
