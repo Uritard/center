@@ -34,11 +34,10 @@ import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.RobotTaskMessage;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
-import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.feign.RobotProxy;
 import com.yjh.platform.module.patrol.dao.*;
-import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.*;
+import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.query.TaskMeteQuery;
 import com.yjh.platform.module.patrol.entity.query.TaskQuery;
 import com.yjh.platform.module.patrol.event.InspectionResultEvent;
@@ -1326,7 +1325,10 @@ public class UPatrolTaskService {
 
             List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
             if (task.getTaskType() == INITIAL_PATROL) {
-                robotCode.add(tRobotInfoDao.selectByPrimaryId(task.getRobotId()).getRobotCode());
+                TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(task.getRobotId());
+                if (Objects.nonNull(tRobotInfo)) {
+                    robotCode.add(tRobotInfo.getRobotCode());
+                }
              }
             log.info("robotCode : {}", robotCode);
             if (scheduledByLocal(task.getDateType())) {
@@ -2073,14 +2075,10 @@ public class UPatrolTaskService {
         }
         uPatrolResult.setTaskState(TASK_STATE_PAUSE);
         try {
-            //TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
-
-            //Thread.sleep(10000);
             updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_PAUSE));
 
             // 机器人任务暂停，包括机器人和下级系统
-            List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
-            robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+            List<String> robotCodeList = selectRobotCodeList(uPatrolResult);
             log.info("===Robot task pause,robotCodeList:{}", robotCodeList);
             if (CollectionUtils.isNotEmpty(robotCodeList)) {
                 Map<String, Object> robotTaskStatesMap = new HashMap<>(6);
@@ -2153,8 +2151,7 @@ public class UPatrolTaskService {
 
         try {
             //机器人任务继续
-            List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
-            robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+            List<String> robotCodeList = selectRobotCodeList(uPatrolResult);
             log.info("机器人任务继续,robotCodeList:{}", robotCodeList);
             if (CollectionUtils.isNotEmpty(robotCodeList)) {
                 Map<String, Object> robotTaskStatesMap = new HashMap<>();
@@ -2200,10 +2197,8 @@ public class UPatrolTaskService {
             log.warn("任务已经结束，不可重复终止！taskState: {}", uPatrolResult.getTaskState());
             return;
         }
-
+        List<String> robotCodeList = selectRobotCodeList(uPatrolResult);
         // 下级任务终止
-        List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
-        robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
         log.info("下级任务终止,robotCodeList:{}", robotCodeList);
         if (CollectionUtils.isNotEmpty(robotCodeList)) {
             Map<String, Object> robotTaskStatesMap = new HashMap<>();
@@ -2796,8 +2791,8 @@ public class UPatrolTaskService {
                 uPatrolDataResult.setResultNum(redisInfoMap.get("resultNum"));
                 //判断任务状态是否为终止状态 如果是:设置巡视结果为任务的异常原因
                 if ((TASK_STATE_INTERRUPT==taskStatus) && (MapUtils.getIntValue(redisInfoMap, "cruiseResult") == (CRUISE_RESULT_ABNORMAL))) {
-                    //设置巡视值
-                    uPatrolDataResult.setResultDesc(description);
+                    //设置巡视值。如果description不存在则取desc
+                    uPatrolDataResult.setResultDesc(StringUtils.defaultIfBlank(description, redisInfoMap.get("resultDesc")));
                 }else {
                     uPatrolDataResult.setResultDesc(redisInfoMap.get("resultDesc"));
                 }
@@ -2985,6 +2980,24 @@ public class UPatrolTaskService {
      */
     public TRobotInfo selectRobotInfoByCode(String robotCode){
         return tRobotInfoDao.selectByRobotCode(robotCode);
+    }
+
+    /**
+     * 根据任务信息获取任务相关的机器人编码
+     * @param uPatrolResult 任务信息
+     * @return 机器人编码列表
+     */
+    public List<String> selectRobotCodeList(UPatrolResult uPatrolResult) {
+        List<String> robotCodeList = new ArrayList<>();
+        if (uPatrolResult.getTaskType() == INITIAL_PATROL) {
+            // 简易机器人初始任务与其他任务不同，直接获取任务相关机器人ID
+            robotCodeList.add(
+                Optional.ofNullable(tRobotInfoDao.selectByPrimaryId(uPatrolResult.getRobotId())).map(TRobotInfo::getRobotCode).orElse(""));
+        } else {
+            robotCodeList = uPatrolTaskDao.selectRobotIsRunning(uPatrolResult.getTaskId());
+        }
+
+        return robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class)

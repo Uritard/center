@@ -357,12 +357,16 @@ public class SimplePointServiceImpl implements SimplePointService {
         if (resMete > 0) {
             List<TCruisePointInstance> cruisePointInstanceList = new ArrayList<>(resMete);
             for (int i = 0; i < deviceMeteList.size(); i++) {
+                TStdDeviceMete mete = deviceMeteList.get(i);
                 TCruisePointInstance cruisePointInstance = new TCruisePointInstance();
-                cruisePointInstance.setDeviceMeteId(deviceMeteList.get(i).getDeviceMeteId())
-                    .setDeviceId(deviceMeteList.get(i).getDeviceId()).setCruiseId(robotInspection.getInspectionId())
-                    .setCruiseName(robotInspection.getInspectionName()).setCruiseType(CruiseConstant.TypeEnum.ROBOT.getCode());
+                cruisePointInstance.setDeviceMeteId(mete.getDeviceMeteId())
+                    .setCustomId(mete.getCustomId())
+                    .setDeviceId(mete.getDeviceId())
+                    .setCruiseId(robotInspection.getInspectionId())
+                    .setCruiseName(robotInspection.getInspectionName())
+                    .setCruiseType(CruiseConstant.TypeEnum.ROBOT.getCode());
                 cruisePointInstanceList.add(cruisePointInstance);
-                deviceConfigList.get(i).setDevUuid(String.valueOf(deviceMeteList.get(i).getDeviceMeteId()));
+                deviceConfigList.get(i).setDevUuid(StrUtil.toStringOrNull(mete.getDeviceMeteId()));
                 if (deviceConfigList.get(i).getDevType().equals(AnalyseMeteTypeEnum.NEW_SX_BJ.getName())) {
                     if (CollectionUtils.isEmpty(deviceConfigList.get(i).getParams())) {
                         throw new BusinessException(deviceConfigList.get(i).getDevName() + "的标定参数不能为空！");
