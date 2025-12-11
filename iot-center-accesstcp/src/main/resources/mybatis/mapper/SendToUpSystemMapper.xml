@@ -679,6 +679,8 @@
                 -- 遥信 (tele-signal): requires alarm_level
                 (b.mete_kind = 1 AND b.alarm_level IS NOT NULL)
                 -- 遥测 (telemetry): requires at least one alarm rule (high/low limit)
+                -- Note: Only checks for NOT NULL, not for meaningful values (e.g., non-zero).
+                -- This is intentional to match existing business logic for alarm rules.
                 OR (b.mete_kind = 2 AND (
                     b.high_limit2 IS NOT NULL OR b.low_limit2 IS NOT NULL 
                     OR b.high_limit3 IS NOT NULL OR b.low_limit3 IS NOT NULL 

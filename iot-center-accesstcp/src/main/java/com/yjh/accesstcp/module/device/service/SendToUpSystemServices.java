@@ -94,7 +94,11 @@ public class SendToUpSystemServices {
     private static final String TASK_PRIORITY_REDIS_KEY="task_priority_config:";
     
     /**
-     * Initial capacity for alarm map - includes all standard fields plus alarm_level
+     * Initial capacity for alarm map
+     * Base map contains 10 fields, with room for 1 additional field (alarm_level for 遥信 points)
+     * Fields: device_id, device_name, defect_type, station_code, station_name,
+     *         decide_rule, decision_value_class, alarm_desc, alarm_type, base_line_value
+     * Optional: alarm_level (added for 遥信 points)
      */
     private static final int ALARM_MAP_INITIAL_CAPACITY = 11;
     
