@@ -97,6 +97,18 @@ public class SendToUpSystemServices {
      * Initial capacity for alarm map - includes all standard fields plus alarm_level
      */
     private static final int ALARM_MAP_INITIAL_CAPACITY = 11;
+    
+    /**
+     * Alarm level constants for 遥信 (tele-signal) points
+     * Values above this threshold indicate a configured alarm level
+     */
+    private static final int ALARM_LEVEL_THRESHOLD = 130;
+    
+    /**
+     * Alarm level code mappings: 131=一般(normal), 132=严重(serious), 133=危急(critical)
+     */
+    private static final int ALARM_LEVEL_NORMAL_CODE = 131;
+    private static final int ALARM_LEVEL_SERIOUS_CODE = 132;
 
     public static final String DAY_FORMAT = ",'%Y-%m-%d')";
     public static final String WEEK_FORMAT = " ,'%u') + 1";
@@ -517,8 +529,8 @@ public class SendToUpSystemServices {
             String alarmType = recognitionTypeToAlarmType(t.getRecognitionType(), String.valueOf(t.getIsTemdif()));
             String alarmDesc = "";
             //遥信 (tele-signal) - requires alarm_level and includes it in output
-            if (t.getMeteKind() == 1 && t.getAlarmLevel() != null && t.getAlarmLevel() > 130) {
-                int alarmLevel = t.getAlarmLevel() == 131 ? 1 : t.getAlarmLevel() == 132 ? 2 : 3;
+            if (t.getMeteKind() == 1 && t.getAlarmLevel() != null && t.getAlarmLevel() > ALARM_LEVEL_THRESHOLD) {
+                int alarmLevel = t.getAlarmLevel() == ALARM_LEVEL_NORMAL_CODE ? 1 : t.getAlarmLevel() == ALARM_LEVEL_SERIOUS_CODE ? 2 : 3;
                 String alarmState = t.getAlarmState() == 0 ? t.getStateZero() : t.getStateOne();
                 alarmDesc = "告警级别：" + getAlarmLevel(alarmLevel) + ";告警状态：" + alarmState;
                 Map<String, Object> item = getAlarmMapWithLevel(t, 1, alarmState, alarmLevel, alarmDesc, alarmType);
