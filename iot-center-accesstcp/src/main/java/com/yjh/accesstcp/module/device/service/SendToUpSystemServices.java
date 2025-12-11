@@ -92,6 +92,11 @@ public class SendToUpSystemServices {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static final String TASK_PRIORITY_REDIS_KEY="task_priority_config:";
+    
+    /**
+     * Initial capacity for alarm map - includes all standard fields plus alarm_level
+     */
+    private static final int ALARM_MAP_INITIAL_CAPACITY = 11;
 
     public static final String DAY_FORMAT = ",'%Y-%m-%d')";
     public static final String WEEK_FORMAT = " ,'%u') + 1";
@@ -606,21 +611,7 @@ public class SendToUpSystemServices {
 
     public Map<String, Object> getAlarmMap(TCruisePointInstanceMeteDetail detail, Integer rule,
                                            Object value, Integer level, String alarmDesc, String alarmType) {
-        Map<String, Object> item = new HashMap<>(11);
-        if (Constant.standardPoints()){
-            item.put("device_id", detail.getDevicePointId());
-        } else {
-            item.put("device_id", detail.getInstanceId());
-        }
-        item.put("device_name", detail.getMeteName());
-        item.put("defect_type", "");
-        item.put("station_code", Constant.stationCode());
-        item.put("station_name", Constant.stationName());
-        item.put("decide_rule", rule);
-        item.put("decision_value_class", 1);
-        item.put("alarm_desc", alarmDesc);
-        item.put("alarm_type", alarmType);
-        item.put("base_line_value", value);
+        Map<String, Object> item = buildBaseAlarmMap(detail, rule, value, alarmDesc, alarmType);
         item.put("alarm_level", level);
         return item;
     }
@@ -649,7 +640,7 @@ public class SendToUpSystemServices {
      */
     private Map<String, Object> buildBaseAlarmMap(TCruisePointInstanceMeteDetail detail, Integer rule,
                                                    Object value, String alarmDesc, String alarmType) {
-        Map<String, Object> item = new HashMap<>(11);
+        Map<String, Object> item = new HashMap<>(ALARM_MAP_INITIAL_CAPACITY);
         if (Constant.standardPoints()){
             item.put("device_id", detail.getDevicePointId());
         } else {
