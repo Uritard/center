@@ -609,11 +609,14 @@ public class SendToUpSystemServices {
         return alarmType;
     }
 
+    /**
+     * @deprecated Use {@link #getAlarmMapWithLevel(TCruisePointInstanceMeteDetail, Integer, Object, Integer, String, String)} instead.
+     * This method is kept for backward compatibility.
+     */
+    @Deprecated
     public Map<String, Object> getAlarmMap(TCruisePointInstanceMeteDetail detail, Integer rule,
                                            Object value, Integer level, String alarmDesc, String alarmType) {
-        Map<String, Object> item = buildBaseAlarmMap(detail, rule, value, alarmDesc, alarmType);
-        item.put("alarm_level", level);
-        return item;
+        return getAlarmMapWithLevel(detail, rule, value, level, alarmDesc, alarmType);
     }
 
     /**
