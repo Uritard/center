@@ -630,6 +630,25 @@ public class SendToUpSystemServices {
      */
     public Map<String, Object> getAlarmMapWithLevel(TCruisePointInstanceMeteDetail detail, Integer rule,
                                            Object value, Integer level, String alarmDesc, String alarmType) {
+        Map<String, Object> item = buildBaseAlarmMap(detail, rule, value, alarmDesc, alarmType);
+        item.put("alarm_level", level);
+        return item;
+    }
+
+    /**
+     * Create alarm map WITHOUT alarm_level field for 遥测 (telemetry) points
+     */
+    public Map<String, Object> getAlarmMapWithoutLevel(TCruisePointInstanceMeteDetail detail, Integer rule,
+                                                     Object value, String alarmDesc, String alarmType) {
+        // Note: alarm_level is intentionally NOT included for telemetry points
+        return buildBaseAlarmMap(detail, rule, value, alarmDesc, alarmType);
+    }
+
+    /**
+     * Build base alarm map with common fields
+     */
+    private Map<String, Object> buildBaseAlarmMap(TCruisePointInstanceMeteDetail detail, Integer rule,
+                                                   Object value, String alarmDesc, String alarmType) {
         Map<String, Object> item = new HashMap<>(11);
         if (Constant.standardPoints()){
             item.put("device_id", detail.getDevicePointId());
@@ -645,31 +664,6 @@ public class SendToUpSystemServices {
         item.put("alarm_desc", alarmDesc);
         item.put("alarm_type", alarmType);
         item.put("base_line_value", value);
-        item.put("alarm_level", level);
-        return item;
-    }
-
-    /**
-     * Create alarm map WITHOUT alarm_level field for 遥测 (telemetry) points
-     */
-    public Map<String, Object> getAlarmMapWithoutLevel(TCruisePointInstanceMeteDetail detail, Integer rule,
-                                                     Object value, String alarmDesc, String alarmType) {
-        Map<String, Object> item = new HashMap<>(10);
-        if (Constant.standardPoints()){
-            item.put("device_id", detail.getDevicePointId());
-        } else {
-            item.put("device_id", detail.getInstanceId());
-        }
-        item.put("device_name", detail.getMeteName());
-        item.put("defect_type", "");
-        item.put("station_code", Constant.stationCode());
-        item.put("station_name", Constant.stationName());
-        item.put("decide_rule", rule);
-        item.put("decision_value_class", 1);
-        item.put("alarm_desc", alarmDesc);
-        item.put("alarm_type", alarmType);
-        item.put("base_line_value", value);
-        // Note: alarm_level is intentionally NOT included for telemetry points
         return item;
     }
 

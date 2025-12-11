@@ -676,8 +676,14 @@
         WHERE
             b.mete_kind != '' AND b.mete_kind IS NOT NULL
             AND (
+                -- 遥信 (tele-signal): requires alarm_level
                 (b.mete_kind = 1 AND b.alarm_level IS NOT NULL)
-                OR (b.mete_kind = 2 AND (b.high_limit2 IS NOT NULL OR b.low_limit2 IS NOT NULL OR b.high_limit3 IS NOT NULL OR b.low_limit3 IS NOT NULL OR b.high_limit4 IS NOT NULL OR b.low_limit4 IS NOT NULL))
+                -- 遥测 (telemetry): requires at least one alarm rule (high/low limit)
+                OR (b.mete_kind = 2 AND (
+                    b.high_limit2 IS NOT NULL OR b.low_limit2 IS NOT NULL 
+                    OR b.high_limit3 IS NOT NULL OR b.low_limit3 IS NOT NULL 
+                    OR b.high_limit4 IS NOT NULL OR b.low_limit4 IS NOT NULL
+                ))
             )
     </select>
 
