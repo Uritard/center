@@ -511,44 +511,44 @@ public class SendToUpSystemServices {
         meteDetails.forEach(t->{
             String alarmType = recognitionTypeToAlarmType(t.getRecognitionType(), String.valueOf(t.getIsTemdif()));
             String alarmDesc = "";
-            //遥信
-            if (t.getMeteKind() == 1 && t.getAlarmLevel() > 130) {
+            //遥信 (tele-signal) - requires alarm_level and includes it in output
+            if (t.getMeteKind() == 1 && t.getAlarmLevel() != null && t.getAlarmLevel() > 130) {
                 int alarmLevel = t.getAlarmLevel() == 131 ? 1 : t.getAlarmLevel() == 132 ? 2 : 3;
                 String alarmState = t.getAlarmState() == 0 ? t.getStateZero() : t.getStateOne();
                 alarmDesc = "告警级别：" + getAlarmLevel(alarmLevel) + ";告警状态：" + alarmState;
-                Map<String, Object> item = getAlarmMap(t, 1, alarmState, alarmLevel, alarmDesc, alarmType);
+                Map<String, Object> item = getAlarmMapWithLevel(t, 1, alarmState, alarmLevel, alarmDesc, alarmType);
                 list.add(item);
             }
-            //遥测
+            //遥测 (telemetry) - does NOT require alarm_level and does NOT include it in output
             if (t.getMeteKind() == 2) {
                 if (t.getHighLimit2() != null) {
-                    alarmDesc =  "告警级别：" + getAlarmLevel(1) + ";告警上限：" + t.getHighLimit2();
-                    Map<String, Object> itemHigh = getAlarmMap(t, 6, t.getHighLimit2(), 1, alarmDesc, alarmType);
+                    alarmDesc =  "告警上限：" + t.getHighLimit2();
+                    Map<String, Object> itemHigh = getAlarmMapWithoutLevel(t, 6, t.getHighLimit2(), alarmDesc, alarmType);
                     list.add(itemHigh);
                 }
                 if (t.getLowLimit2() != null) {
-                    alarmDesc =  "告警级别：" + getAlarmLevel(1) + ";告警下限：" + t.getLowLimit2();
-                    Map<String, Object> itemLow = getAlarmMap(t, 7, t.getLowLimit2(), 1, alarmDesc, alarmType);
+                    alarmDesc =  "告警下限：" + t.getLowLimit2();
+                    Map<String, Object> itemLow = getAlarmMapWithoutLevel(t, 7, t.getLowLimit2(), alarmDesc, alarmType);
                     list.add(itemLow);
                 }
                 if (t.getHighLimit3() != null) {
-                    alarmDesc =  "告警级别：" + getAlarmLevel(2) + ";告警上限：" + t.getHighLimit3();
-                    Map<String, Object> itemHigh = getAlarmMap(t, 6, t.getHighLimit3(), 2, alarmDesc, alarmType);
+                    alarmDesc =  "告警上限：" + t.getHighLimit3();
+                    Map<String, Object> itemHigh = getAlarmMapWithoutLevel(t, 6, t.getHighLimit3(), alarmDesc, alarmType);
                     list.add(itemHigh);
                 }
                 if (t.getLowLimit3() != null) {
-                    alarmDesc =  "告警级别：" + getAlarmLevel(2) + ";告警下限：" + t.getLowLimit3();
-                    Map<String, Object> itemLow = getAlarmMap(t, 7, t.getLowLimit3(), 2, alarmDesc, alarmType);
+                    alarmDesc =  "告警下限：" + t.getLowLimit3();
+                    Map<String, Object> itemLow = getAlarmMapWithoutLevel(t, 7, t.getLowLimit3(), alarmDesc, alarmType);
                     list.add(itemLow);
                 }
                 if (t.getHighLimit4() != null) {
-                    alarmDesc =  "告警级别：" + getAlarmLevel(3) + ";告警上限：" + t.getHighLimit4();
-                    Map<String, Object> itemHigh = getAlarmMap(t, 6, t.getHighLimit4(), 3, alarmDesc, alarmType);
+                    alarmDesc =  "告警上限：" + t.getHighLimit4();
+                    Map<String, Object> itemHigh = getAlarmMapWithoutLevel(t, 6, t.getHighLimit4(), alarmDesc, alarmType);
                     list.add(itemHigh);
                 }
                 if (t.getLowLimit4() != null) {
-                    alarmDesc =  "告警级别：" + getAlarmLevel(3) + ";告警下限：" + t.getLowLimit4();
-                    Map<String, Object> itemLow = getAlarmMap(t, 7, t.getLowLimit4(), 3, alarmDesc, alarmType);
+                    alarmDesc =  "告警下限：" + t.getLowLimit4();
+                    Map<String, Object> itemLow = getAlarmMapWithoutLevel(t, 7, t.getLowLimit4(), alarmDesc, alarmType);
                     list.add(itemLow);
                 }
             }
@@ -622,6 +622,54 @@ public class SendToUpSystemServices {
         item.put("alarm_type", alarmType);
         item.put("base_line_value", value);
         item.put("alarm_level", level);
+        return item;
+    }
+
+    /**
+     * Create alarm map WITH alarm_level field for 遥信 (tele-signal) points
+     */
+    public Map<String, Object> getAlarmMapWithLevel(TCruisePointInstanceMeteDetail detail, Integer rule,
+                                           Object value, Integer level, String alarmDesc, String alarmType) {
+        Map<String, Object> item = new HashMap<>(11);
+        if (Constant.standardPoints()){
+            item.put("device_id", detail.getDevicePointId());
+        } else {
+            item.put("device_id", detail.getInstanceId());
+        }
+        item.put("device_name", detail.getMeteName());
+        item.put("defect_type", "");
+        item.put("station_code", Constant.stationCode());
+        item.put("station_name", Constant.stationName());
+        item.put("decide_rule", rule);
+        item.put("decision_value_class", 1);
+        item.put("alarm_desc", alarmDesc);
+        item.put("alarm_type", alarmType);
+        item.put("base_line_value", value);
+        item.put("alarm_level", level);
+        return item;
+    }
+
+    /**
+     * Create alarm map WITHOUT alarm_level field for 遥测 (telemetry) points
+     */
+    public Map<String, Object> getAlarmMapWithoutLevel(TCruisePointInstanceMeteDetail detail, Integer rule,
+                                                     Object value, String alarmDesc, String alarmType) {
+        Map<String, Object> item = new HashMap<>(10);
+        if (Constant.standardPoints()){
+            item.put("device_id", detail.getDevicePointId());
+        } else {
+            item.put("device_id", detail.getInstanceId());
+        }
+        item.put("device_name", detail.getMeteName());
+        item.put("defect_type", "");
+        item.put("station_code", Constant.stationCode());
+        item.put("station_name", Constant.stationName());
+        item.put("decide_rule", rule);
+        item.put("decision_value_class", 1);
+        item.put("alarm_desc", alarmDesc);
+        item.put("alarm_type", alarmType);
+        item.put("base_line_value", value);
+        // Note: alarm_level is intentionally NOT included for telemetry points
         return item;
     }
 
