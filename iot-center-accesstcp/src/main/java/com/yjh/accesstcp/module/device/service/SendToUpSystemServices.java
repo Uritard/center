@@ -99,6 +99,12 @@ public class SendToUpSystemServices {
     private static final int ALARM_MAP_INITIAL_CAPACITY = 11;
     
     /**
+     * Measurement point type constants
+     */
+    private static final int METE_KIND_TELE_SIGNAL = 1;  // 遥信 (tele-signal)
+    private static final int METE_KIND_TELEMETRY = 2;    // 遥测 (telemetry)
+    
+    /**
      * Alarm level constants for 遥信 (tele-signal) points
      * Values above this threshold indicate a configured alarm level
      */
@@ -109,6 +115,7 @@ public class SendToUpSystemServices {
      */
     private static final int ALARM_LEVEL_NORMAL_CODE = 131;
     private static final int ALARM_LEVEL_SERIOUS_CODE = 132;
+    private static final int ALARM_LEVEL_CRITICAL_CODE = 133;
 
     public static final String DAY_FORMAT = ",'%Y-%m-%d')";
     public static final String WEEK_FORMAT = " ,'%u') + 1";
@@ -529,15 +536,15 @@ public class SendToUpSystemServices {
             String alarmType = recognitionTypeToAlarmType(t.getRecognitionType(), String.valueOf(t.getIsTemdif()));
             String alarmDesc = "";
             //遥信 (tele-signal) - requires alarm_level and includes it in output
-            if (t.getMeteKind() == 1 && t.getAlarmLevel() != null && t.getAlarmLevel() > ALARM_LEVEL_THRESHOLD) {
-                int alarmLevel = t.getAlarmLevel() == ALARM_LEVEL_NORMAL_CODE ? 1 : t.getAlarmLevel() == ALARM_LEVEL_SERIOUS_CODE ? 2 : 3;
+            if (t.getMeteKind() == METE_KIND_TELE_SIGNAL && t.getAlarmLevel() != null && t.getAlarmLevel() > ALARM_LEVEL_THRESHOLD) {
+                int alarmLevel = convertAlarmLevelCode(t.getAlarmLevel());
                 String alarmState = t.getAlarmState() == 0 ? t.getStateZero() : t.getStateOne();
                 alarmDesc = "告警级别：" + getAlarmLevel(alarmLevel) + ";告警状态：" + alarmState;
                 Map<String, Object> item = getAlarmMapWithLevel(t, 1, alarmState, alarmLevel, alarmDesc, alarmType);
                 list.add(item);
             }
             //遥测 (telemetry) - does NOT require alarm_level and does NOT include it in output
-            if (t.getMeteKind() == 2) {
+            if (t.getMeteKind() == METE_KIND_TELEMETRY) {
                 if (t.getHighLimit2() != null) {
                     alarmDesc =  "告警上限：" + t.getHighLimit2();
                     Map<String, Object> itemHigh = getAlarmMapWithoutLevel(t, 6, t.getHighLimit2(), alarmDesc, alarmType);
@@ -571,6 +578,21 @@ public class SendToUpSystemServices {
             }
         });
         return CreateModeXMLUtil.createXmlFile(list, path, "alarm_threshold_" + Constant.stationCode() + ".xml", "Alarm_Threshold");
+    }
+
+    /**
+     * Convert alarm level code (131, 132, 133) to internal level (1, 2, 3)
+     * @param alarmLevelCode the database alarm level code
+     * @return 1 for normal, 2 for serious, 3 for critical
+     */
+    private int convertAlarmLevelCode(int alarmLevelCode) {
+        if (alarmLevelCode == ALARM_LEVEL_NORMAL_CODE) {
+            return 1;  // 一般 (normal)
+        } else if (alarmLevelCode == ALARM_LEVEL_SERIOUS_CODE) {
+            return 2;  // 严重 (serious)
+        } else {
+            return 3;  // 危急 (critical) - includes ALARM_LEVEL_CRITICAL_CODE and any other value
+        }
     }
 
     private String getAlarmLevel(int alarmLevel) {
