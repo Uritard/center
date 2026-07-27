@@ -128,6 +128,20 @@
             limit 1
     </select>
 
+    <select id="selectRecentManualPatrolTask" resultType="com.yjh.platform.module.patrol.entity.UPatrolTask">
+        select
+            a.*
+        from u_patrol_task a
+        where a.task_type = #{taskType, jdbcType=INTEGER}
+          and a.execute_type = #{executeType, jdbcType=INTEGER}
+          <!-- task_source=1 为下级系统主动创建并上报的任务，不参与本级手动巡视2小时归并 -->
+          and (a.task_source is null or a.task_source != 1)
+          and a.start_time <![CDATA[<=]]> #{executeTime, jdbcType=TIMESTAMP}
+          and a.start_time <![CDATA[>=]]> DATE_SUB(#{executeTime, jdbcType=TIMESTAMP}, INTERVAL 2 HOUR)
+        order by a.start_time desc, a.create_time desc
+        limit 1
+    </select>
+
     <select id="select" parameterType="com.yjh.platform.module.patrol.entity.UPatrolTask" resultType="com.yjh.platform.module.patrol.entity.UPatrolTask">
         select
         a.task_id,
