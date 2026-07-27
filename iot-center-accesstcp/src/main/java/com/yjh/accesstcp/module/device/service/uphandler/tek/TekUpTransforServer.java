@@ -93,7 +93,7 @@ public class TekUpTransforServer {
             map.put("device_list", deviceIdList);
             log.info("This is a normal task！！！！！！！！！！！！！");
             map.put("plan_code", taskPlan.getPlanNo());
-            // 任务类型 1 例行  2 特殊  3 专项巡视  4 自定义巡视
+            // 任务类型 1 例行  2 特殊  3 专项巡视  4 手动巡视
             map.put("type", "4");
             // 优先级
             map.put("priority", "2");

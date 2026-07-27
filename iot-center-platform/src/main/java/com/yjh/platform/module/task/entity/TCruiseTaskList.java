@@ -91,7 +91,7 @@ public class TCruiseTaskList implements Serializable {
     @ApiModelProperty(value = "是否支持红外巡视")
     private Integer ifInferad;
 
-    @ApiModelProperty(value = "是否支持人工巡视")
+    @ApiModelProperty(value = "是否支持手动巡检")
     private Integer ifArtificial;
 
     @ApiModelProperty(value = "结果分析")

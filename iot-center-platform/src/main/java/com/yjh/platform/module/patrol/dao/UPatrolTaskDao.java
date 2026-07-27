@@ -33,6 +33,9 @@ public interface UPatrolTaskDao {
     int update(UPatrolTask uPatrolTask);
     UPatrolTask selectByPrimaryId(@Param(value = "taskId") String taskId);
     UPatrolTask selectThisTaskByTaskCode(@Param(value = "taskCode") String taskCode, @Param(value = "executeTime") Date executeTime);
+    UPatrolTask selectRecentManualPatrolTask(@Param(value = "executeTime") Date executeTime,
+                                             @Param(value = "taskType") Integer taskType,
+                                             @Param(value = "executeType") Integer executeType);
     List<UPatrolTask> select(@Param(value = "taskId") String taskId,
                              @Param(value = "taskCode") String taskCode,
                              @Param(value = "taskName") String taskName,

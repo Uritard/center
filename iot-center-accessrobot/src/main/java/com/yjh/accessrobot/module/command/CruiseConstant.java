@@ -28,7 +28,7 @@ public interface CruiseConstant {
      */
     int SPECIAL_PROJECT_PATROL = 217;
     /**
-     * 巡视类型，自定义巡视
+     * 巡视类型，手动巡视
      */
     int CUSTOM_PATROL = 218;
     /**

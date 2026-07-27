@@ -107,6 +107,9 @@ public class UPatrolTaskService {
     public static final String SUBSET = "--subset";
     public static final String REISSUE_PREFIX = "reissue_result";
     private static final String OFF_LINE = "离线";
+    private static final int MANUAL_PATROL_TASK_TYPE = 218;
+    private static final int MANUAL_PATROL_PLAN_TYPE = 4;
+    private static final String MANUAL_PATROL_TASK_NAME_PREFIX = "手动巡视_";
     public static final Map<String, Object> MAP_LOCK = new ConcurrentHashMap<>();
     /**
      / 限流 10s一次
@@ -201,6 +204,30 @@ public class UPatrolTaskService {
      * @return 任务执行ID
      */
     public Map<String,Object> addTask(TCruiseTaskAdd tCruiseTaskAdd, Boolean issueFlag){
+        if (isManualPatrolTask(tCruiseTaskAdd)) {
+            Date executeTime = Optional.ofNullable(tCruiseTaskAdd.getStartTime()).orElse(new Date());
+            Integer taskType = MANUAL_PATROL_TASK_TYPE;
+            Integer executeType = TaskTypeEnum.NOW.getType();
+            UPatrolTask recentTask = uPatrolTaskDao.selectRecentManualPatrolTask(executeTime, taskType, executeType);
+            if (Objects.nonNull(recentTask)) {
+                String manualKey = PATROL_SUMMARY_PREFIX + recentTask.getTaskId();
+                Map<String,Object> manualTaskMap = redisTemplate.opsForHash().entries(manualKey);
+                if (MapUtils.isEmpty(manualTaskMap)) {
+                    List<Long> instanceList = uPatrolTaskDao.selectInsByTask(recentTask.getTaskId());
+                    if (CollectionUtils.isNotEmpty(instanceList)) {
+                        initializeTaskInfo(instanceList, recentTask, false);
+                    }
+                    manualTaskMap = redisTemplate.opsForHash().entries(manualKey);
+                }
+                if (MapUtils.isNotEmpty(manualTaskMap)) {
+                    log.info("手动巡视2小时内归并到已有任务, taskId: {}", recentTask.getTaskId());
+                    return manualTaskMap;
+                }
+                log.warn("手动巡视归并任务缓存重建失败，创建新任务，taskId: {}", recentTask.getTaskId());
+            }
+            tCruiseTaskAdd.setTaskName(MANUAL_PATROL_TASK_NAME_PREFIX + DateTimeUtil.format3(executeTime));
+        }
+
         // insert 需要走事物，使用 AopContext.currentProxy 获取当前代理，走事物处理
         UPatrolTaskService proxy = SpringBeanUtils.getBean(UPatrolTaskService.class);
         assert proxy != null;
@@ -213,6 +240,24 @@ public class UPatrolTaskService {
         Map<String,Object> taskMap = redisTemplate.opsForHash().entries(key);
 
         return taskMap;
+    }
+
+    private boolean isManualPatrolTask(TCruiseTaskAdd tCruiseTaskAdd) {
+        if (Objects.isNull(tCruiseTaskAdd) || !Objects.equals(TaskTypeEnum.NOW.getType(), tCruiseTaskAdd.getIfRun())) {
+            return false;
+        }
+        if (Objects.nonNull(tCruiseTaskAdd.getPlanId())) {
+            return false;
+        }
+        if (StringUtils.isNotBlank(tCruiseTaskAdd.getTaskCode())) {
+            return false;
+        }
+        Integer type = tCruiseTaskAdd.getType();
+        if (Objects.isNull(type)) {
+            return true;
+        }
+        // type = 4 表示上送报文中的手动巡视“预案类型”编码；type = 218 表示平台落库后的手动巡视“任务类型”编码
+        return Objects.equals(MANUAL_PATROL_PLAN_TYPE, type) || Objects.equals(MANUAL_PATROL_TASK_TYPE, type);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -471,8 +516,8 @@ public class UPatrolTaskService {
                     taskType = INITIAL_PATROL;
                     break;
                 default:
-                    //自定义巡视
-                    taskType = 218;
+                    //手动巡视
+                    taskType = MANUAL_PATROL_TASK_TYPE;
             }
             uPatrolTask.setTaskType(taskType);
             String[] deviceInstancesFromUpperSystem = StringUtils.isEmpty(tCruiseTaskAdd.getDeviceList())
@@ -4011,8 +4056,8 @@ public class UPatrolTaskService {
                 taskType = 217;
                 break;
             default:
-                //自定义巡视
-                taskType = 218;
+                //手动巡视
+                taskType = MANUAL_PATROL_TASK_TYPE;
         }
         String[] deviceInstancesFromUpperSystem = tCruiseTaskAdd.getDeviceList().split(",");
         for (String item : deviceInstancesFromUpperSystem) {

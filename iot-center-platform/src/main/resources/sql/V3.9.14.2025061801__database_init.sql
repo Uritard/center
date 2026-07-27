@@ -1223,7 +1223,7 @@ CREATE TABLE `t_cruise_task_attr` (
   `if_robot` int(11) DEFAULT '1' COMMENT '是否支持机器人巡视',
   `if_video` int(11) DEFAULT '1' COMMENT '是否支持视频巡视',
   `if_inferad` int(11) DEFAULT '1' COMMENT '是否支持红外巡视',
-  `if_artificial` int(11) DEFAULT '1' COMMENT '是否支持人工巡视',
+  `if_artificial` int(11) DEFAULT '1' COMMENT '是否支持手动巡检',
   PRIMARY KEY (`task_id`,`instance_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='任务关联表';
 

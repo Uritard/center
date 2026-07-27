@@ -461,7 +461,7 @@ INSERT INTO `t_dict_business` VALUES ('300100', '214', 'plan_type', '例行巡�
 INSERT INTO `t_dict_business` VALUES ('300101', '215', 'plan_type', '熄灯巡视', '0', '巡视类型', '3');
 INSERT INTO `t_dict_business` VALUES ('300102', '216', 'plan_type', '特殊巡视', '2', '巡视类型', '4');
 INSERT INTO `t_dict_business` VALUES ('300103', '217', 'plan_type', '专项巡视', '3', '巡视类型', '5');
-INSERT INTO `t_dict_business` VALUES ('300104', '218', 'plan_type', '自定义巡视', '4', '巡视类型', '6');
+INSERT INTO `t_dict_business` VALUES ('300104', '218', 'plan_type', '手动巡视', '4', '巡视类型', '6');
 INSERT INTO `t_dict_business` VALUES ('300105', '219', 'mete_type', '位置状态识别', '2', '巡视内容', '2');
 INSERT INTO `t_dict_business` VALUES ('300106', '220', 'mete_type', '外观缺陷识别', '3', '巡视内容', '3');
 INSERT INTO `t_dict_business` VALUES ('300107', '221', 'mete_type', '表计读数', '1', '巡视内容', '1');
